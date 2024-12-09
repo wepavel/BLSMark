@@ -22,3 +22,25 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+
+# Определяем базовую директорию для выходных файлов
+BASE_DIR = $$PWD/target
+
+# Настройка для Debug и Release конфигураций
+CONFIG(debug, debug|release) {
+    DESTDIR = $$BASE_DIR/debug
+} else {
+    DESTDIR = $$BASE_DIR/release
+}
+
+# Устанавливаем выходную директорию для промежуточных файлов
+OBJECTS_DIR = $$BASE_DIR/.obj
+MOC_DIR = $$BASE_DIR/.moc
+RCC_DIR = $$BASE_DIR/.rcc
+UI_DIR = $$BASE_DIR/.ui
+
+# Настройка post-build для Release конфигурации
+CONFIG(release, debug|release) {
+    QMAKE_POST_LINK = $$(QTDIR)/bin/windeployqt $$DESTDIR/$$TARGET.exe
+}
