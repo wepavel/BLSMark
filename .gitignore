@@ -3,6 +3,9 @@
 
 *~
 *.autosave
+*.pdf
+*.eps
+*.zip
 *.a
 *.core
 *.moc
@@ -76,4 +79,5 @@ CMakeLists.txt.user*
 # Directories with generated files
 /build*/
 /target*/
+/test_resources*/
 .qtc_clangd/

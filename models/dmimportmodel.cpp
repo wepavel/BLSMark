@@ -1,0 +1,106 @@
+#include "dmimportmodel.h"
+
+DMImportModel::DMImportModel(QObject *parent)
+    : QAbstractTableModel(parent)
+{}
+
+QVariant DMImportModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole)
+        return QVariant();
+
+    if (orientation == Qt::Horizontal) {
+        switch (static_cast<Column>(section)) {
+
+        // case Column::Number: return tr("№");
+        // case Column::Code: return tr("C");
+        // case Column::Page: return tr("Страница");
+        // case Column::DataMatrix: return tr("Data Matrix");
+            case Column::NumPageColumn: return tr("№ страницы");
+            case Column::CodeColumn: return tr("Код");
+            case Column::ImgColumn: return tr("Base64");
+            default: return QVariant();
+        }
+    } else if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
+        return section+1;
+    }
+    return QVariant();
+}
+
+int DMImportModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    return m_data.size();
+}
+
+int DMImportModel::columnCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    return static_cast<int>(Column::ColumnCount);
+}
+
+QVariant DMImportModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid() || role != Qt::DisplayRole)
+        return QVariant();
+
+    const RowData &rowData = m_data[index.row()];
+    switch (static_cast<Column>(index.column())) {
+        case Column::NumPageColumn: return rowData.page;
+        case Column::CodeColumn: return rowData.code;
+        case Column::ImgColumn: return rowData.imgBase64;
+    // case Column::Number: return index.row() + 1;
+    // case Column::Code: return rowData.code;
+    // case Column::Page: return rowData.page;
+    // case Column::DataMatrix: return rowData.dataMatrix;
+    default: return QVariant();
+    }
+}
+
+bool DMImportModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role != Qt::EditRole || !index.isValid())
+        return false;
+
+    RowData &rowData = m_data[index.row()];
+    switch (static_cast<Column>(index.column())) {
+    case Column::NumPageColumn:
+        rowData.page = value.toInt();
+        break;
+    case Column::CodeColumn:
+        rowData.code = value.toString();
+        break;
+    case Column::ImgColumn:
+        rowData.imgBase64 = value.toString();
+        break;
+    default:
+        return false;
+    }
+
+    emit dataChanged(index, index, {role});
+    return true;
+}
+
+Qt::ItemFlags DMImportModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+}
+
+void DMImportModel::addRow(const QString &code, int page, const QString &imgBase64)
+{
+    beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
+    m_data.append({page, code, imgBase64});
+    endInsertRows();
+}
+
+void DMImportModel::clear()
+{
+    beginResetModel();
+    m_data.clear();
+    endResetModel();
+}

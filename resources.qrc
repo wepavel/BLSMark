@@ -1,0 +1,60 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>img/bls_logo.png</file>
+        <file>img/mark.png</file>
+        <file>ico/bls_ico.ico</file>
+        <file>img/img_placeholder.png</file>
+        <file>img/mark_full.png</file>
+    </qresource>
+    <qresource prefix="/qss_icons">
+        <file>styles/qdarkstyle/rc/branch_closed.png</file>
+        <file>styles/qdarkstyle/rc/branch_closed-on.png</file>
+        <file>styles/qdarkstyle/rc/branch_open.png</file>
+        <file>styles/qdarkstyle/rc/branch_open-on.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_checked.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_checked_disabled.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_checked_focus.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_indeterminate.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_indeterminate_disabled.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_indeterminate_focus.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_unchecked.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_unchecked_disabled.png</file>
+        <file>styles/qdarkstyle/rc/checkbox_unchecked_focus.png</file>
+        <file>styles/qdarkstyle/rc/close.png</file>
+        <file>styles/qdarkstyle/rc/close-button.svg</file>
+        <file>styles/qdarkstyle/rc/close-button-disabled.svg</file>
+        <file>styles/qdarkstyle/rc/close-hover.png</file>
+        <file>styles/qdarkstyle/rc/close-pressed.png</file>
+        <file>styles/qdarkstyle/rc/down_arrow.png</file>
+        <file>styles/qdarkstyle/rc/down_arrow_disabled.png</file>
+        <file>styles/qdarkstyle/rc/drag.png</file>
+        <file>styles/qdarkstyle/rc/Hmovetoolbar.png</file>
+        <file>styles/qdarkstyle/rc/Hsepartoolbar.png</file>
+        <file>styles/qdarkstyle/rc/left_arrow.png</file>
+        <file>styles/qdarkstyle/rc/left_arrow_disabled.png</file>
+        <file>styles/qdarkstyle/rc/radio_checked.png</file>
+        <file>styles/qdarkstyle/rc/radio_checked_disabled.png</file>
+        <file>styles/qdarkstyle/rc/radio_checked_focus.png</file>
+        <file>styles/qdarkstyle/rc/radio_unchecked.png</file>
+        <file>styles/qdarkstyle/rc/radio_unchecked_disabled.png</file>
+        <file>styles/qdarkstyle/rc/radio_unchecked_focus.png</file>
+        <file>styles/qdarkstyle/rc/right_arrow.png</file>
+        <file>styles/qdarkstyle/rc/right_arrow_disabled.png</file>
+        <file>styles/qdarkstyle/rc/select.png</file>
+        <file>styles/qdarkstyle/rc/sizegrip.png</file>
+        <file>styles/qdarkstyle/rc/stylesheet-branch-end.png</file>
+        <file>styles/qdarkstyle/rc/stylesheet-branch-more.png</file>
+        <file>styles/qdarkstyle/rc/stylesheet-vline.png</file>
+        <file>styles/qdarkstyle/rc/transparent.png</file>
+        <file>styles/qdarkstyle/rc/undock.png</file>
+        <file>styles/qdarkstyle/rc/up_arrow.png</file>
+        <file>styles/qdarkstyle/rc/up_arrow_disabled.png</file>
+        <file>styles/qdarkstyle/rc/Vmovetoolbar.png</file>
+        <file>styles/qdarkstyle/rc/Vsepartoolbar.png</file>
+        <file>styles/qdarkstyle/rc/zoom.png</file>
+    </qresource>
+    <qresource prefix="/styles">
+        <file>styles/qdarkstyle/style.qss</file>
+        <file>styles/qlightstyle/style.qss</file>
+    </qresource>
+</RCC>

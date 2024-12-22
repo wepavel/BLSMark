@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -17,7 +18,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
 private:
+    //---Vars
     Ui::MainWindow *ui;
+    QString style = "dark";
+
+
+    //---Funcs
+    void fill_logo();
+    void toggle_theme();
 };
 #endif // MAINWINDOW_H
