@@ -1,13 +1,18 @@
 #include "dmimportform.h"
 #include "ui_dmimportform.h"
-#include <QDir>
+
 #include <QFileDialog>
 #include <QProcess>
 #include <QtConcurrent>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QListView>
+#include <QTreeView>
 
 #include "widgets/dminfoform.h"
+#include "sqlmodels/dmcodemodel.h"
+
+
 
 DMImportForm::DMImportForm(QWidget *parent)
     : QWidget(parent)
@@ -18,6 +23,20 @@ DMImportForm::DMImportForm(QWidget *parent)
 
     setAcceptDrops(true);
     setupImportTable();
+
+    if (db.createTable<DMCodeModel>()) {
+        qDebug() << "User table created successfully";
+    } else {
+        qDebug() << "Failed to create DMCodeModel table";
+    }
+
+    // m_db->setDatabaseName(gSettings.getAppPath()+"/mydb.sqlite");
+    // m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
+    // m_db->setDatabaseName(gSettings.getAppPath() + "/mydb.sqlite");
+
+    // if (!m_db->open()) {
+    //     qDebug() << "Error opening database:" << m_db->lastError().text();
+    // }
 }
 
 DMImportForm::~DMImportForm()
@@ -26,55 +45,146 @@ DMImportForm::~DMImportForm()
 }
 
 
+void DMImportForm::saveImage(const QString &code, const QString &base64Image)
+{
+    QFuture<bool> future = QtConcurrent::run(&DMImportForm::writeImageToDisk, code, base64Image);
+
+    // Опционально: если нужно отслеживать завершение операции
+    // QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>(this);
+    // watcher->setFuture(future);
+    // connect(watcher, &QFutureWatcher<void>::finished, this, &ImageManager::onImageSaved);
+}
 //-----------------------PRIVATE SLOTS-----------------------
 void DMImportForm::on_pb_load_file_clicked()
 {
-    QStringList file_paths = QFileDialog::getOpenFileNames(
+    QStringList gsPath;
+    gsPath << "--gs-path" << gSettings.getAppPath()+"/process/gs/gs10.04.0/bin/gswin64c.exe";
+    QStringList filePaths = QFileDialog::getOpenFileNames(
         this,
         tr("Открыть файл"),
-        QDir::homePath(),
-        tr("PDF файлы (*.pdf);;EPS Файлы (*.eps)")
+        lastUsedDirectory,
+        tr("PDF и EPS файлы (*.pdf *.eps);;PDF файлы (*.pdf);;EPS Файлы (*.eps);;Все файлы (*)")
         );
-    if (!file_paths.isEmpty()) {
-        startReadDm(pdf_importer_path, file_paths);
+    if (!filePaths.isEmpty()) {
+        lastUsedDirectory = QFileInfo(filePaths.first()).path();
+        gsPath.append(filePaths);
+        startReadDm(pdf_importer_path, gsPath);
+    }
+}
+
+void DMImportForm::on_pb_load_dir_clicked()
+{
+    QStringList gsPath;
+    gsPath << "--gs-path" << gSettings.getAppPath()+"/process/gs/gs10.04.0/bin/gswin64c.exe";
+
+    QString selectedDir = QFileDialog::getExistingDirectory(
+        this,
+        tr("Выберите директорию"),
+        QDir::homePath(),
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+    if (!selectedDir.isEmpty()) {
+        // lastUsedDirectory = QFileInfo(selectedDir.first()).path();
+        gsPath.append(selectedDir);
+        startReadDm(pdf_importer_path, gsPath);
     }
 }
 
 void DMImportForm::init_process()
 {
     qDebug() << "init_process";
-    progressDialog = new QProgressDialog("Импорт кодов...", "Отмена", 0, 100, this);
-    progressDialog->setWindowModality(Qt::WindowModal);
-    progressDialog->setMinimumDuration(0);
-    progressDialog->setValue(0);
-    progressDialog->exec();
+    // progressDialog = new QProgressDialog("Импорт кодов...", "Отмена", 0, 100, this);
+
+    // progressDialog->setWindowModality(Qt::WindowModal);
+    // progressDialog->setMinimumDuration(0);
+    // progressDialog->setValue(0);
+    // progressDialog->exec();
+    m_doubleProgressDialog = new DoubleProgressDialog();
+    m_doubleProgressDialog->exec();
+
+    ui->tw_dm_codes->horizontalHeader()->setSectionResizeMode(DMImportModel::CodeColumn, QHeaderView::ResizeToContents);
 }
 
 void DMImportForm::recieve_dm_data(QString row)
 {
     // qDebug() << row;
+    row.replace("Payload: ", "");
     QStringList cols = row.split("|");
 
-    if (progressDialog->value()<100) {
-        progressDialog->setValue(cols.value(2).toInt());
-    }
+    quint8 docs_progress = cols.value(0).toUInt(); //Прогресс всех документов
+    quint8 doc_progress = cols.value(1).toUInt(); //Прогресс в одном документе
+    QString dm_code = cols.value(2);
+    QString file_path = cols.value(3);
+    QString img_base64 = cols.value(4);
 
-    importModel->addRow(cols.value(3), cols.value(1).toInt(), cols.value(4));
+    qDebug() << "Doc progress: " << doc_progress << "; Docs progress: " << docs_progress;
+
+    // auto x = 1;
+    // if (progressDialog->value()<100) {
+    //     progressDialog->setValue(docs_progress);
+    // }
+
+    // if (m_doubleProgressDialog->getFileProgress()<100) {
+    //     m_doubleProgressDialog->setFileProgress(doc_progress);
+    // }
+    m_doubleProgressDialog->setFileProgress(doc_progress);
+    // if (m_doubleProgressDialog->getFilesProgress()<100) {
+    //     m_doubleProgressDialog->setFilesProgress(docs_progress);
+    // }
+    m_doubleProgressDialog->setFilesProgress(docs_progress);
+    // DMCodeModel new_code(code, QString("%1.png").arg(getHashForCode(code)));
+
+    // QSqlQuery query(*m_db);
+
+    // auto dt = QDateTime::currentDateTime();
+    // QString request = QString("INSERT INTO %1 (code, img_path, import_date) VALUES ('sss', %2, '2024-12-23 11:48:42')")
+    //                       .arg("dmcodes", code, getHashForCode(code), dt.toString());
+    // query.prepare(request);
+
+    // qDebug() << "Exec query: " << query.exec();
+    // if (db.insert(new_code)) {
+    //     qDebug() << "New code inserted successfully";
+    // } else {
+    //     qDebug() << "New code not inserted";
+    // }
+    saveImage(dm_code, img_base64);
+
+    importModel->addRow(dm_code, file_path, img_base64);
 
     // if (progressDialog->wasCanceled()) {
     //     // Здесь логика для прерывания процесса
     // }
 }
 
+void DMImportForm::recieve_err_data(QString row)
+{
+    qDebug() << row;
+}
+
 void DMImportForm::complete_process()
 {
     qDebug() << "Complete process";
 
-    progressDialog->close();
-    if(progressDialog != nullptr) {
-        delete progressDialog;
-        progressDialog = nullptr;
-    }
+    // progressDialog->close();
+    // connect(progressDialog, &QProgressDialog::destroyed, this, [this](){
+    //     ui->tw_dm_codes->horizontalHeader()->setSectionResizeMode(DMImportModel::CodeColumn, QHeaderView::Interactive);;
+    //     qDebug() << "Progress dialog has been destroyed";
+    // });
+    // progressDialog->deleteLater();
+    m_doubleProgressDialog->setFileProgress(100);
+    m_doubleProgressDialog->setFilesProgress(100);
+    m_doubleProgressDialog->close();
+    connect(m_doubleProgressDialog, &QProgressDialog::destroyed, this, [this](){
+        ui->tw_dm_codes->horizontalHeader()->setSectionResizeMode(DMImportModel::CodeColumn, QHeaderView::Interactive);;
+        qDebug() << "Progress dialog has been destroyed";
+    });
+    m_doubleProgressDialog->deleteLater();
+
+    // connect(progressDialog, &QProgressDialog::c)
+    // if(progressDialog != nullptr) {
+    //     delete progressDialog;
+    //     progressDialog = nullptr;
+    // }
 }
 //-----------------------PRIVATE SLOTS-----------------------
 void DMImportForm::startReadDm(const QString &program, const QStringList &arguments)
@@ -85,7 +195,7 @@ void DMImportForm::startReadDm(const QString &program, const QStringList &argume
         QProcess process;
         process.setProcessChannelMode(QProcess::MergedChannels);
         // TODO сделать загрузку нескольких файлов
-        process.start(program, QStringList() << arguments.value(0));
+        process.start(program, arguments);
 
         if (process.waitForStarted())
         {
@@ -103,8 +213,13 @@ void DMImportForm::startReadDm(const QString &program, const QStringList &argume
 
                         if (!line.isEmpty()) {
                             QString lineStr = QString::fromUtf8(line).trimmed();
-                            QMetaObject::invokeMethod(this, "recieve_dm_data",
-                                                      Qt::QueuedConnection, Q_ARG(QString, lineStr));
+                            if(lineStr.startsWith("Payload: ")) {
+                                QMetaObject::invokeMethod(this, "recieve_dm_data",
+                                                          Qt::QueuedConnection, Q_ARG(QString, lineStr));
+                            } else {
+                                QMetaObject::invokeMethod(this, "recieve_err_data",
+                                                          Qt::QueuedConnection, Q_ARG(QString, lineStr));
+                            }
                         }
                     }
                 }
@@ -124,12 +239,88 @@ void DMImportForm::startReadDm(const QString &program, const QStringList &argume
     connect(watcher, &QFutureWatcher<void>::destroyed, this, [](){qDebug() << "Watcher destroyed";});
 }
 
+// void DMImportForm::startReadDm(const QString &program, const QStringList &arguments)
+// {
+//     importModel->clear();
+
+//     QFuture<void> future = QtConcurrent::run([=]() {
+//         QProcess process;
+//         process.setProcessChannelMode(QProcess::SeparateChannels);
+//         process.start(program, arguments);
+
+//         if (process.waitForStarted())
+//         {
+//             QMetaObject::invokeMethod(this, "init_process",
+//                                       Qt::QueuedConnection);
+
+//             QByteArray stdoutBuffer;
+//             QByteArray stderrBuffer;
+
+//             while (process.state() == QProcess::Running) {
+//                 process.waitForReadyRead(100); // Wait for 100ms
+
+//                 // Handle stdout
+//                 if (process.bytesAvailable()) {
+//                     stdoutBuffer += process.readAllStandardOutput();
+//                     int lineEnd;
+//                     while ((lineEnd = stdoutBuffer.indexOf('\n')) != -1) {
+//                         QByteArray line = stdoutBuffer.left(lineEnd);
+//                         stdoutBuffer = stdoutBuffer.mid(lineEnd + 1);
+
+//                         if (!line.isEmpty()) {
+//                             QString lineStr = QString::fromUtf8(line).trimmed();
+//                             QMetaObject::invokeMethod(this, "recieve_dm_data",
+//                                                       Qt::QueuedConnection, Q_ARG(QString, lineStr));
+//                         }
+//                     }
+//                 }
+
+//                 // Handle stderr
+//                 if (process.bytesAvailable()) {
+//                     stderrBuffer += process.readAllStandardError();
+//                     int lineEnd;
+//                     while ((lineEnd = stderrBuffer.indexOf('\n')) != -1) {
+//                         QByteArray line = stderrBuffer.left(lineEnd);
+//                         stderrBuffer = stderrBuffer.mid(lineEnd + 1);
+
+//                         if (!line.isEmpty()) {
+//                             QString lineStr = QString::fromUtf8(line).trimmed();
+//                             QMetaObject::invokeMethod(this, "recieve_err_data",
+//                                                       Qt::QueuedConnection, Q_ARG(QString, lineStr));
+//                         }
+//                     }
+//                 }
+//             }
+//             QMetaObject::invokeMethod(this, "complete_process", Qt::QueuedConnection);
+//         }
+//         else
+//         {
+//             QMetaObject::invokeMethod(this, "processError", Qt::QueuedConnection,
+//                                       Q_ARG(QString, "Failed to start process: " + process.errorString()));
+//         }
+//     });
+
+//     QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
+//     watcher->setFuture(future);
+//     connect(watcher, &QFutureWatcher<void>::finished, watcher, &QFutureWatcher<void>::deleteLater);
+//     connect(watcher, &QFutureWatcher<void>::destroyed, this, [](){qDebug() << "Watcher destroyed";});
+// }
+
 void DMImportForm::setupImportTable()
 {
+    // ui->tw_dm_codes->setToolTip("");
+    // ui->tw_dm_codes->viewport()->setToolTip("");
+
+    // Использование:
+    // ui->tw_dm_codes->setItemDelegate(new NoEmptyAreaTooltipDelegate(ui->tw_dm_codes));
+
+
     ui->tw_dm_codes->setModel(importModel);
     ui->tw_dm_codes->hideColumn(DMImportModel::ImgColumn);
     ui->tw_dm_codes->horizontalHeader()->setStretchLastSection(true); // растянуть последнюю секцию (это свойство можно задать и просто в дизайнере)
-    ui->tw_dm_codes->horizontalHeader()->setSectionResizeMode(DMImportModel::NumPageColumn, QHeaderView::ResizeToContents);
+
+    ui->tw_dm_codes->horizontalHeader()->setSectionResizeMode(DMImportModel::CodeColumn, QHeaderView::Interactive);
+    ui->tw_dm_codes->horizontalHeader()->setSectionResizeMode(DMImportModel::CodeColumn, QHeaderView::ResizeToContents);
     ui->tw_dm_codes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tw_dm_codes->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tw_dm_codes->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -144,13 +335,40 @@ void DMImportForm::setupImportTable()
         // Создаем список для хранения значений всех столбцов
         QStringList rowData;
 
-        QModelIndex pageIdx = model->index(row, DMImportModel::NumPageColumn);
+
         QModelIndex codeIdx = model->index(row, DMImportModel::CodeColumn);
+        QModelIndex filenameIdx = model->index(row, DMImportModel::FilenameColumn);
         QModelIndex imgIdx = model->index(row, DMImportModel::ImgColumn);
-        qDebug() << "Page: " << model->data(pageIdx).toInt() << "; Code: " << model->data(codeIdx).toString();
+        // qDebug() << "Page: " << model->data(pageIdx).toInt() << "; Code: " << model->data(codeIdx).toString();
+
+        // auto x = db.findById<DMCodeModel>(1);
+
+        // auto entity = db.findByCode<DMCodeModel>(model->data(codeIdx).toString());
+        // std::unique_ptr<DMCodeModel> entity = db.findByCode<DMCodeModel>(model->data(codeIdx).toString());
+        // QString raw_ptr = entity->m_code;
+        // DMCodeModel value = *raw_ptr;
+
+        // if (entity) {
+        //     // Объект найден
+        //     qDebug() << "Found entity with code:" << entity->m_code;
+        // } else {
+        //     // Объект не найден
+        //     qDebug() << "Entity not found";
+        // }
+
 
         QDialog dialog;
-        QWidget *widget = new DMInfoForm(model->data(codeIdx).toString(), model->data(imgIdx).toString(), &dialog);
+
+
+        QPixmap pixmap(gSettings.getAppPath() + "/DataMatrixImages/" + getHashForCode(model->data(codeIdx).toString()));
+        QWidget *widget;
+        if (pixmap.isNull()) {
+            widget = new DMInfoForm(model->data(codeIdx).toString(), QString(), &dialog);
+        } else {
+            // Использование загруженного изображения
+            widget = new DMInfoForm(model->data(codeIdx).toString(), pixmap, &dialog);
+        }
+
         QVBoxLayout *layout = new QVBoxLayout(&dialog);
         layout->addWidget(widget);
         dialog.setLayout(layout);
@@ -160,4 +378,43 @@ void DMImportForm::setupImportTable()
         int result = dialog.exec();
     });
 }
+
+
+bool DMImportForm::writeImageToDisk(const QString &code, const QString &base64Image)
+{
+    // Создаем директорию для сохранения, если она не существует
+    QString saveDir = gSettings.getAppPath() + "/DataMatrixImages";
+    QDir().mkpath(saveDir);
+
+    QString codeHash = getHashForCode(code);
+    QString fileName = saveDir + "/" + codeHash + ".png";
+    QByteArray imageData = QByteArray::fromBase64(base64Image.toUtf8());
+
+    if (QFile::exists(fileName)) {
+        qDebug() << "Image already exists:" << fileName;
+        return true;  // Возвращаем true, так как файл уже существует
+    }
+
+    QImage image;
+    if (!image.loadFromData(imageData)) {
+        qDebug() << "Failed to load image from data";
+        return false;
+    }
+
+    if (!image.save(fileName, "PNG")) {
+        qDebug() << "Failed to save image to" << fileName;
+        return false;
+    }
+
+    qDebug() << "Image saved successfully to" << fileName;
+    return true;
+}
+
+QString DMImportForm::getHashForCode(const QString &code)
+{
+    return QCryptographicHash::hash(code.toUtf8(), QCryptographicHash::Sha256).toHex();
+}
+
+
+
 

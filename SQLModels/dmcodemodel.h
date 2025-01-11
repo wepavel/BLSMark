@@ -4,40 +4,60 @@
 #include <QStringList>
 #include <QVariantMap>
 #include <QDateTime>
+#include <QObject>
 
 #include "sqlmodels/baseentity.h"
 
 
-class DMCodeModel : public BaseEntity
+class DMCodeModel : public QObject, public BaseEntity
 {
+    Q_OBJECT
 public:
-    QString id;  // Изменено на QString для ULID
-    QString code;
-    QString img_base64;
-    QDateTime import_date;
+    explicit DMCodeModel(QObject *parent = nullptr)
+        : QObject(parent)
+        , m_id(0)
+        , m_import_date(QDateTime::currentDateTime())
+    {}
 
-    DMCodeModel() : import_date(QDateTime::currentDateTime()) {}  // Конструктор по умолчанию
+    explicit DMCodeModel(const QString &code, const QString &img_path = QString(), QObject *parent = nullptr)
+        : QObject(parent)
+        , m_id(0)
+        , m_code(code)
+        , m_img_path(img_path)
+        , m_import_date(QDateTime::currentDateTime())
+    {}
+
+    int m_id;
+    QString m_code;
+    QString m_img_path;
+    QDateTime m_import_date;
+
+    // DMCodeModel() : m_import_date(QDateTime::currentDateTime()) {}  // Конструктор по умолчанию
 
     QString tableName() const override { return "dmcodes"; }
 
     QStringList fields() const override {
-        return {"id", "code", "img_base64", "import_date"};
+        return {"id", "code", "img_path", "import_date"};
     }
 
     QVariantMap toMap() const override {
         return {
-            {"id", id},
-            {"code", code},
-            {"img_base64", img_base64},
-            {"import_date", import_date}
+            {"id", m_id},
+            {"code", m_code},
+            {"img_path", m_img_path},
+            {"import_date", m_import_date}
         };
     }
 
     void fromMap(const QVariantMap& map) override {
-        id = map["id"].toString();  // Изменено на toString() для ULID
-        code = map["code"].toString();
-        img_base64 = map["img_base64"].toString();
-        import_date = map["import_date"].toDateTime();
+        m_id = map["id"].toInt();
+        m_code = map["code"].toString();
+        m_img_path = map["img_path"].toString();
+        m_import_date = map["import_date"].toDateTime();
+    }
+
+    QStringList uniqueFields() const override {
+        return {"code", "img_path"};
     }
 };
 

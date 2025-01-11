@@ -5,7 +5,7 @@
 #include <QProcess>
 #include <QFutureWatcher>
 #include <QProgressDialog>
-
+#include <QDir>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
@@ -13,7 +13,8 @@
 
 #include "core/globalsettings.h"
 #include "models/dmimportmodel.h"
-#include "crud/crudbase.h"
+#include "crud/cruddmcode.h"
+#include "dialogs/doubleprogressdialog.h"
 
 namespace Ui {
 class DMImportForm;
@@ -26,6 +27,8 @@ class DMImportForm : public QWidget
 public:
     explicit DMImportForm(QWidget *parent = nullptr);
     ~DMImportForm();
+
+    void saveImage(const QString &code, const QString &base64Image);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override
@@ -55,20 +58,31 @@ private slots:
     void on_pb_load_file_clicked();
     void init_process();
     void recieve_dm_data(QString row);
+    void recieve_err_data(QString row);
     void complete_process();
+
+    void on_pb_load_dir_clicked();
 
 private:
     //---Vars
     Ui::DMImportForm *ui;
     DMImportModel* importModel;
     QProgressDialog *progressDialog;
-    QString pdf_importer_path = gSettings.get_app_path() + "/process/extract_datamatrix.exe";
-    CRUDBase db = CRUDBase("QSQLITE", gSettings.get_app_path() + "/mydb.sqlite");
+    DoubleProgressDialog *m_doubleProgressDialog;
+
+    QString pdf_importer_path = gSettings.getAppPath() + "/process/extract_datamatrix.exe";
+    QString lastUsedDirectory = QDir::homePath();
+    // CRUDDMCode db = CRUDDMCode("QSQLITE", gSettings.getAppPath() + "/mydb.sqlite");
+    CRUDDMCode db = CRUDDMCode("QSQLITE", "C:/Users/Wepal/Documents/mydb.sqlite");
+
+    // QSqlDatabase* m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
+
 
     //---Funcs
     void startReadDm(const QString &program, const QStringList &arguments);
     void setupImportTable();
-
+    static bool writeImageToDisk(const QString &code, const QString &base64Image);
+    static QString getHashForCode(const QString &code);
 };
 
 #endif // DMIMPORTFORM_H

@@ -40,6 +40,7 @@ CONFIG(release, debug|release) {
 SOURCES += \
     core/globalsettings.cpp \
     core/stylemanager.cpp \
+    dialogs/doubleprogressdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
@@ -48,6 +49,8 @@ SOURCES += \
 
 HEADERS += \
     crud/crudbase.h \
+    crud/cruddmcode.h \
+    dialogs/doubleprogressdialog.h \
     sqlmodels/baseentity.h \
     sqlmodels/dmcodemodel.h \
     core/globalsettings.h \
@@ -58,6 +61,7 @@ HEADERS += \
     widgets/dminfoform.h
 
 FORMS += \
+    dialogs/doubleprogressdialog.ui \
     mainwindow.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui

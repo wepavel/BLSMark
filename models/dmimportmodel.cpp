@@ -15,9 +15,8 @@ QVariant DMImportModel::headerData(int section, Qt::Orientation orientation, int
         // case Column::Number: return tr("№");
         // case Column::Code: return tr("C");
         // case Column::Page: return tr("Страница");
-        // case Column::DataMatrix: return tr("Data Matrix");
-            case Column::NumPageColumn: return tr("№ страницы");
             case Column::CodeColumn: return tr("Код");
+            case Column::FilenameColumn: return tr("Имя файла");
             case Column::ImgColumn: return tr("Base64");
             default: return QVariant();
         }
@@ -43,20 +42,47 @@ int DMImportModel::columnCount(const QModelIndex &parent) const
 
 QVariant DMImportModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || role != Qt::DisplayRole)
+    if (!index.isValid())
         return QVariant();
 
     const RowData &rowData = m_data[index.row()];
-    switch (static_cast<Column>(index.column())) {
-        case Column::NumPageColumn: return rowData.page;
+
+    if (role == Qt::DisplayRole)
+    {
+        switch (static_cast<Column>(index.column())) {
         case Column::CodeColumn: return rowData.code;
-        case Column::ImgColumn: return rowData.imgBase64;
-    // case Column::Number: return index.row() + 1;
-    // case Column::Code: return rowData.code;
-    // case Column::Page: return rowData.page;
-    // case Column::DataMatrix: return rowData.dataMatrix;
-    default: return QVariant();
+        case Column::FilenameColumn: return rowData.filename;
+        case Column::ImgColumn: return "Image";
+        // case Column::Number: return index.row() + 1;
+        // case Column::Code: return rowData.code;
+        // case Column::Page: return rowData.page;
+        // case Column::DataMatrix: return rowData.dataMatrix;
+        default: return QVariant();
+        }
     }
+    else if (role == Qt::ToolTipRole)
+    {
+        switch (static_cast<Column>(index.column())) {
+        case Column::CodeColumn:
+            return QString("Code: %1").arg(rowData.code);
+        case Column::FilenameColumn:
+            return QString("Filename: %1").arg(rowData.filename);
+        case Column::ImgColumn:
+            return QString("Base64 Image (Size: %1 bytes)").arg(rowData.imgBase64.size());
+        // case Column::Number:
+        //     return QString("Row number: %1").arg(index.row() + 1);
+        // case Column::Code:
+        //     return QString("Code: %1").arg(rowData.code);
+        // case Column::Page:
+        //     return QString("Page: %1").arg(rowData.page);
+        // case Column::DataMatrix:
+        //     return QString("DataMatrix: %1").arg(rowData.dataMatrix);
+        default:
+            return QVariant();
+        }
+    }
+
+    return QVariant();
 }
 
 bool DMImportModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -66,11 +92,11 @@ bool DMImportModel::setData(const QModelIndex &index, const QVariant &value, int
 
     RowData &rowData = m_data[index.row()];
     switch (static_cast<Column>(index.column())) {
-    case Column::NumPageColumn:
-        rowData.page = value.toInt();
-        break;
     case Column::CodeColumn:
         rowData.code = value.toString();
+        break;
+    case Column::FilenameColumn:
+        rowData.filename = value.toString();
         break;
     case Column::ImgColumn:
         rowData.imgBase64 = value.toString();
@@ -91,10 +117,10 @@ Qt::ItemFlags DMImportModel::flags(const QModelIndex &index) const
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
-void DMImportModel::addRow(const QString &code, int page, const QString &imgBase64)
+void DMImportModel::addRow(const QString &code, const QString &filename, const QString &imgBase64)
 {
     beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
-    m_data.append({page, code, imgBase64});
+    m_data.append({code, filename, imgBase64});
     endInsertRows();
 }
 

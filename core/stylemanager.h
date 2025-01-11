@@ -20,16 +20,16 @@ public:
     Q_ENUM(ThemeType)
 
     //---Funcs
-    void toggle_theme();
-    void set_theme(const ThemeType &theme);
+    void toggleTheme();
+    void setTheme(const ThemeType &theme);
 
-    static QString theme_to_string(ThemeType theme)
+    static QString themeToString(ThemeType theme)
     {
         const QMetaEnum metaEnum = QMetaEnum::fromType<ThemeType>();
         return QString(metaEnum.valueToKey(theme));
     }
 
-    static ThemeType string_to_theme(const QString& themeString)
+    static ThemeType stringToTheme(const QString& themeString)
     {
         const QMetaEnum metaEnum = QMetaEnum::fromType<ThemeType>();
         bool ok;

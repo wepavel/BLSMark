@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    gSettings.load_settings("/ini/settings.ini");
-    styleManager.set_theme(StyleManager::LightStyle);
+    gSettings.loadSettings("/ini/settings.ini");
+    styleManager.setTheme(StyleManager::LightStyle);
 
     MainWindow w;
     w.show();

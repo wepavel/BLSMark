@@ -8,6 +8,8 @@
 #include <QMetaEnum>
 #include <QCoreApplication>
 
+#include "stylemanager.h"
+
 
 class GlobalSettings: public QObject
 {
@@ -15,12 +17,15 @@ class GlobalSettings: public QObject
 public:
     static GlobalSettings& instance();
 
-    void load_settings(const QString& filename = "config.ini");
-    void save_settings();
+    void loadSettings(const QString& filename = "config.ini");
+    void saveSettings();
 
-    QVariant get_value(const QString &group, const QString& key, const QVariant& defaultValue = QVariant()) const;
-    void set_value(const QString &group, const QString& key, const QVariant& value);
-    QString get_app_path() const;
+    void getTheme();
+    void setTheme(StyleManager::ThemeType theme);
+
+    QString getAppPath() const;
+    QString getGhostScriptPath() const;
+    QString getBSLDMParserPath() const;
 
 private:
     //---Funcs
@@ -30,6 +35,12 @@ private:
     GlobalSettings(const GlobalSettings&) = delete;
     GlobalSettings& operator=(const GlobalSettings&) = delete;
 
+    QVariant getValue(const QString &group, const QString& key, const QVariant& defaultValue = QVariant()) const;
+    void setValue(const QString &group, const QString& key, const QVariant& value);
+
+    QString parsePath(QString path);
+
+    //---Vars
     QSettings* m_settings;
     QString m_filename;
     QString app_path;

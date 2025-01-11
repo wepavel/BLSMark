@@ -65,23 +65,38 @@ public:
 
     template<typename T>
     bool insert(const T& entity) {
-        SpinLockGuard guard(m_lock);
+        // SpinLockGuard guard(m_lock);
         QSqlQuery query(*m_db);
-        QString fields = entity.fields().join(", ");
-        QString placeholders = QString(":%1").arg(entity.fields().join(", :"));
+
+        QStringList fieldsList = entity.fields();
+        fieldsList.removeAll("id");  // Удаляем 'id' из списка полей
+
+        QString fields = fieldsList.join(", ");
+        QString placeholders = QString(":%1").arg(fieldsList.join(", :"));
 
         query.prepare(QString("INSERT INTO %1 (%2) VALUES (%3)")
                           .arg(entity.tableName(), fields, placeholders));
 
         auto map = entity.toMap();
-        for (auto it = map.begin(); it != map.end(); ++it) {
-            query.bindValue(":" + it.key(), it.value());
+        for (const auto& field : fieldsList) {
+            query.bindValue(":" + field, map[field]);
         }
 
         if (!query.exec()) {
-            qDebug() << "Insert error:" << query.lastError().text();
+            QSqlError error = query.lastError();
+            if (error.type() == QSqlError::StatementError &&
+                error.text().contains("UNIQUE constraint failed", Qt::CaseInsensitive)) {
+                qDebug() << "Unique constraint violation:" << error.text();
+            } else {
+                qDebug() << "Insert error:" << error.text();
+            }
             return false;
         }
+
+        // Получаем сгенерированный id и обновляем объект
+        int lastInsertId = query.lastInsertId().toInt();
+        const_cast<T&>(entity).m_id = lastInsertId;
+
         return true;
     }
 
@@ -110,14 +125,112 @@ public:
         return result;
     }
 
-    // Остальные методы (findById, update, deleteById) аналогично обернуть в SpinLockGuard
+    template<typename T>
+    std::unique_ptr<T> findById(int id) {
+        SpinLockGuard guard(m_lock);
+        QSqlQuery query(*m_db);
+        query.prepare(QString("SELECT * FROM %1 WHERE id = :id").arg(T().tableName()));
+        query.bindValue(":id", id);
+
+        if (!query.exec() || !query.next()) {
+            qDebug() << "Find by ID error:" << query.lastError().text();
+            return nullptr;
+        }
+
+        auto entity = std::make_unique<T>();
+        QVariantMap map;
+        for (const auto& field : entity->fields()) {
+            map[field] = query.value(field);
+        }
+        entity->fromMap(map);
+        return entity;
+    }
+
+    template<typename T>
+    bool update(const T& entity) {
+        SpinLockGuard guard(m_lock);
+        QSqlQuery query(*m_db);
+        QStringList updateFields;
+        for (const auto& field : entity.fields()) {
+            if (field != "id") {
+                updateFields << QString("%1 = :%1").arg(field);
+            }
+        }
+
+        query.prepare(QString("UPDATE %1 SET %2 WHERE id = :id")
+                          .arg(entity.tableName(), updateFields.join(", ")));
+
+        auto map = entity.toMap();
+        for (auto it = map.begin(); it != map.end(); ++it) {
+            query.bindValue(":" + it.key(), it.value());
+        }
+
+        if (!query.exec()) {
+            QSqlError error = query.lastError();
+            if (error.type() == QSqlError::StatementError &&
+                error.text().contains("UNIQUE constraint failed", Qt::CaseInsensitive)) {
+                qDebug() << "Unique constraint violation:" << error.text();
+            } else {
+                qDebug() << "Update error:" << error.text();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    template<typename T>
+    bool deleteById(int id) {
+        SpinLockGuard guard(m_lock);
+        QSqlQuery query(*m_db);
+        query.prepare(QString("DELETE FROM %1 WHERE id = :id").arg(T().tableName()));
+        query.bindValue(":id", id);
+
+        if (!query.exec()) {
+            qDebug() << "Delete error:" << query.lastError().text();
+            return false;
+        }
+        return true;
+    }
+
+    template<typename T>
+    bool createTable() {
+        SpinLockGuard guard(m_lock);
+        T tempEntity;
+        QString tableName = tempEntity.tableName();
+
+        QStringList columnDefs;
+        for (const auto& field : tempEntity.fields()) {
+            QString columnType;
+            if (field == "id") {
+                columnDefs << "id INTEGER PRIMARY KEY AUTOINCREMENT";
+            } else {
+                // Здесь вы можете добавить логику для определения типа столбца
+                // На основе имени поля или дополнительной информации из вашей модели
+                columnType = "TEXT";  // По умолчанию используем TEXT
+                columnDefs << QString("%1 %2").arg(field, columnType);
+            }
+        }
+
+        // Добавляем ограничения уникальности
+        QStringList uniqueFields = tempEntity.uniqueFields();
+        for (const auto& field : uniqueFields) {
+            columnDefs << QString("UNIQUE(%1)").arg(field);
+        }
+
+        QString createTableQuery = QString("CREATE TABLE IF NOT EXISTS %1 (%2)")
+                                       .arg(tableName, columnDefs.join(", "));
+
+        qDebug() << "Create table query:" << createTableQuery;  // Добавьте эту строку для отладки
+
+        QSqlQuery query(*m_db);
+        if (!query.exec(createTableQuery)) {
+            qDebug() << "Error creating table:" << query.lastError().text();
+            return false;
+        }
+        return true;
+    }
 
 private:
-    //---Vars
-    QSqlDatabase* m_db;
-    bool m_ownDb;
-    QAtomicInt m_lock;
-
     //---Funcs
     QString getSqlType(QVariant::Type type) {
         switch (type) {
@@ -138,6 +251,7 @@ private:
         }
     }
 
+protected:
     //---Classes
     class SpinLockGuard {
     public:
@@ -152,6 +266,12 @@ private:
     private:
         QAtomicInt& m_lock;
     };
+
+    QAtomicInt m_lock;
+    //---Vars
+    QSqlDatabase* m_db;
+    bool m_ownDb;
 };
 
 #endif // CRUDBASE_H
+

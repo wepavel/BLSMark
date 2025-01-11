@@ -8,7 +8,7 @@ StyleManager& StyleManager::instance()
     return instance;
 }
 
-auto StyleManager::set_theme(const ThemeType &theme) -> void
+auto StyleManager::setTheme(const ThemeType &theme) -> void
 {
     QString style_path = "";
     QApplication *app = qobject_cast<QApplication*>(QApplication::instance());
@@ -30,12 +30,12 @@ auto StyleManager::set_theme(const ThemeType &theme) -> void
     }
 }
 
-auto StyleManager::toggle_theme() -> void
+auto StyleManager::toggleTheme() -> void
 {
     qDebug() << "Change theme";
     if (style == ThemeType::DarkStyle) {
-        set_theme(ThemeType::LightStyle);
+        setTheme(ThemeType::LightStyle);
     } else {
-        set_theme(ThemeType::DarkStyle);
+        setTheme(ThemeType::DarkStyle);
     }
 }

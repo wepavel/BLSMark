@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     DMImportForm* pdf_importer = new DMImportForm(this);
     ui->tab_import->layout()->addWidget(pdf_importer);
-    connect(ui->act_toggle_theme, &QAction::triggered, this, [this](){styleManager.toggle_theme();});
+    connect(ui->act_toggle_theme, &QAction::triggered, this, [this](){styleManager.toggleTheme();});
 
 }
 
@@ -66,5 +66,5 @@ auto MainWindow::fill_logo() -> void
 
 void MainWindow::toggle_theme()
 {
-    styleManager.toggle_theme();
+    styleManager.toggleTheme();
 }

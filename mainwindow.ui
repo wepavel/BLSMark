@@ -17,12 +17,15 @@
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_main">
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>Основное окно</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="2" column="0">
@@ -96,7 +99,7 @@
       </widget>
       <widget class="QWidget" name="tab_import">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Окно вгрузки кодов</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6"/>
       </widget>

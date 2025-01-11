@@ -1,7 +1,7 @@
 QToolTip {
-    border: 1px solid #FFFFFF;
+    border: 1px solid #000000;
     background-color: #fefefe;
-    color: white;
+    color: black;
     padding: 0px;                /*remove padding, for fix combobox tooltip.*/
 }
 
@@ -442,13 +442,13 @@ QScrollBar::sub-page:vertical {
 }
 
 QTextEdit {
-    background-color: #232629;
+    background-color: #f9f9f9;
     color: #000000;
     border: 1px solid #bcc1c6;
 }
 
 QPlainTextEdit {
-    background-color: #232629;
+    background-color: #f9f9f9;
     ;
     color: #000000;
     border-radius: 2px;
@@ -646,7 +646,7 @@ QComboBox::down-arrow:focus {
 QAbstractSpinBox {
     padding: 5px;
     border: 1px solid #bcc1c6;
-    background-color: #232629;
+    background-color: #f9f9f9;
     color: #000000;
     border-radius: 2px;
     min-width: 75px;
@@ -884,7 +884,7 @@ QDockWidget::float-button:pressed {
 QTreeView,
 QListView {
     border: 1px solid #bcc1c6;
-    background-color: #232629;
+    background-color: #f9f9f9;
 }
 
 QTreeView:branch:selected,
@@ -974,7 +974,7 @@ QSlider::groove:horizontal {
 }
 
 QSlider::handle:horizontal {
-    background: #232629;
+    background: #f9f9f9;
     border: 1px solid #565a5e;
     width: 16px;
     height: 16px;
@@ -991,7 +991,7 @@ QSlider::groove:vertical {
 }
 
 QSlider::handle:vertical {
-    background: #232629;
+    background: #f9f9f9;
     border: 1px solid #565a5e;
     width: 16px;
     height: 16px;
@@ -1215,7 +1215,7 @@ QProgressBar {
 }
 
 QProgressBar::chunk {
-    background-color: #05B8CC;
+    background-color: #fb9804;
 }
 
 QDateEdit {
@@ -1234,7 +1234,7 @@ QDateEdit:on {
 }
 
 QDateEdit QAbstractItemView {
-    background-color: #232629;
+    background-color: #f9f9f9;
     border-radius: 2px;
     border: 1px solid #3375A3;
     selection-background-color: #fb9f18;

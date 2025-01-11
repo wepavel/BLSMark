@@ -13,8 +13,13 @@ class DMInfoForm : public QWidget
 
 public:
     explicit DMInfoForm(
-        const QString &dm_code,
-        const QString &img_base64=QString(),
+        const QString &dmCode,
+        const QString &base64Image=QString(),
+        QWidget *parent = nullptr
+        );
+    explicit DMInfoForm(
+        const QString &dmCode,
+        const QPixmap &image=QPixmap(":/images/img/img_placeholder.png"),
         QWidget *parent = nullptr
         );
     ~DMInfoForm();
