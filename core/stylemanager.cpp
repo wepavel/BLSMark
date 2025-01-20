@@ -1,6 +1,8 @@
 #include "stylemanager.h"
 #include <QApplication>
 #include <QFile>
+#include <QTextStream>
+#include <QDebug>
 
 StyleManager& StyleManager::instance()
 {

@@ -16,6 +16,8 @@
 #include "crud/cruddmcode.h"
 #include "dialogs/doubleprogressdialog.h"
 
+
+
 namespace Ui {
 class DMImportForm;
 }
@@ -86,3 +88,5 @@ private:
 };
 
 #endif // DMIMPORTFORM_H
+
+

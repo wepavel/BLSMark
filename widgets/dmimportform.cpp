@@ -115,9 +115,9 @@ void DMImportForm::recieve_dm_data(QString row)
     quint8 doc_progress = cols.value(1).toUInt(); //Прогресс в одном документе
     QString dm_code = cols.value(2);
     QString file_path = cols.value(3);
-    QString img_base64 = cols.value(4);
+    // QString img_base64 = cols.value(4);
 
-    qDebug() << "Doc progress: " << doc_progress << "; Docs progress: " << docs_progress;
+    // qDebug() << "Doc progress: " << doc_progress << "; Docs progress: " << docs_progress;
 
     // auto x = 1;
     // if (progressDialog->value()<100) {
@@ -147,9 +147,9 @@ void DMImportForm::recieve_dm_data(QString row)
     // } else {
     //     qDebug() << "New code not inserted";
     // }
-    saveImage(dm_code, img_base64);
+    // saveImage(dm_code, img_base64);
 
-    importModel->addRow(dm_code, file_path, img_base64);
+    importModel->addRow(dm_code, file_path, "");
 
     // if (progressDialog->wasCanceled()) {
     //     // Здесь логика для прерывания процесса
@@ -338,7 +338,7 @@ void DMImportForm::setupImportTable()
 
         QModelIndex codeIdx = model->index(row, DMImportModel::CodeColumn);
         QModelIndex filenameIdx = model->index(row, DMImportModel::FilenameColumn);
-        QModelIndex imgIdx = model->index(row, DMImportModel::ImgColumn);
+        // QModelIndex imgIdx = model->index(row, DMImportModel::ImgColumn);
         // qDebug() << "Page: " << model->data(pageIdx).toInt() << "; Code: " << model->data(codeIdx).toString();
 
         // auto x = db.findById<DMCodeModel>(1);
@@ -363,10 +363,12 @@ void DMImportForm::setupImportTable()
         QPixmap pixmap(gSettings.getAppPath() + "/DataMatrixImages/" + getHashForCode(model->data(codeIdx).toString()));
         QWidget *widget;
         if (pixmap.isNull()) {
-            widget = new DMInfoForm(model->data(codeIdx).toString(), QString(), &dialog);
+            // widget = new DMInfoForm(model->data(codeIdx).toString(), QString(), &dialog);
+            widget = new DMInfoForm(model->data(codeIdx).toString(), &dialog);
         } else {
             // Использование загруженного изображения
-            widget = new DMInfoForm(model->data(codeIdx).toString(), pixmap, &dialog);
+            // widget = new DMInfoForm(model->data(codeIdx).toString(), pixmap, &dialog);
+            widget = new DMInfoForm(model->data(codeIdx).toString(), &dialog);
         }
 
         QVBoxLayout *layout = new QVBoxLayout(&dialog);

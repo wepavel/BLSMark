@@ -28,5 +28,7 @@ private:
     //---Funcs
     void fill_logo();
     void toggle_theme();
+    void setup_menubar();
+
 };
 #endif // MAINWINDOW_H

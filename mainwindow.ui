@@ -18,10 +18,10 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_main">
        <attribute name="title">
@@ -64,14 +64,14 @@
            <item row="1" column="0">
             <widget class="QPushButton" name="pushButton_2">
              <property name="text">
-              <string>PushButton</string>
+              <string>Тестовая кнопка 2</string>
              </property>
             </widget>
            </item>
            <item row="0" column="0">
             <widget class="QPushButton" name="pushButton">
              <property name="text">
-              <string>Test</string>
+              <string>Тестовая кнопка 1</string>
              </property>
             </widget>
            </item>
@@ -85,7 +85,7 @@
            <item row="2" column="0">
             <widget class="QPushButton" name="pushButton_3">
              <property name="text">
-              <string>PushButton</string>
+              <string>Тестовая кнопка 3</string>
              </property>
             </widget>
            </item>
@@ -123,6 +123,7 @@
     <property name="title">
      <string>Файл</string>
     </property>
+    <addaction name="action"/>
    </widget>
    <widget class="QMenu" name="menu_view">
     <property name="title">
@@ -130,13 +131,30 @@
     </property>
     <addaction name="act_toggle_theme"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Инструменты</string>
+    </property>
+    <addaction name="act_check_code"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_view"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="act_toggle_theme">
    <property name="text">
     <string>Сменить тему</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>Настройки</string>
+   </property>
+  </action>
+  <action name="act_check_code">
+   <property name="text">
+    <string>Проверка кода</string>
    </property>
   </action>
  </widget>

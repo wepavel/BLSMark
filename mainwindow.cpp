@@ -5,10 +5,14 @@
 #include <QSizeGrip>
 #include <QFile>
 #include <QDesktopServices>
+#include <QFileDialog>
+#include <QInputDialog>
+
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
 #include "widgets/dmimportform.h"
-#include <QFileDialog>
+#include "widgets/dminfoform.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,13 +21,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     setWindowTitle("BLS Mark");
-    fill_logo();
-    statusBar()->showMessage("Offline mode");
+
+
 
     DMImportForm* pdf_importer = new DMImportForm(this);
     ui->tab_import->layout()->addWidget(pdf_importer);
-    connect(ui->act_toggle_theme, &QAction::triggered, this, [this](){styleManager.toggleTheme();});
 
+    setup_menubar();
+    fill_logo();
+    statusBar()->showMessage(tr("Offline mode"));
 }
 
 MainWindow::~MainWindow()
@@ -44,7 +50,7 @@ auto MainWindow::fill_logo() -> void
     ui->hl_logo->addStretch(1);
 
     QLabel *label = new QLabel(this);
-    label->setText("<a href='http://blscom.ru/'>Посетите наш сайт</a>");
+    label->setText(tr("<a href='http://blscom.ru/'>Посетите наш сайт</a>"));
     label->setOpenExternalLinks(true); // Это позволит открывать ссылку в браузере по умолчанию
 
     // Если вы хотите обрабатывать клик самостоятельно:
@@ -67,4 +73,33 @@ auto MainWindow::fill_logo() -> void
 void MainWindow::toggle_theme()
 {
     styleManager.toggleTheme();
+}
+
+void MainWindow::setup_menubar()
+{
+    connect(ui->act_toggle_theme, &QAction::triggered, this, [this](){styleManager.toggleTheme();});
+    connect(ui->act_check_code, &QAction::triggered, this, [this](){
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("Проверка кода"),
+                                             tr("Введите код:"), QLineEdit::Normal,
+                                             "", &ok);
+
+        qDebug() << "TEEEST";
+
+        if (ok && !text.isEmpty()) {
+            QDialog dialog;
+
+            QWidget *widget = new DMInfoForm(text, &dialog);
+
+
+            QVBoxLayout *layout = new QVBoxLayout(&dialog);
+            layout->addWidget(widget);
+            dialog.setLayout(layout);
+
+            // Настройка вашего виджета
+
+            int result = dialog.exec();
+        } else return;
+
+    });
 }

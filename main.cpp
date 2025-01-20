@@ -4,6 +4,7 @@
 #include <QIODevice>
 #include <QFile>
 #include <QDebug>
+
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
 

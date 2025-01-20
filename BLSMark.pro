@@ -1,12 +1,10 @@
-QT += core gui
-QT += concurrent
-QT += sql
+QT += core gui concurrent sql
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 CONFIG -= debug_and_release debug_and_release_target
-
 
 
 
@@ -67,8 +65,19 @@ FORMS += \
     widgets/dminfoform.ui
 
 RESOURCES += \
-    resources.qrc
+    resources.qrc \
 
 
 win32: RC_ICONS = ico/bls_ico.ico
+
+
+# Путь к директории с библиотекой$
+LIBS += -L$$PWD/side_packs/libs/dmtx -ldmtx
+# Зависимость от статической библиотеки
+PRE_TARGETDEPS += $$PWD/side_packs/libs/dmtx/libdmtx.a
+INCLUDEPATH += $$PWD/side_packs/libs/dmtx
+
+
+# D:\Qt\6.8.1\mingw_64\bin\lupdate.exe BLSMark.pro
+TRANSLATIONS += bls_mark_ru.ts
 
