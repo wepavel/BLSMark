@@ -39,6 +39,7 @@ SOURCES += \
     core/globalsettings.cpp \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
+    dialogs/settingsdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
+    dialogs/settingsdialog.h \
     sqlmodels/baseentity.h \
     sqlmodels/dmcodemodel.h \
     core/globalsettings.h \
@@ -60,6 +62,7 @@ HEADERS += \
 
 FORMS += \
     dialogs/doubleprogressdialog.ui \
+    dialogs/settingsdialog.ui \
     mainwindow.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui
@@ -67,6 +70,7 @@ FORMS += \
 RESOURCES += \
     resources.qrc \
 
+DISTFILES += $$BASE_DIR/debug/ini/settings.ini
 
 win32: RC_ICONS = ico/bls_ico.ico
 

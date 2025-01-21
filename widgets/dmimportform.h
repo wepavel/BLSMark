@@ -72,7 +72,6 @@ private:
     QProgressDialog *progressDialog;
     DoubleProgressDialog *m_doubleProgressDialog;
 
-    QString pdf_importer_path = gSettings.getAppPath() + "/process/extract_datamatrix.exe";
     QString lastUsedDirectory = QDir::homePath();
     // CRUDDMCode db = CRUDDMCode("QSQLITE", gSettings.getAppPath() + "/mydb.sqlite");
     CRUDDMCode db = CRUDDMCode("QSQLITE", "C:/Users/Wepal/Documents/mydb.sqlite");

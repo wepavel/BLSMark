@@ -20,15 +20,24 @@ public:
     void loadSettings(const QString& filename = "config.ini");
     void saveSettings();
 
-    void getTheme();
+    StyleManager::ThemeType getTheme() const;
     void setTheme(StyleManager::ThemeType theme);
 
+    QString getDataMatrixExtractPath() const;
+    bool setDataMatrixExtractPath(const QString& path);
+
+    QString getGsWin64Path() const;
+    bool setGsWin64Path(const QString& path);
+
+    QString getBackendServiceIP() const;
+    void setBackendServiceIP(const QString& ip);
+
+    int getBackendServicePort() const;
+    void setBackendServicePort(const int port);
+
     QString getAppPath() const;
-    QString getGhostScriptPath() const;
-    QString getBSLDMParserPath() const;
 
 private:
-    //---Funcs
     GlobalSettings() {
         app_path = QCoreApplication::applicationDirPath();
     } // Приватный конструктор
@@ -39,11 +48,20 @@ private:
     void setValue(const QString &group, const QString& key, const QVariant& value);
 
     QString parsePath(QString path);
+    bool checkRightPath(const QString& path);
+
+    void initializeSettings();
 
     //---Vars
     QSettings* m_settings;
     QString m_filename;
     QString app_path;
+
+    StyleManager::ThemeType m_theme;
+    QString m_dataMatrixExtractPath;
+    QString m_gsWin64Path;
+    QString m_backendServiceIP;
+    int m_backendServicePort;
 };
 
 // Глобальный макрос для удобного доступа

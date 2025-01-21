@@ -102,4 +102,8 @@ void MainWindow::setup_menubar()
         } else return;
 
     });
+    connect(ui->act_settings, &QAction::triggered, this, [this](){
+        SettingsDialog d(this);
+        d.exec();
+    });
 }

@@ -58,7 +58,8 @@ void DMImportForm::saveImage(const QString &code, const QString &base64Image)
 void DMImportForm::on_pb_load_file_clicked()
 {
     QStringList gsPath;
-    gsPath << "--gs-path" << gSettings.getAppPath()+"/process/gs/gs10.04.0/bin/gswin64c.exe";
+    //qDebug() << gSettings.getGsWin64Path();
+    gsPath << "--gs-path" << gSettings.getGsWin64Path();
     QStringList filePaths = QFileDialog::getOpenFileNames(
         this,
         tr("Открыть файл"),
@@ -68,14 +69,17 @@ void DMImportForm::on_pb_load_file_clicked()
     if (!filePaths.isEmpty()) {
         lastUsedDirectory = QFileInfo(filePaths.first()).path();
         gsPath.append(filePaths);
-        startReadDm(pdf_importer_path, gsPath);
+        //qDebug() << gSettings.getDataMatrixExtractPath();
+        startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
     }
 }
 
 void DMImportForm::on_pb_load_dir_clicked()
 {
     QStringList gsPath;
-    gsPath << "--gs-path" << gSettings.getAppPath()+"/process/gs/gs10.04.0/bin/gswin64c.exe";
+    gsPath << "--gs-path" << gSettings.getGsWin64Path();
+    // qDebug() << gSettings.getDataMatrixExtractPath();
+    // qDebug() << gSettings.getGsWin64Path();
 
     QString selectedDir = QFileDialog::getExistingDirectory(
         this,
@@ -86,7 +90,7 @@ void DMImportForm::on_pb_load_dir_clicked()
     if (!selectedDir.isEmpty()) {
         // lastUsedDirectory = QFileInfo(selectedDir.first()).path();
         gsPath.append(selectedDir);
-        startReadDm(pdf_importer_path, gsPath);
+        startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
     }
 }
 
