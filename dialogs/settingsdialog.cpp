@@ -1,6 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
-
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <qfiledialog.h>
 
 SettingsDialog::SettingsDialog(QWidget *parent)
@@ -12,6 +13,15 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     ui->pb_apply->setEnabled(false);
     ui->pb_open_dm_path->setFocusPolicy(Qt::NoFocus);
     ui->pb_open_gs_path->setFocusPolicy(Qt::NoFocus);
+
+    QRegularExpression ipRegExp("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+    QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipRegExp, this);
+    ui->le_backend_ser_ip->setValidator(ipValidator);
+
+    QRegularExpression portRegExp("^(6553[0-5]|655[0-3][0-5]|64[0-9]{3}|[1-5]?[0-9]{1,4})$");
+    QRegularExpressionValidator *portValidator = new QRegularExpressionValidator(portRegExp, this);
+    ui->le_backend_ser_port->setValidator(portValidator);
+
     initUIConnections();
 }
 
