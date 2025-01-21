@@ -32,37 +32,13 @@ public:
 
     void saveImage(const QString &code, const QString &base64Image);
 
-protected:
-    void dragEnterEvent(QDragEnterEvent *event) override
-    {
-        if (event->mimeData()->hasUrls()) {
-            event->acceptProposedAction();
-        }
-    }
-
-    void dropEvent(QDropEvent *event) override
-    {
-        const QMimeData* mimeData = event->mimeData();
-        if (mimeData->hasUrls()) {
-            QList<QUrl> urlList = mimeData->urls();
-            for (const QUrl &url : urlList) {
-                if (url.isLocalFile()) {
-                    qDebug() << url.toLocalFile();
-                    // startReadDm(pdf_importer_path, url.toLocalFile())
-                    // processDroppedFile(url.toLocalFile());
-                }
-            }
-        }
-        event->acceptProposedAction();
-    }
-
 private slots:
     void on_pb_load_file_clicked();
     void init_process();
     void recieve_dm_data(QString row);
     void recieve_err_data(QString row);
     void complete_process();
-
+    void files_were_dropped(QStringList filePaths);
     void on_pb_load_dir_clicked();
 
 private:

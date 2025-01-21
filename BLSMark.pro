@@ -43,6 +43,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
+    tables/dragdroptableview.cpp \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp
 
@@ -57,6 +58,7 @@ HEADERS += \
     core/stylemanager.h \
     mainwindow.h \
     models/dmimportmodel.h \
+    tables/dragdroptableview.h \
     widgets/dmimportform.h \
     widgets/dminfoform.h
 

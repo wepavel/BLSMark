@@ -66,6 +66,7 @@ void DMImportForm::on_pb_load_file_clicked()
         lastUsedDirectory,
         tr("PDF и EPS файлы (*.pdf *.eps);;PDF файлы (*.pdf);;EPS Файлы (*.eps);;Все файлы (*)")
         );
+    qDebug() << filePaths;
     if (!filePaths.isEmpty()) {
         lastUsedDirectory = QFileInfo(filePaths.first()).path();
         gsPath.append(filePaths);
@@ -190,6 +191,18 @@ void DMImportForm::complete_process()
     //     progressDialog = nullptr;
     // }
 }
+
+void DMImportForm::files_were_dropped(QStringList filePaths)
+{
+    QStringList gsPath;
+    gsPath << "--gs-path" << gSettings.getGsWin64Path();
+    lastUsedDirectory = QFileInfo(filePaths.first()).path();
+    gsPath.append(filePaths);
+    qDebug() << gsPath;
+    startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
+}
+
+
 //-----------------------PRIVATE SLOTS-----------------------
 void DMImportForm::startReadDm(const QString &program, const QStringList &arguments)
 {
@@ -318,7 +331,6 @@ void DMImportForm::setupImportTable()
     // Использование:
     // ui->tw_dm_codes->setItemDelegate(new NoEmptyAreaTooltipDelegate(ui->tw_dm_codes));
 
-
     ui->tw_dm_codes->setModel(importModel);
     ui->tw_dm_codes->hideColumn(DMImportModel::ImgColumn);
     ui->tw_dm_codes->horizontalHeader()->setStretchLastSection(true); // растянуть последнюю секцию (это свойство можно задать и просто в дизайнере)
@@ -328,8 +340,8 @@ void DMImportForm::setupImportTable()
     ui->tw_dm_codes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tw_dm_codes->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tw_dm_codes->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    connect(ui->tw_dm_codes, &QTableView::doubleClicked, this, [this](const QModelIndex &index) {
+    connect(ui->tw_dm_codes, &DragDropTableView::filesWereDropped, this, &DMImportForm::files_were_dropped);
+    connect(ui->tw_dm_codes, &QTableView::doubleClicked, [this](const QModelIndex &index) {
         // Получаем модель
         QAbstractItemModel *model = ui->tw_dm_codes->model();
 
