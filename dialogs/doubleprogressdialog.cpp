@@ -6,7 +6,7 @@ DoubleProgressDialog::DoubleProgressDialog(QWidget *parent)
     , ui(new Ui::DoubleProgressDialog)
 {
     ui->setupUi(this);
-
+    setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
     setWindowTitle("Идёт импорт файлов");
     ui->prb_load_file->setRange(0,100);
     ui->prb_load_files->setRange(0,100);

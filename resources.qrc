@@ -5,6 +5,8 @@
         <file>ico/bls_ico.ico</file>
         <file>img/img_placeholder.png</file>
         <file>img/mark_full.png</file>
+        <file>img/file_open_icon.png</file>
+        <file>img/settings.png</file>
     </qresource>
     <qresource prefix="/qss_icons">
         <file>styles/qdarkstyle/rc/branch_closed.png</file>

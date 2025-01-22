@@ -58,24 +58,33 @@ void DMImportForm::saveImage(const QString &code, const QString &base64Image)
 void DMImportForm::on_pb_load_file_clicked()
 {
     QStringList gsPath;
-    gsPath << "--gs-path" << gSettings.getAppPath()+"/process/gs/gs10.04.0/bin/gswin64c.exe";
+    //qDebug() << gSettings.getGsWin64Path();
+    gsPath << "--gs-path" << gSettings.getGsWin64Path();
     QStringList filePaths = QFileDialog::getOpenFileNames(
         this,
         tr("Открыть файл"),
         lastUsedDirectory,
         tr("PDF и EPS файлы (*.pdf *.eps);;PDF файлы (*.pdf);;EPS Файлы (*.eps);;Все файлы (*)")
         );
+    qDebug() << filePaths;
+    if((filePaths.size()) > 100){
+        showBigAmountWarning();
+        return;
+    }
     if (!filePaths.isEmpty()) {
         lastUsedDirectory = QFileInfo(filePaths.first()).path();
         gsPath.append(filePaths);
-        startReadDm(pdf_importer_path, gsPath);
+        //qDebug() << gSettings.getDataMatrixExtractPath();
+        startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
     }
 }
 
 void DMImportForm::on_pb_load_dir_clicked()
 {
     QStringList gsPath;
-    gsPath << "--gs-path" << gSettings.getAppPath()+"/process/gs/gs10.04.0/bin/gswin64c.exe";
+    gsPath << "--gs-path" << gSettings.getGsWin64Path();
+    // qDebug() << gSettings.getDataMatrixExtractPath();
+    // qDebug() << gSettings.getGsWin64Path();
 
     QString selectedDir = QFileDialog::getExistingDirectory(
         this,
@@ -86,7 +95,7 @@ void DMImportForm::on_pb_load_dir_clicked()
     if (!selectedDir.isEmpty()) {
         // lastUsedDirectory = QFileInfo(selectedDir.first()).path();
         gsPath.append(selectedDir);
-        startReadDm(pdf_importer_path, gsPath);
+        startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
     }
 }
 
@@ -186,6 +195,29 @@ void DMImportForm::complete_process()
     //     progressDialog = nullptr;
     // }
 }
+
+void DMImportForm::files_were_dropped(QStringList filePaths, QStringList dirs)
+{
+    if((filePaths.size() == 0) && (dirs.size() == 0))
+            return;
+    if((filePaths.size()+dirs.size()) > 100){
+        showBigAmountWarning();
+        return;
+    }
+    QStringList gsPath;
+    gsPath << "--gs-path" << gSettings.getGsWin64Path();
+    if(filePaths.size() != 0)
+        lastUsedDirectory = QFileInfo(filePaths.first()).path();
+    else
+        lastUsedDirectory = QFileInfo(dirs.first()).path();
+
+    gsPath.append(filePaths);
+    gsPath.append(dirs);
+    //qDebug() << gsPath;
+    startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
+}
+
+
 //-----------------------PRIVATE SLOTS-----------------------
 void DMImportForm::startReadDm(const QString &program, const QStringList &arguments)
 {
@@ -314,7 +346,6 @@ void DMImportForm::setupImportTable()
     // Использование:
     // ui->tw_dm_codes->setItemDelegate(new NoEmptyAreaTooltipDelegate(ui->tw_dm_codes));
 
-
     ui->tw_dm_codes->setModel(importModel);
     ui->tw_dm_codes->hideColumn(DMImportModel::ImgColumn);
     ui->tw_dm_codes->horizontalHeader()->setStretchLastSection(true); // растянуть последнюю секцию (это свойство можно задать и просто в дизайнере)
@@ -324,8 +355,8 @@ void DMImportForm::setupImportTable()
     ui->tw_dm_codes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tw_dm_codes->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tw_dm_codes->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    connect(ui->tw_dm_codes, &QTableView::doubleClicked, this, [this](const QModelIndex &index) {
+    connect(ui->tw_dm_codes, &DragDropTableView::filesWereDropped, this, &DMImportForm::files_were_dropped);
+    connect(ui->tw_dm_codes, &QTableView::doubleClicked, [this](const QModelIndex &index) {
         // Получаем модель
         QAbstractItemModel *model = ui->tw_dm_codes->model();
 
@@ -379,6 +410,15 @@ void DMImportForm::setupImportTable()
 
         int result = dialog.exec();
     });
+}
+
+void DMImportForm::showBigAmountWarning()
+{
+    QMessageBox::warning(this,
+                         tr("Внимание!"),
+                         tr("Нельзя загрузить более 100 объектов(папок и файлов) за раз! \n"
+                            " Используйте папки для большого количества файлов."),
+                         QMessageBox::Ok);
 }
 
 

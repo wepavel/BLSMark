@@ -68,6 +68,7 @@ auto MainWindow::fill_logo() -> void
     image_label->setFixedSize(120, 60); // Установите нужный размер
 
     ui->hl_logo->addWidget(image_label);
+
 }
 
 void MainWindow::toggle_theme()
@@ -77,7 +78,6 @@ void MainWindow::toggle_theme()
 
 void MainWindow::setup_menubar()
 {
-    connect(ui->act_toggle_theme, &QAction::triggered, this, [this](){styleManager.toggleTheme();});
     connect(ui->act_check_code, &QAction::triggered, this, [this](){
         bool ok;
         QString text = QInputDialog::getText(this, tr("Проверка кода"),
@@ -101,5 +101,9 @@ void MainWindow::setup_menubar()
             int result = dialog.exec();
         } else return;
 
+    });
+    connect(ui->act_settings, &QAction::triggered, this, [this](){
+        SettingsDialog d(this);
+        d.exec();
     });
 }

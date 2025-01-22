@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include "dialogs/settingsdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,7 +17,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
 
 private:
     //---Vars
