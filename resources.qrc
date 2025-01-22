@@ -7,6 +7,8 @@
         <file>img/mark_full.png</file>
         <file>img/file_open_icon.png</file>
         <file>img/settings.png</file>
+        <file>img/no.png</file>
+        <file>img/yes.png</file>
     </qresource>
     <qresource prefix="/qss_icons">
         <file>styles/qdarkstyle/rc/branch_closed.png</file>

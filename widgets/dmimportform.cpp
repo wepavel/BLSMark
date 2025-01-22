@@ -355,6 +355,8 @@ void DMImportForm::setupImportTable()
     ui->tw_dm_codes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tw_dm_codes->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tw_dm_codes->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tw_dm_codes->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
+
     connect(ui->tw_dm_codes, &DragDropTableView::filesWereDropped, this, &DMImportForm::files_were_dropped);
     connect(ui->tw_dm_codes, &QTableView::doubleClicked, [this](const QModelIndex &index) {
         // Получаем модель

@@ -7,11 +7,11 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
-
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
 #include "widgets/dmimportform.h"
 #include "widgets/dminfoform.h"
+#include <widgets/connectionstateform.h>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -26,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     DMImportForm* pdf_importer = new DMImportForm(this);
     ui->tab_import->layout()->addWidget(pdf_importer);
+
+    ConnectionStateForm* conStateForm = new ConnectionStateForm(this);
+    ui->tab_main->layout()->addWidget(conStateForm);
 
     setup_menubar();
     fill_logo();

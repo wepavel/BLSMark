@@ -1080,7 +1080,6 @@ QPushButton::menu-indicator {
 
 QTableView {
     border: 1px solid #bcc1c6;
-    gridline-color: #fefefe;
     background-color: #f9f9f9;
 }
 
@@ -1136,11 +1135,6 @@ QHeaderView::section::horizontal::only-one {
 
 QHeaderView::section::horizontal {
     border-left: transparent;
-}
-
-QHeaderView::section:checked {
-    color: white;
-    background-color: #cc8100;
 }
 
 

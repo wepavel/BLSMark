@@ -85,36 +85,36 @@ QVariant DMImportModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool DMImportModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    if (role != Qt::EditRole || !index.isValid())
-        return false;
+// bool DMImportModel::setData(const QModelIndex &index, const QVariant &value, int role)
+// {
+//     if (role != Qt::EditRole || !index.isValid())
+//         return false;
 
-    RowData &rowData = m_data[index.row()];
-    switch (static_cast<Column>(index.column())) {
-    case Column::CodeColumn:
-        rowData.code = value.toString();
-        break;
-    case Column::FilenameColumn:
-        rowData.filename = value.toString();
-        break;
-    case Column::ImgColumn:
-        rowData.imgBase64 = value.toString();
-        break;
-    default:
-        return false;
-    }
+//     RowData &rowData = m_data[index.row()];
+//     switch (static_cast<Column>(index.column())) {
+//     case Column::CodeColumn:
+//         rowData.code = value.toString();
+//         break;
+//     case Column::FilenameColumn:
+//         rowData.filename = value.toString();
+//         break;
+//     case Column::ImgColumn:
+//         rowData.imgBase64 = value.toString();
+//         break;
+//     default:
+//         return false;
+//     }
 
-    emit dataChanged(index, index, {role});
-    return true;
-}
+//     emit dataChanged(index, index, {role});
+//     return true;
+// }
 
 Qt::ItemFlags DMImportModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return Qt::NoItemFlags;
 
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    return QAbstractItemModel::flags(index); // убрал тут | Qt::ItemIsEditable
 }
 
 void DMImportModel::addRow(const QString &code, const QString &filename, const QString &imgBase64)
