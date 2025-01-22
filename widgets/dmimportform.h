@@ -15,7 +15,7 @@
 #include "models/dmimportmodel.h"
 #include "crud/cruddmcode.h"
 #include "dialogs/doubleprogressdialog.h"
-
+#include <QMessageBox>
 
 
 namespace Ui {
@@ -33,12 +33,13 @@ public:
     void saveImage(const QString &code, const QString &base64Image);
 
 private slots:
+    //-----------------------PRIVATE SLOTS-----------------------
     void on_pb_load_file_clicked();
     void init_process();
     void recieve_dm_data(QString row);
     void recieve_err_data(QString row);
     void complete_process();
-    void files_were_dropped(QStringList filePaths);
+    void files_were_dropped(QStringList filePaths, QStringList dirs);
     void on_pb_load_dir_clicked();
 
 private:
@@ -58,6 +59,7 @@ private:
     //---Funcs
     void startReadDm(const QString &program, const QStringList &arguments);
     void setupImportTable();
+    void showBigAmountWarning();
     static bool writeImageToDisk(const QString &code, const QString &base64Image);
     static QString getHashForCode(const QString &code);
 };

@@ -67,6 +67,10 @@ void DMImportForm::on_pb_load_file_clicked()
         tr("PDF и EPS файлы (*.pdf *.eps);;PDF файлы (*.pdf);;EPS Файлы (*.eps);;Все файлы (*)")
         );
     qDebug() << filePaths;
+    if((filePaths.size()) > 100){
+        showBigAmountWarning();
+        return;
+    }
     if (!filePaths.isEmpty()) {
         lastUsedDirectory = QFileInfo(filePaths.first()).path();
         gsPath.append(filePaths);
@@ -192,13 +196,24 @@ void DMImportForm::complete_process()
     // }
 }
 
-void DMImportForm::files_were_dropped(QStringList filePaths)
+void DMImportForm::files_were_dropped(QStringList filePaths, QStringList dirs)
 {
+    if((filePaths.size() == 0) && (dirs.size() == 0))
+            return;
+    if((filePaths.size()+dirs.size()) > 100){
+        showBigAmountWarning();
+        return;
+    }
     QStringList gsPath;
     gsPath << "--gs-path" << gSettings.getGsWin64Path();
-    lastUsedDirectory = QFileInfo(filePaths.first()).path();
+    if(filePaths.size() != 0)
+        lastUsedDirectory = QFileInfo(filePaths.first()).path();
+    else
+        lastUsedDirectory = QFileInfo(dirs.first()).path();
+
     gsPath.append(filePaths);
-    qDebug() << gsPath;
+    gsPath.append(dirs);
+    //qDebug() << gsPath;
     startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
 }
 
@@ -395,6 +410,15 @@ void DMImportForm::setupImportTable()
 
         int result = dialog.exec();
     });
+}
+
+void DMImportForm::showBigAmountWarning()
+{
+    QMessageBox::warning(this,
+                         tr("Внимание!"),
+                         tr("Нельзя загрузить более 100 объектов(папок и файлов) за раз! \n"
+                            " Используйте папки для большого количества файлов."),
+                         QMessageBox::Ok);
 }
 
 

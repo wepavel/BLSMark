@@ -21,7 +21,16 @@
        <string/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
+      </property>
+      <property name="elideMode">
+       <enum>Qt::TextElideMode::ElideNone</enum>
+      </property>
+      <property name="usesScrollButtons">
+       <bool>true</bool>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="tab_main">
        <attribute name="title">
@@ -101,7 +110,23 @@
        <attribute name="title">
         <string>Окно вгрузки кодов</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_6"/>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -125,12 +150,6 @@
     </property>
     <addaction name="act_settings"/>
    </widget>
-   <widget class="QMenu" name="menu_view">
-    <property name="title">
-     <string>Вид</string>
-    </property>
-    <addaction name="act_toggle_theme"/>
-   </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>Инструменты</string>
@@ -138,7 +157,6 @@
     <addaction name="act_check_code"/>
    </widget>
    <addaction name="menu"/>
-   <addaction name="menu_view"/>
    <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

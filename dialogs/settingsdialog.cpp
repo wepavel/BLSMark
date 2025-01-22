@@ -56,22 +56,24 @@ void SettingsDialog::on_pb_apply_clicked()
 {
     gSettings.setBackendServiceIP(ui->le_backend_ser_ip->text());
     gSettings.setBackendServicePort(ui->le_backend_ser_port->text().toInt());
-    if(ui->rb_light->isChecked())
+
+    if(ui->rb_light->isChecked()) {
         gSettings.setTheme(StyleManager::LightStyle);
-    else
+        styleManager.setTheme(StyleManager::LightStyle);
+    } else {
         gSettings.setTheme(StyleManager::DarkStyle);
+        styleManager.setTheme(StyleManager::DarkStyle);
+    }
+
     gSettings.setDataMatrixExtractPath(ui->le_dm_path->text());
     gSettings.setGsWin64Path(ui->le_gs_win64->text());
-
-
-    done(QDialog::Accepted);
+    ui->pb_apply->setEnabled(false);
 }
 
 void SettingsDialog::on_pb_cancel_clicked()
 {
     done(QDialog::Rejected);
 }
-
 
 void SettingsDialog::on_pb_open_dm_path_clicked()
 {
