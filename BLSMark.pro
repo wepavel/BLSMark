@@ -43,15 +43,19 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
+    models/goodsmodel.cpp \
     tables/dragdroptableview.cpp \
+    widgets/connectionstateform.cpp \
     widgets/dmimportform.cpp \
-    widgets/dminfoform.cpp
+    widgets/dminfoform.cpp \
+    widgets/statelabel.cpp
 
 HEADERS += \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
     dialogs/settingsdialog.h \
+    models/goodsmodel.h \
     sqlmodels/baseentity.h \
     sqlmodels/dmcodemodel.h \
     core/globalsettings.h \
@@ -59,13 +63,16 @@ HEADERS += \
     mainwindow.h \
     models/dmimportmodel.h \
     tables/dragdroptableview.h \
+    widgets/connectionstateform.h \
     widgets/dmimportform.h \
-    widgets/dminfoform.h
+    widgets/dminfoform.h \
+    widgets/statelabel.h
 
 FORMS += \
     dialogs/doubleprogressdialog.ui \
     dialogs/settingsdialog.ui \
     mainwindow.ui \
+    widgets/connectionstateform.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui
 
