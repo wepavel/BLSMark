@@ -16,11 +16,13 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
     ui->setupUi(this);
     initStatesTable();
     initGoodsTable();
+    initHealthChecker();
 }
 
 ConnectionStateForm::~ConnectionStateForm()
 {
     delete mdl;
+    delete h_checker;
 }
 
 void ConnectionStateForm::initStatesTable()
@@ -36,6 +38,7 @@ void ConnectionStateForm::initStatesTable()
 
             // Создаем StateLabel
             StateLabel *st_lbl = new StateLabel(container);
+            lbls.append(st_lbl);
             layout->addWidget(st_lbl);  // Добавляем StateLabel в макет
 
             // Добавляем контейнер в ячейку таблицы
@@ -68,6 +71,17 @@ void ConnectionStateForm::initGoodsTable()
     mdl->addRow("21321", "Товар", "РОССИЯ", currentTimeInSeconds, currentTimeInSeconds-100);
     mdl->addRow("21321", "Товар", "РОССИЯ", currentTimeInSeconds, currentTimeInSeconds-100);
     mdl->addRow("21321", "Товар", "РОССИЯ", currentTimeInSeconds, currentTimeInSeconds-100);
+}
+
+void ConnectionStateForm::initHealthChecker()
+{
+    h_checker = new HealthChecker(this);
+    connect(h_checker, &HealthChecker::serviceIsAvailable,this, [this](){
+        lbls[0]->setState(true);
+    });
+    connect(h_checker, &HealthChecker::serviceIsNotAvailable,this, [this](){
+        lbls[0]->setState(false);
+    });
 }
 
 

@@ -1,4 +1,4 @@
-QT += core gui concurrent sql
+QT += core gui concurrent sql network
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -37,6 +37,7 @@ CONFIG(release, debug|release) {
 
 SOURCES += \
     core/globalsettings.cpp \
+    core/healthchecker.cpp \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
     dialogs/settingsdialog.cpp \
@@ -51,6 +52,7 @@ SOURCES += \
     widgets/statelabel.cpp
 
 HEADERS += \
+    core/healthchecker.h \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \

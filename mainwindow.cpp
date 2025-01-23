@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     setWindowTitle("BLS Mark");
+    qDebug() << "ID_MAIN: " << QThread::currentThreadId();
 
 
 

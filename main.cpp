@@ -4,9 +4,9 @@
 #include <QIODevice>
 #include <QFile>
 #include <QDebug>
-
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
+#include <core/healthchecker.h>
 
 
 int main(int argc, char *argv[])
@@ -18,5 +18,6 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
+
     return a.exec();
 }
