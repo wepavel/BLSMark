@@ -21,6 +21,7 @@ private:
     QNetworkAccessManager *manager;
     QNetworkRequest ping_request;
     QTimer* timer;
+    bool isRequestInProgress = false;
 
 signals:
     void serviceIsAvailable();

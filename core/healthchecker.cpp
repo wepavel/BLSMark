@@ -14,6 +14,11 @@ HealthChecker::HealthChecker(QObject *parent)
 
 void HealthChecker::sendPingRequest()
 {
+    if (isRequestInProgress)
+        return;
+
+    isRequestInProgress = true;
+
     // Отправляем GET запрос
     QNetworkReply *reply = manager->get(ping_request);
 
@@ -39,6 +44,7 @@ void HealthChecker::sendPingRequest()
 
         // Удаляем объект ответа после завершения работы с ним
         reply->deleteLater();
+        isRequestInProgress = false;
     });
 }
 
