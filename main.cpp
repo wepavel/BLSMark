@@ -6,6 +6,7 @@
 #include <QDebug>
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
+#include "widgets/healthcheckform.h"
 #include <core/healthchecker.h>
 
 
@@ -15,7 +16,6 @@ int main(int argc, char *argv[])
 
     gSettings.loadSettings("/ini/settings.ini");
     styleManager.setTheme(gSettings.getTheme());
-
     MainWindow w;
     w.show();
 

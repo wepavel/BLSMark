@@ -1,5 +1,4 @@
-QT += core gui concurrent sql network
-
+QT += core gui concurrent sql network websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -49,6 +48,8 @@ SOURCES += \
     widgets/connectionstateform.cpp \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp \
+    widgets/healthcheckform.cpp \
+    widgets/healthunitform.cpp \
     widgets/statelabel.cpp
 
 HEADERS += \
@@ -68,6 +69,8 @@ HEADERS += \
     widgets/connectionstateform.h \
     widgets/dmimportform.h \
     widgets/dminfoform.h \
+    widgets/healthcheckform.h \
+    widgets/healthunitform.h \
     widgets/statelabel.h
 
 FORMS += \
@@ -76,7 +79,9 @@ FORMS += \
     mainwindow.ui \
     widgets/connectionstateform.ui \
     widgets/dmimportform.ui \
-    widgets/dminfoform.ui
+    widgets/dminfoform.ui \
+    widgets/healthcheckform.ui \
+    widgets/healthunitform.ui
 
 RESOURCES += \
     resources.qrc \
