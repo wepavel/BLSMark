@@ -31,10 +31,12 @@ void SettingsDialog::getDataFromIniFile()
     {
     case StyleManager::LightStyle:
         ui->rb_light->setChecked(true);
+        ui->rb_light->setFocus();
         break;
 
     case StyleManager::DarkStyle:
         ui->rb_dark->setChecked(true);
+        ui->rb_dark->setFocus();
         break;
 
     default:
