@@ -7,7 +7,7 @@ StateLabel::StateLabel(QWidget *parent)
     noPix.load(":/images/img/no.png");
     yesPix = yesPix.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     noPix = noPix.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    setPixmap(yesPix);
+    setPixmap(noPix);
 }
 
 void StateLabel::setState(bool ok)

@@ -1,5 +1,4 @@
-QT += core gui concurrent sql
-
+QT += core gui concurrent sql network websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -37,6 +36,7 @@ CONFIG(release, debug|release) {
 
 SOURCES += \
     core/globalsettings.cpp \
+    core/healthchecker.cpp \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
     dialogs/settingsdialog.cpp \
@@ -48,9 +48,12 @@ SOURCES += \
     widgets/connectionstateform.cpp \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp \
+    widgets/healthcheckform.cpp \
+    widgets/healthunitform.cpp \
     widgets/statelabel.cpp
 
 HEADERS += \
+    core/healthchecker.h \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
@@ -66,6 +69,8 @@ HEADERS += \
     widgets/connectionstateform.h \
     widgets/dmimportform.h \
     widgets/dminfoform.h \
+    widgets/healthcheckform.h \
+    widgets/healthunitform.h \
     widgets/statelabel.h
 
 FORMS += \
@@ -74,7 +79,9 @@ FORMS += \
     mainwindow.ui \
     widgets/connectionstateform.ui \
     widgets/dmimportform.ui \
-    widgets/dminfoform.ui
+    widgets/dminfoform.ui \
+    widgets/healthcheckform.ui \
+    widgets/healthunitform.ui
 
 RESOURCES += \
     resources.qrc \
