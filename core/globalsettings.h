@@ -37,6 +37,10 @@ public:
 
     QString getAppPath() const;
 
+
+signals:
+    void backendServiceIpPortChanged();
+
 private:
     GlobalSettings() {
         app_path = QCoreApplication::applicationDirPath();
