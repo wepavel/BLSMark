@@ -1,11 +1,17 @@
 #include "healthchecker.h"
+#include "qjsondocument.h"
+#include "qjsonobject.h"
 #include "qthread.h"
 
 HealthChecker::HealthChecker(QObject *parent)
     : QObject{parent}
 {
+    connect(&gSettings, &GlobalSettings::backendServiceIpPortChanged, this, &HealthChecker::on_backend_service_ip_port_changed);
     // http
-    httpPingRequest = QNetworkRequest(QUrl("http://127.0.0.1:8001/api/v1/heartbeat/service-heartbeat/ping"));
+    QString url = QString("http://%1:%2/api/v1/heartbeat/service-heartbeat/ping")
+                        .arg(gSettings.getBackendServiceIP())
+                        .arg(gSettings.getBackendServicePort());
+    httpPingRequest = QNetworkRequest(QUrl(url));
     httpManager = new QNetworkAccessManager(this);
     httpTimer = new QTimer(this);
     httpTimer->setInterval(500);
@@ -13,12 +19,19 @@ HealthChecker::HealthChecker(QObject *parent)
     httpTimer->start();
 
     // websocket
+    m_websocketUrl = QString("ws://%1:%2/api/v1/heartbeat/ws-status/1")
+                         .arg(gSettings.getBackendServiceIP())
+                         .arg(gSettings.getBackendServicePort());
+    qDebug() << m_websocketUrl;
     m_webSocket = new QWebSocket();
     connect(m_webSocket, &QWebSocket::connected, this, &HealthChecker::on_ws_connected);
     connect(m_webSocket, &QWebSocket::disconnected, this, &HealthChecker::on_ws_disconnected);
     connect(m_webSocket, &QWebSocket::textMessageReceived, this, &HealthChecker::on_ws_textMessageReceived);
     m_webSocketReconnectTimer = new QTimer(this);
+    m_webSocketRequestTimer = new QTimer(this);
     connect(m_webSocketReconnectTimer, &QTimer::timeout, this, &HealthChecker::wsConnectToServer);
+    connect(m_webSocketRequestTimer, &QTimer::timeout, this, &HealthChecker::wsRequestStatesData);
+
     wsConnectToServer();
 }
 
@@ -48,7 +61,7 @@ void HealthChecker::httpSendPingRequest()
                 emit serviceIsNotAvailable();
             }
         } else {
-            qDebug() << "Error:" << reply->errorString();
+            //qDebug() << "Error:" << reply->errorString();
             emit serviceIsNotAvailable();
         }
 
@@ -61,14 +74,33 @@ void HealthChecker::httpSendPingRequest()
 void HealthChecker::wsConnectToServer()
 {
     if (m_webSocket->state() != QAbstractSocket::ConnectedState) {
-        qDebug() << "Attempting to connect to server...";
+        qDebug() << "Attempting to connect to server with url " << m_websocketUrl;
         m_webSocket->open(m_websocketUrl);
     }
+}
+
+void HealthChecker::wsDisconnectFromServer()
+{
+    if (m_webSocket->state() == QAbstractSocket::ConnectedState) {
+        qDebug() << "Disconnecting from server...";
+        m_webSocket->close();
+    }
+}
+
+void HealthChecker::wsRequestStatesData()
+{
+    QJsonObject message;
+    message["type"] = "heartbeat";
+    QJsonDocument doc(message);
+    QString jsonMessage = doc.toJson(QJsonDocument::Compact);
+
+    m_webSocket->sendTextMessage(jsonMessage);
 }
 
 void HealthChecker::on_ws_connected()
 {
     m_webSocketReconnectTimer->stop();
+    m_webSocketRequestTimer->start(2000);
     emit serviceWorks();
     qDebug() << "Connected to server!";
 }
@@ -77,13 +109,34 @@ void HealthChecker::on_ws_disconnected()
 {
     qDebug() << "Disconnected from server!";
     emit serviceDoesNotWork();
+    m_webSocketRequestTimer->stop();
     // Попытаться переподключиться через 3 секунды
     m_webSocketReconnectTimer->start(WS_RECONNECT_INTERVAL_MS);
 }
 
+
 void HealthChecker::on_ws_textMessageReceived(const QString &message)
 {
     qDebug() << "Received message:" << message;
+}
+
+void HealthChecker::on_backend_service_ip_port_changed()
+{
+    // Обновление url для http
+    QString url = QString("http://%1:%2/api/v1/heartbeat/service-heartbeat/ping")
+                                            .arg(gSettings.getBackendServiceIP())
+                                            .arg(gSettings.getBackendServicePort());
+    httpPingRequest = QNetworkRequest(QUrl(url)); // обновляем url
+    httpIsRequestInProgress = false;
+    httpSendPingRequest();
+
+    // Обновление и переподключение для ws
+    m_websocketUrl = QString("ws://%1:%2/api/v1/heartbeat/ws-status/1")
+                         .arg(gSettings.getBackendServiceIP())
+                         .arg(gSettings.getBackendServicePort());
+    qDebug() << "newwsurl" << m_websocketUrl;
+    wsDisconnectFromServer();
+    wsConnectToServer();
 }
 
 HealthChecker::~HealthChecker()
@@ -92,4 +145,5 @@ HealthChecker::~HealthChecker()
     delete httpTimer;
     delete m_webSocketReconnectTimer;
     delete m_webSocket;
+    delete m_webSocketRequestTimer;
 }

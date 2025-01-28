@@ -54,8 +54,14 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::on_pb_apply_clicked()
 {
-    gSettings.setBackendServiceIP(ui->le_backend_ser_ip->text());
-    gSettings.setBackendServicePort(ui->le_backend_ser_port->text().toInt());
+    // если port или IP поменялись, надо сделать переподключение в HealthChecker
+    if ((gSettings.getBackendServiceIP() != ui->le_backend_ser_ip->text()) ||
+        (gSettings.getBackendServicePort() != ui->le_backend_ser_port->text().toInt()))
+    {
+        gSettings.setBackendServiceIP(ui->le_backend_ser_ip->text());
+        gSettings.setBackendServicePort(ui->le_backend_ser_port->text().toInt());
+        gSettings.backendServiceIpPortChanged(); // см. конструктор HealthChecker()
+    }
 
     if(ui->rb_light->isChecked()) {
         gSettings.setTheme(StyleManager::LightStyle);
