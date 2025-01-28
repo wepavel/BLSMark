@@ -1080,6 +1080,7 @@ QPushButton::menu-indicator {
 
 QTableView {
     border: 1px solid #bcc1c6;
+	gridline-color: #d3d3d3;
     background-color: #f9f9f9;
 }
 
