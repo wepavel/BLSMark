@@ -26,13 +26,13 @@ void HealthCheckForm::setAvailable(const QString& unitName, const bool available
 {
     if (unitsMap.contains(unitName))
     {
-        // if(unitName == "Сервис" && available == false)
-        // {
-        //     for(const QString &name: unitsOrder){
-        //         unitsMap[name]->setAvailable(false);
-        //         unitsMap[name]->setWorking(false);
-        //     }
-        // }
+        if(unitName == "Сервис" && available == false)
+        {
+            for(const QString &name: unitsOrder){
+                unitsMap[name]->setAvailable(false);
+                unitsMap[name]->setWorking(false);
+            }
+        }
         unitsMap[unitName]->setAvailable(available);
     } else {
         qDebug() << "Единица не найдена: " << unitName;
@@ -43,15 +43,15 @@ void HealthCheckForm::setWorks(const QString& unitName, const bool works)
 {
     if (unitsMap.contains(unitName))
     {
-        // if(unitName == "Сервис" && works == false)
-        // {
-        //     for(const QString &name: unitsOrder){
-        //         if(name == "Сервис")
-        //             continue;
-        //         unitsMap[name]->setAvailable(false);
-        //         unitsMap[name]->setWorking(false);
-        //     }
-        // }
+        if(unitName == "Сервис" && works == false)
+        {
+            for(const QString &name: unitsOrder){
+                if(name == "Сервис")
+                    continue;
+                unitsMap[name]->setAvailable(false);
+                unitsMap[name]->setWorking(false);
+            }
+        }
         unitsMap[unitName]->setWorking(works);
     } else {
         qDebug() << "Единица не найдена:" << unitName;

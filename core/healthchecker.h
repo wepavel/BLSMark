@@ -9,7 +9,9 @@
 #include <QWebSocket>
 #include "globalsettings.h"
 
+#define HTTP_REQUEST_INTERVAL_MS 500
 #define WS_RECONNECT_INTERVAL_MS 3000
+#define WS_REQUEST_INTERVAL_MS 2000
 
 class HealthChecker : public QObject
 {
@@ -38,6 +40,13 @@ private:
     void wsDisconnectFromServer();
     void wsRequestStatesData();
 
+    QString getName(QString name);
+    QMap<QString, QString> devNamesMap = {
+        {"printer","Принтер"},
+        {"plc","ПЛК"},
+        {"scanner","Сканер"},
+    };
+
 private slots:
     void on_ws_connected();
     void on_ws_disconnected();
@@ -45,13 +54,8 @@ private slots:
     void on_backend_service_ip_port_changed();
 
 signals:
-    // http
-    void serviceIsAvailable();
-    void serviceIsNotAvailable();
-
-    // ws
-    void serviceWorks();
-    void serviceDoesNotWork();
+    void deviceAvailableChanged(QString devName, bool available);
+    void deviceWorksChanged(QString devName, bool works);
 };
 
 #endif // HEALTHCHECKER_H
