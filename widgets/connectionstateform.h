@@ -31,6 +31,10 @@ private:
     HealthChecker* m_hChecker;
     HealthCheckForm* m_healthCheckForm;
     QTableView* m_tvGoods;
+
+private slots:
+    void device_available_changed(QString devName, bool available);
+    void device_works_changed(QString devName, bool works);
 };
 
 #endif // CONNECTIONSTATEFORM_H

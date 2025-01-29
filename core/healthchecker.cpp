@@ -1,4 +1,5 @@
 #include "healthchecker.h"
+#include "qjsonarray.h"
 #include "qjsondocument.h"
 #include "qjsonobject.h"
 #include "qthread.h"
@@ -14,7 +15,7 @@ HealthChecker::HealthChecker(QObject *parent)
     httpPingRequest = QNetworkRequest(QUrl(url));
     httpManager = new QNetworkAccessManager(this);
     httpTimer = new QTimer(this);
-    httpTimer->setInterval(500);
+    httpTimer->setInterval(HTTP_REQUEST_INTERVAL_MS);
     connect(httpTimer, &QTimer::timeout, this, &HealthChecker::httpSendPingRequest);
     httpTimer->start();
 
@@ -55,14 +56,14 @@ void HealthChecker::httpSendPingRequest()
             // Проверяем, что в ответе есть "pong"
             if (responseData == "pong") {
                 //qDebug() << "Received pong!";
-                emit serviceIsAvailable();
+                emit deviceAvailableChanged("Сервис", true);
             } else {
-                qDebug() << "Unexpected response:" << responseData;
-                emit serviceIsNotAvailable();
+                //qDebug() << "Unexpected response:" << responseData;
+                emit deviceAvailableChanged("Сервис", false);
             }
         } else {
             //qDebug() << "Error:" << reply->errorString();
-            emit serviceIsNotAvailable();
+            emit deviceAvailableChanged("Сервис", false);
         }
 
         // Удаляем объект ответа после завершения работы с ним
@@ -97,27 +98,60 @@ void HealthChecker::wsRequestStatesData()
     m_webSocket->sendTextMessage(jsonMessage);
 }
 
+QString HealthChecker::getName(QString name)
+{
+    return devNamesMap[name];
+}
+
 void HealthChecker::on_ws_connected()
 {
     m_webSocketReconnectTimer->stop();
-    m_webSocketRequestTimer->start(2000);
-    emit serviceWorks();
+    m_webSocketRequestTimer->start(WS_REQUEST_INTERVAL_MS);
+    emit deviceWorksChanged("Сервис", true);
     qDebug() << "Connected to server!";
 }
 
 void HealthChecker::on_ws_disconnected()
 {
     qDebug() << "Disconnected from server!";
-    emit serviceDoesNotWork();
+    emit deviceWorksChanged("Сервис", false);
     m_webSocketRequestTimer->stop();
     // Попытаться переподключиться через 3 секунды
     m_webSocketReconnectTimer->start(WS_RECONNECT_INTERVAL_MS);
 }
 
-
 void HealthChecker::on_ws_textMessageReceived(const QString &message)
 {
     qDebug() << "Received message:" << message;
+    // Шаг 1: Десериализуем строку JSON в QJsonDocument
+    QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+
+    // Проверим, был ли JSON корректно распарсен
+    if (doc.isNull()) {
+        qDebug() << "Invalid JSON format!";
+        return;
+    }
+
+    // Шаг 2: Извлекаем объект данных
+    QJsonObject rootObj = doc.object();
+    QJsonObject dataObj = rootObj.value("data").toObject();
+    QJsonArray messagesArray = dataObj.value("message").toArray();
+
+    // Шаг 3: Перебираем сообщения и извлекаем булевые значения
+    for (const QJsonValue &value : messagesArray) {
+        QJsonObject messageObj = value.toObject();
+        QString name = messageObj.value("name").toString();
+        bool ping = messageObj.value("ping").toBool();
+        bool heartbeat = messageObj.value("heartbeat").toBool();
+
+        emit deviceAvailableChanged(getName(name), ping);
+        emit deviceWorksChanged(getName(name), heartbeat);
+        qDebug() << "Device:" << name;
+        qDebug() << "  Ping:" << ping;
+        qDebug() << "  Heartbeat:" << heartbeat;
+    }
+
+    deviceWorksChanged("Сервис", true);
 }
 
 void HealthChecker::on_backend_service_ip_port_changed()
@@ -141,9 +175,12 @@ void HealthChecker::on_backend_service_ip_port_changed()
 
 HealthChecker::~HealthChecker()
 {
+    m_webSocketReconnectTimer->stop();
+    m_webSocketRequestTimer->stop();
+    wsDisconnectFromServer();
     delete httpManager;
     delete httpTimer;
     delete m_webSocketReconnectTimer;
-    delete m_webSocket;
     delete m_webSocketRequestTimer;
+    delete m_webSocket;
 }

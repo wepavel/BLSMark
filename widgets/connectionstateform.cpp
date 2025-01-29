@@ -52,21 +52,18 @@ void ConnectionStateForm::initHealthChecker()
 
     m_hChecker = new HealthChecker(this);
 
-    connect(m_hChecker, &HealthChecker::serviceIsAvailable, this, [this](){
-        m_healthCheckForm->setAvailable("Сервис", true);
-    });
+    connect(m_hChecker, &HealthChecker::deviceAvailableChanged, this, &ConnectionStateForm::device_available_changed);
+    connect(m_hChecker, &HealthChecker::deviceWorksChanged, this, &ConnectionStateForm::device_works_changed);
+}
 
-    connect(m_hChecker, &HealthChecker::serviceIsNotAvailable, this, [this](){
-        m_healthCheckForm->setAvailable("Сервис", false);
-    });
+void ConnectionStateForm::device_available_changed(QString devName, bool available)
+{
+    m_healthCheckForm->setAvailable(devName, available);
+}
 
-    connect(m_hChecker, &HealthChecker::serviceWorks, this, [this](){
-        m_healthCheckForm->setWorks("Сервис", true);
-    });
-
-    connect(m_hChecker, &HealthChecker::serviceDoesNotWork, this, [this](){
-        m_healthCheckForm->setWorks("Сервис", false);
-    });
+void ConnectionStateForm::device_works_changed(QString devName, bool works)
+{
+    m_healthCheckForm->setWorks(devName, works);
 }
 
 
