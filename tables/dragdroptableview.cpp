@@ -27,17 +27,15 @@ void DragDropTableView::dragEnterEvent(QDragEnterEvent *event)
         }
 
         if (isValidDrop) {
-            setStyleSheet("QTableView { background-color: #D3FFD3; }");  // Зеленый цвет
+            event->accept();
         } else {
-            setStyleSheet("QTableView { background-color: #FFD3D3; }");  // Красный цвет
+            event->ignore();
         }
     }
-    event->accept();
 }
 
 void DragDropTableView::dropEvent(QDropEvent *event)
 {
-    //qDebug() << "dropEvent";
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls()) {
         QList<QUrl> urls = mimeData->urls();
@@ -66,14 +64,11 @@ void DragDropTableView::dropEvent(QDropEvent *event)
         if(!resultFilesPaths.isEmpty() || !resultDirs.isEmpty()) // если были получены какие-то файлы
             emit filesWereDropped(resultFilesPaths, resultDirs); // отправим их
     }
-    setStyleSheet("QTableView { background-color: transparent; }");
     event->accept();
 }
 
 void DragDropTableView::dragLeaveEvent(QDragLeaveEvent *event)
 {
-    // Сбросить подсветку, если курсор покидает область таблицы
-    setStyleSheet("QTableView { background-color: transparent; }");
     event->accept();
 }
 
