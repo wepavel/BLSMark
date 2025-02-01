@@ -20,10 +20,9 @@ HealthChecker::HealthChecker(QObject *parent)
     httpTimer->start();
 
     // websocket
-    m_websocketUrl = QString("ws://%1:%2/api/v1/heartbeat/ws-status/1")
+    m_websocketUrl = QString("ws://%1:%2/api/v1/streaming/ws-status/1")
                          .arg(gSettings.getBackendServiceIP())
                          .arg(gSettings.getBackendServicePort());
-    qDebug() << m_websocketUrl;
     m_webSocket = new QWebSocket();
     connect(m_webSocket, &QWebSocket::connected, this, &HealthChecker::on_ws_connected);
     connect(m_webSocket, &QWebSocket::disconnected, this, &HealthChecker::on_ws_disconnected);
@@ -70,6 +69,11 @@ void HealthChecker::httpSendPingRequest()
         reply->deleteLater();
         httpIsRequestInProgress = false;
     });
+}
+
+QWebSocket *HealthChecker::getConnection()
+{
+    return m_webSocket;
 }
 
 void HealthChecker::wsConnectToServer()
@@ -122,7 +126,6 @@ void HealthChecker::on_ws_disconnected()
 
 void HealthChecker::on_ws_textMessageReceived(const QString &message)
 {
-    qDebug() << "Received message:" << message;
     // Шаг 1: Десериализуем строку JSON в QJsonDocument
     QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
 
@@ -146,9 +149,9 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
 
         emit deviceAvailableChanged(getName(name), ping);
         emit deviceWorksChanged(getName(name), heartbeat);
-        qDebug() << "Device:" << name;
-        qDebug() << "  Ping:" << ping;
-        qDebug() << "  Heartbeat:" << heartbeat;
+        // qDebug() << "Device:" << name;
+        // qDebug() << "  Ping:" << ping;
+        // qDebug() << "  Heartbeat:" << heartbeat;
     }
 
     deviceWorksChanged("Сервис", true);
@@ -165,10 +168,10 @@ void HealthChecker::on_backend_service_ip_port_changed()
     httpSendPingRequest();
 
     // Обновление и переподключение для ws
-    m_websocketUrl = QString("ws://%1:%2/api/v1/heartbeat/ws-status/1")
+    m_websocketUrl = QString("ws://%1:%2/api/v1/streaming/ws-status/1")
                          .arg(gSettings.getBackendServiceIP())
                          .arg(gSettings.getBackendServicePort());
-    qDebug() << "newwsurl" << m_websocketUrl;
+    //qDebug() << "newwsurl" << m_websocketUrl;
     wsDisconnectFromServer();
     wsConnectToServer();
 }

@@ -1,4 +1,5 @@
 #include "goodsmodel.h"
+#include "qbrush.h"
 #include "qdatetime.h"
 
 GoodsModel::GoodsModel(QObject *parent)
@@ -26,6 +27,12 @@ QVariant GoodsModel::data(const QModelIndex &index, int role) const
 
     const RowData &rowData = m_data[index.row()];
 
+    if (role == Qt::BackgroundRole) {
+        if (m_data[index.row()].timeStickOnGood == 0) {
+            return QBrush(Qt::red); // Установим красный цвет фона
+        }
+    }
+
     if (role == Qt::DisplayRole)
     {
         switch (static_cast<Column>(index.column())) {
@@ -34,11 +41,14 @@ QVariant GoodsModel::data(const QModelIndex &index, int role) const
         case Column::CountryColumn: return rowData.country;
 
         case Column::TimeDbAdd: {
-            return QDateTime::fromSecsSinceEpoch(rowData.timeStickOnGood)
+            return QDateTime::fromSecsSinceEpoch(rowData.timeDbAdd)
                 .toString("dd.MM.yyyy HH:mm:ss");
         }
 
         case Column::TimeStickOnGood: {
+            if(rowData.timeStickOnGood == 0){
+                return "";
+            }
             return QDateTime::fromSecsSinceEpoch(rowData.timeStickOnGood)
                 .toString("dd.MM.yyyy HH:mm:ss");
         }
@@ -46,6 +56,11 @@ QVariant GoodsModel::data(const QModelIndex &index, int role) const
         default: return QVariant();
         }
     }
+
+    if (role == Qt::TextAlignmentRole) {
+        return Qt::AlignCenter; // Выравнивание по центру
+    }
+
     return QVariant();
 }
 

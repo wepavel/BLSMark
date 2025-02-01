@@ -1066,12 +1066,8 @@ QPushButton::menu-indicator {
 
 QTableView {
     border: 1px solid #76797C;
+    border-radius: 0px;
     background-color: #232629;
-}
-
-QTableView,
-QHeaderView {
-    border-radius: 3px;
 }
 
 QTableView::item:pressed,
@@ -1086,6 +1082,10 @@ QTreeView::item:selected:active,
 QListView::item:selected:active {
     background: #fb9f18;
     color: #eff0f1;
+}
+
+QTableview::item{
+    border-radius: 0px;
 }
 
 QHeaderView {

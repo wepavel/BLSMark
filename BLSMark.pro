@@ -35,6 +35,7 @@ CONFIG(release, debug|release) {
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    core/dmcodewshandler.cpp \
     core/globalsettings.cpp \
     core/healthchecker.cpp \
     core/stylemanager.cpp \
@@ -44,6 +45,7 @@ SOURCES += \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
     models/goodsmodel.cpp \
+    tables/autoscrolltableview.cpp \
     tables/dragdroptableview.cpp \
     widgets/connectionstateform.cpp \
     widgets/dmimportform.cpp \
@@ -53,6 +55,7 @@ SOURCES += \
     widgets/statelabel.cpp
 
 HEADERS += \
+    core/dmcodewshandler.h \
     core/healthchecker.h \
     crud/crudbase.h \
     crud/cruddmcode.h \
@@ -65,6 +68,7 @@ HEADERS += \
     core/stylemanager.h \
     mainwindow.h \
     models/dmimportmodel.h \
+    tables/autoscrolltableview.h \
     tables/dragdroptableview.h \
     widgets/connectionstateform.h \
     widgets/dmimportform.h \
