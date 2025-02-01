@@ -54,7 +54,7 @@ auto MainWindow::fill_logo() -> void
     ui->hl_logo->addStretch(1);
 
     QLabel *label = new QLabel(this);
-    label->setText(tr("<a href='http://blscom.ru/'>Посетите наш сайт</a>"));
+    label->setText(tr("<a href='http://blscom.ru/' style='color: orange; font-family: Arial, sans-serif; font-size: 14px; text-decoration: underline;'>Посетите наш сайт http://blscom.ru</a>"));
     label->setOpenExternalLinks(true); // Это позволит открывать ссылку в браузере по умолчанию
 
     // Если вы хотите обрабатывать клик самостоятельно:
