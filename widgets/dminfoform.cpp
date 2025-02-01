@@ -76,9 +76,9 @@ DMInfoForm::DMInfoForm(const QString &dmCode, QWidget *parent)
 
     DataMatrixAttrs dmAttrs;
     bool dmValidated = validateDataMatrix(dmCode, dmAttrs);
-    setDMFields(dmAttrs);
-    if(dmValidated) {
 
+    if(dmValidated) {
+        setDMFields(dmAttrs);
         QString code = prepareDataMatrix(dmCode);
         QPixmap img = generateDataMatrix(code, 10);
         ui->lbl_img->setPixmap(img);
@@ -114,12 +114,21 @@ DMInfoForm::DataMatrixAttrs DMInfoForm::parseDataMatrix(const QString &dataMatri
             if (group.length() > 16) {  // Если после GTIN есть еще данные
                 QString remainder = group.mid(16);
                 if (remainder.startsWith("21")) {
-                    QString countryCode = remainder.mid(2, 1);
 
-                    result.countryCode = countryCode.toInt();
-                    result.country = countryToString(static_cast<Country>(result.countryCode));
+                    if (remainder.at(2).isDigit()) {
+                        QString countryCode = remainder.mid(2, 1);
 
-                    result.serialNumber = remainder.mid(3, 5);
+                        result.countryCode = countryCode.toInt();
+                        result.country = countryToString(static_cast<Country>(result.countryCode));
+
+                        result.serialNumber = remainder.mid(3, -1);
+                    } else {
+                        QString countryCode = 0;
+
+                        result.countryCode = countryCode.toInt();
+                        result.country = countryToString(static_cast<Country>(result.countryCode));
+                        result.serialNumber = remainder.mid(2, -1);
+                    }
                 }
             }
         } else if (group.startsWith("91")) {
@@ -147,6 +156,10 @@ bool DMInfoForm::validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& 
     // QRegularExpression shortFormatRegex("^(?:\\x{00E8})?01\\d{14}21[1-5].{5}<GS>93.{4}$");
     QRegularExpression shortFormatRegex(R"(^01\d{14}21[0-5].{5,12}<GS>93.{4}$)");
 
+    QRegularExpression longFormatRegexNoCountry(R"(^01\d{14}21[A-Za-z].{5,13}<GS>91.{4}<GS>92.{44}$)");
+    // QRegularExpression shortFormatRegex("^(?:\\x{00E8})?01\\d{14}21[1-5].{5}<GS>93.{4}$");
+    QRegularExpression shortFormatRegexNoCountry(R"(^01\d{14}21[A-Za-z].{5,13}<GS>93.{4}$)");
+
     if (longFormatRegex.match(normalizedCode).hasMatch() || shortFormatRegex.match(normalizedCode).hasMatch()) {
         attrs = parseDataMatrix(normalizedCode);
 
@@ -154,10 +167,10 @@ bool DMInfoForm::validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& 
         if (attrs.gtin.length() != 14 || !attrs.gtin.toULongLong()) return false;
 
         // Проверка серийного номера
-        if (attrs.serialNumber.length() != 5) return false;
+        if (attrs.serialNumber.length() < 5 || attrs.serialNumber.length() > 13) return false;
 
         // Проверка кода страны
-        if (attrs.countryCode < 1 || attrs.countryCode > 5) return false;
+        if (attrs.countryCode < 0 || attrs.countryCode > 5) return false;
 
         // Проверка формата и соответствующих полей
         if (attrs.isLongFormat) {
@@ -169,6 +182,28 @@ bool DMInfoForm::validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& 
             if (attrs.verificationKeyValue != QString("-")) return false;
         }
 
+        return true;
+    } else if (longFormatRegexNoCountry.match(normalizedCode).hasMatch() || shortFormatRegexNoCountry.match(normalizedCode).hasMatch()) {
+        attrs = parseDataMatrix(normalizedCode);
+
+        // Проверка GTIN
+        if (attrs.gtin.length() != 14 || !attrs.gtin.toULongLong()) return false;
+
+        // Проверка серийного номера
+        if (attrs.serialNumber.length() < 5 || attrs.serialNumber.length() > 13) return false;
+
+        // Проверка кода страны
+        if (attrs.countryCode < 0 || attrs.countryCode > 5) return false;
+
+        // Проверка формата и соответствующих полей
+        if (attrs.isLongFormat) {
+            if (attrs.verificationKey.length() != 4) return false;
+            if (attrs.verificationKeyValue.length() != 44) return false;
+
+        } else {
+            if (attrs.verificationKey.length() != 4) return false;
+            if (attrs.verificationKeyValue != QString("-")) return false;
+        }
         return true;
     }
 
@@ -221,6 +256,7 @@ void DMInfoForm::setDMFields(const DataMatrixAttrs &attrs)
     ui->le_country_code->setText(QString::number(attrs.countryCode));
 
     ui->le_country->setText(attrs.country);
+    ui->le_serial->setText(attrs.serialNumber);
     ui->le_verify_code->setText(attrs.verificationKey);
     ui->le_verify_code_value->setText(attrs.verificationKeyValue);
 }
