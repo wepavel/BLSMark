@@ -41,6 +41,9 @@ public:
                 const qint64 &timeDbAdd,
                 const qint64 &timeStickOnGood);
     void clear();
+
+signals:
+    void dataHasBeenAdded();
 };
 
 #endif // GOODSMODEL_H
