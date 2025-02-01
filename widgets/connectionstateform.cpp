@@ -41,7 +41,7 @@ void ConnectionStateForm::initGoodsTable()
     m_tvGoods->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
     m_tvGoods->setFocusPolicy(Qt::ClickFocus);
 
-    qint64 currentTimeInSeconds = QDateTime::currentSecsSinceEpoch();
+    connect(mdl, &GoodsModel::dataHasBeenAdded, m_tvGoods, &AutoScrollTableView::update);
 }
 
 void ConnectionStateForm::initHealthChecker()
@@ -134,7 +134,6 @@ void ConnectionStateForm::dm_code_received(const QString &msg)
                     getDateTime(upload_date).toSecsSinceEpoch(),
                     getDateTime(entry_time).toSecsSinceEpoch()
                     );
-        m_tvGoods->addData();
     }
 }
 

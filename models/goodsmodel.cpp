@@ -101,6 +101,7 @@ void GoodsModel::addRow(const QString &code,
     beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
     m_data.append({code, goodName, country, timeDbAdd, timeStickOnGood});
     endInsertRows();
+    emit dataHasBeenAdded();
 }
 
 void GoodsModel::clear()

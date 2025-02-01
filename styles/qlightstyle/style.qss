@@ -1086,7 +1086,7 @@ QTableView {
 
 QTableView,
 QHeaderView {
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 QTableView::item:pressed,
