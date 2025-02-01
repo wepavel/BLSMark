@@ -38,10 +38,9 @@ public:
     void addRow(const QString &code,
                 const QString &goodName,
                 const QString &country,
-                const qint64& timeDbAdd,
-                const qint64& timeStickOnGood);
+                const qint64 &timeDbAdd,
+                const qint64 &timeStickOnGood);
     void clear();
-
 };
 
 #endif // GOODSMODEL_H

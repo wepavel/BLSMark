@@ -21,6 +21,7 @@ public:
     ~HealthChecker();
 
     void httpSendPingRequest();
+    QWebSocket* getConnection();
 
 private:
     // HTTP
