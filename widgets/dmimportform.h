@@ -15,6 +15,7 @@
 #include "models/dmimportmodel.h"
 #include "crud/cruddmcode.h"
 #include "dialogs/doubleprogressdialog.h"
+#include "qnetworkaccessmanager.h"
 #include <QMessageBox>
 
 
@@ -41,6 +42,7 @@ private slots:
     void complete_process();
     void files_were_dropped(QStringList filePaths, QStringList dirs);
     void on_pb_load_dir_clicked();
+    void on_pb_load_in_db_clicked();
 
 private:
     //---Vars
@@ -48,20 +50,30 @@ private:
     DMImportModel* importModel;
     QProgressDialog *progressDialog;
     DoubleProgressDialog *m_doubleProgressDialog;
+    QNetworkAccessManager *httpManager;
 
     QString lastUsedDirectory = QDir::homePath();
     // CRUDDMCode db = CRUDDMCode("QSQLITE", gSettings.getAppPath() + "/mydb.sqlite");
     CRUDDMCode db = CRUDDMCode("QSQLITE", "C:/Users/Wepal/Documents/mydb.sqlite");
 
     // QSqlDatabase* m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
+    QSet<QString> invalideDmCodesPaths = {"Путь до файла1", "Путь до файла2", "Путь до файла3","Путь до файла4"};
 
+    // std::atomic<int> requestCount{0};
+    // bool dmCodesInserted = false; // Флаг, чтобы гарантировать однократный вызов insertAllDmCodes
+    // QMutex dmCodesMutex; // Защита доступа к dmCodesInserted
+    QStringList gtinsToInsert = {};
 
     //---Funcs
     void startReadDm(const QString &program, const QStringList &arguments);
     void setupImportTable();
     void showBigAmountWarning();
+    QString getFileNameFromPath(const QString& filePath);
     static bool writeImageToDisk(const QString &code, const QString &base64Image);
     static QString getHashForCode(const QString &code);
+    void insertGtinInDb(const QString& gtin);
+    void insertAllGtinsAndDmCodes();
+    void insertAllDmCodes();
 };
 
 #endif // DMIMPORTFORM_H

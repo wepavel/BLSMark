@@ -68,11 +68,7 @@ DMInfoForm::DMInfoForm(const QString &dmCode, QWidget *parent)
 
     ui->lbl_img->setFixedSize(120, 120); // Установите нужный размер
     ui->lbl_img->setScaledContents(true);
-
-
     ui->le_dm_code->setText(dmCode);
-
-
 
     DataMatrixAttrs dmAttrs;
     bool dmValidated = validateDataMatrix(dmCode, dmAttrs);

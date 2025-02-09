@@ -1,4 +1,8 @@
 #include "dmimportform.h"
+#include "dialogs/nameinputdialog.h"
+#include "dminfoform.h"
+#include "qnetworkaccessmanager.h"
+#include "qnetworkreply.h"
 #include "ui_dmimportform.h"
 
 #include <QFileDialog>
@@ -11,15 +15,24 @@
 
 #include "widgets/dminfoform.h"
 #include "sqlmodels/dmcodemodel.h"
+#include "dialogs/invaliddmcodesinfodialog.h"
 
-
+#define gtinIsNotInDb "false"
 
 DMImportForm::DMImportForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::DMImportForm)
     , importModel(new DMImportModel(this))
+    , httpManager(new QNetworkAccessManager(this))
 {
     ui->setupUi(this);
+    //ui->pb_load_in_db->setEnabled(false);
+    ui->pb_load_in_db->setFocusPolicy(Qt::NoFocus);
+
+    connect(importModel, &DMImportModel::dataHasBeenAdded,
+            [this](){ui->pb_load_in_db->setEnabled(true);});
+    connect(importModel, &DMImportModel::dataHasBeenCleared,
+            [this](){ui->pb_load_in_db->setEnabled(true);});
 
     setAcceptDrops(true);
     setupImportTable();
@@ -42,6 +55,7 @@ DMImportForm::DMImportForm(QWidget *parent)
 DMImportForm::~DMImportForm()
 {
     delete ui;
+    delete httpManager;
 }
 
 
@@ -136,11 +150,7 @@ void DMImportForm::recieve_dm_data(QString row)
     // if (m_doubleProgressDialog->getFileProgress()<100) {
     //     m_doubleProgressDialog->setFileProgress(doc_progress);
     // }
-    m_doubleProgressDialog->setFileProgress(doc_progress);
-    // if (m_doubleProgressDialog->getFilesProgress()<100) {
-    //     m_doubleProgressDialog->setFilesProgress(docs_progress);
-    // }
-    m_doubleProgressDialog->setFilesProgress(docs_progress);
+
     // DMCodeModel new_code(code, QString("%1.png").arg(getHashForCode(code)));
 
     // QSqlQuery query(*m_db);
@@ -158,8 +168,21 @@ void DMImportForm::recieve_dm_data(QString row)
     // }
     // saveImage(dm_code, img_base64);
 
-    importModel->addRow(dm_code, file_path, "");
+    DMInfoForm::DataMatrixAttrs dmAttrs;
+    bool dmValidated = DMInfoForm::validateDataMatrix(dm_code, dmAttrs);
 
+    if(dmValidated) {
+        QString gtin = dmAttrs.gtin;
+        importModel->addRow(gtin, dm_code, getFileNameFromPath(file_path), "");
+    } else {
+        invalideDmCodesPaths.insert(file_path);
+    }
+
+    m_doubleProgressDialog->setFileProgress(doc_progress);
+    // if (m_doubleProgressDialog->getFilesProgress()<100) {
+    //     m_doubleProgressDialog->setFilesProgress(docs_progress);
+    // }
+    m_doubleProgressDialog->setFilesProgress(docs_progress);
     // if (progressDialog->wasCanceled()) {
     //     // Здесь логика для прерывания процесса
     // }
@@ -188,6 +211,12 @@ void DMImportForm::complete_process()
         qDebug() << "Progress dialog has been destroyed";
     });
     m_doubleProgressDialog->deleteLater();
+
+    if(!invalideDmCodesPaths.isEmpty()){
+        InvalidDmCodesInfoDialog d(invalideDmCodesPaths);
+        d.exec();
+    }
+    invalideDmCodesPaths.clear();
 
     // connect(progressDialog, &QProgressDialog::c)
     // if(progressDialog != nullptr) {
@@ -423,6 +452,12 @@ void DMImportForm::showBigAmountWarning()
                          QMessageBox::Ok);
 }
 
+QString DMImportForm::getFileNameFromPath(const QString &filePath)
+{
+    QFileInfo fileInfo(filePath);
+    return fileInfo.fileName();
+}
+
 
 bool DMImportForm::writeImageToDisk(const QString &code, const QString &base64Image)
 {
@@ -459,6 +494,104 @@ QString DMImportForm::getHashForCode(const QString &code)
     return QCryptographicHash::hash(code.toUtf8(), QCryptographicHash::Sha256).toHex();
 }
 
+void DMImportForm::insertGtinInDb(const QString& gtin)
+{
+    NameInputDialog d(this);
+    if (d.exec() == QDialog::Accepted){
+        QString name = d.getName();
+        QUrl url = QUrl(QString("http://%1:%2/api/v1/code-processing/add-gtin")
+                            .arg(gSettings.getBackendServiceIP())
+                            .arg(gSettings.getBackendServicePort()));;
+        QNetworkRequest httpRequest(url);
+        httpRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        QJsonObject data;
+        data["name"] = name;
+        data["code"] = gtin;
+        QJsonDocument doc(data);
+        QByteArray jsonData = doc.toJson();
+        QNetworkReply *reply = httpManager->post(httpRequest, jsonData);
+        connect(reply, &QNetworkReply::finished, this, [reply, name, gtin]() { // Capture name and gtin
+            if (reply->error() == QNetworkReply::NoError) {
+                QByteArray responseData = reply->readAll();
+                qDebug() << "GTIN:" << gtin << ", Name: " << name << " - Response: " << responseData;
+            } else {
+                qDebug() << "GTIN:" << gtin << ", Name: " << name << " - Error: " << reply->errorString();
+            }
+            reply->deleteLater();
+        }, Qt::QueuedConnection);
+    }
+}
 
+void DMImportForm::insertAllGtinsAndDmCodes() {
+    QSet<QString> gtins = importModel->getAllGtins();
 
+    for (const QString& gtin : gtins) {
+        QUrl url = QUrl(QString("http://%1:%2/api/v1/code-processing/is-gtin/")
+                            .arg(gSettings.getBackendServiceIP())
+                            .arg(gSettings.getBackendServicePort()));
+        url.setPath(url.path() + QUrl::toPercentEncoding(gtin));
+
+        QNetworkRequest httpRequest(url);
+
+        QNetworkReply* reply = httpManager->get(httpRequest);
+
+        connect(reply, &QNetworkReply::finished, this, [gtin, reply, this]() {
+            QByteArray responseData = reply->readAll();
+            if (reply->error() == QNetworkReply::NoError) {
+                if (responseData == gtinIsNotInDb) {
+                    insertGtinInDb(gtin);
+                }
+            } else {
+                qDebug() << "Error: " << reply->errorString();
+            }
+
+            reply->deleteLater();
+        }, Qt::QueuedConnection);
+
+        connect(reply, &QNetworkReply::errorOccurred, this, [this, reply](QNetworkReply::NetworkError error) {
+            reply->deleteLater();
+        }, Qt::QueuedConnection);
+    }
+
+    // и только после того как все gtin вставлены нам надо вставить dm codes
+    //  insertAllDmCodes()
+};
+
+void DMImportForm::insertAllDmCodes()
+{
+    QUrl url = QUrl(QString("http://%1:%2/api/v1/code-processing/add-dmcodes")
+                        .arg(gSettings.getBackendServiceIP())
+                        .arg(gSettings.getBackendServicePort()));
+    QJsonArray arr;
+    for(const QString& dmCode: importModel->getAllDmCodes()){
+        QJsonObject obj;
+        obj["dm_code"] = dmCode;
+        arr.append(obj);
+    }
+    QNetworkRequest httpRequest(url);
+    httpRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonDocument doc(arr);
+    QByteArray jsonData = doc.toJson();
+    QNetworkReply *reply = httpManager->post(httpRequest, jsonData);
+
+    connect(reply, &QNetworkReply::finished, this, [reply, this]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray responseData = reply->readAll();
+            qDebug() << "insertAllDmCodes NO ERROR: " << responseData;
+            QMessageBox::information(this, "Сообщение об успешной загрузке Qr-кодов",
+                                     "Коды были успешно загружены в БД!");
+        } else {
+            qDebug() << "insertAllDmCodes ERROR: " << reply->errorString();
+            QMessageBox::critical(this, "Произошла ошибка!", reply->errorString());
+        }
+        reply->deleteLater();
+    }, Qt::QueuedConnection);
+}
+
+void DMImportForm::on_pb_load_in_db_clicked()
+{
+    insertAllGtinsAndDmCodes();
+    //insertAllDmCodes();
+}
 
