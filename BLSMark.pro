@@ -40,7 +40,6 @@ SOURCES += \
     core/healthchecker.cpp \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
-    dialogs/nameinputdialog.cpp \
     dialogs/settingsdialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -62,7 +61,6 @@ HEADERS += \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
-    dialogs/nameinputdialog.h \
     dialogs/settingsdialog.h \
     models/goodsmodel.h \
     sqlmodels/baseentity.h \
@@ -83,7 +81,6 @@ HEADERS += \
 
 FORMS += \
     dialogs/doubleprogressdialog.ui \
-    dialogs/nameinputdialog.ui \
     dialogs/settingsdialog.ui \
     mainwindow.ui \
     widgets/connectionstateform.ui \
