@@ -40,6 +40,7 @@ SOURCES += \
     core/healthchecker.cpp \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
+    dialogs/nameinputdialog.cpp \
     dialogs/settingsdialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -52,6 +53,7 @@ SOURCES += \
     widgets/dminfoform.cpp \
     widgets/healthcheckform.cpp \
     widgets/healthunitform.cpp \
+    dialogs/invaliddmcodesinfodialog.cpp \
     widgets/statelabel.cpp
 
 HEADERS += \
@@ -60,6 +62,7 @@ HEADERS += \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
+    dialogs/nameinputdialog.h \
     dialogs/settingsdialog.h \
     models/goodsmodel.h \
     sqlmodels/baseentity.h \
@@ -75,17 +78,20 @@ HEADERS += \
     widgets/dminfoform.h \
     widgets/healthcheckform.h \
     widgets/healthunitform.h \
+    dialogs/invaliddmcodesinfodialog.h \
     widgets/statelabel.h
 
 FORMS += \
     dialogs/doubleprogressdialog.ui \
+    dialogs/nameinputdialog.ui \
     dialogs/settingsdialog.ui \
     mainwindow.ui \
     widgets/connectionstateform.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui \
     widgets/healthcheckform.ui \
-    widgets/healthunitform.ui
+    widgets/healthunitform.ui \
+    dialogs/invaliddmcodesinfodialog.ui
 
 RESOURCES += \
     resources.qrc \

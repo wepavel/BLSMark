@@ -67,7 +67,7 @@ public:
 
     //---Funcs
     static DataMatrixAttrs parseDataMatrix(const QString &dataMatrix);
-    bool validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& attrs);
+    static bool validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& attrs);
     static QPixmap generateDataMatrix(const QString& data, int size);
     static QString prepareDataMatrix(const QString &code);
 

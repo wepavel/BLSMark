@@ -9,6 +9,7 @@
         <file>img/settings.png</file>
         <file>img/no.png</file>
         <file>img/yes.png</file>
+        <file>img/warning.png</file>
     </qresource>
     <qresource prefix="/qss_icons">
         <file>styles/qdarkstyle/rc/branch_closed.png</file>
