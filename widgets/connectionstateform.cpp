@@ -14,15 +14,16 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
     , ui(new Ui::ConnectionStateForm)
 {
     ui->setupUi(this);
-    //initHealthChecker();
+    initHealthChecker();
     initGoodsTable();
+    m_tvGoods->verticalHeader()->setVisible(false); // убираем нумерацию строк
 }
 
 ConnectionStateForm::~ConnectionStateForm()
 {
 
     delete mdl;
-    //delete m_hChecker;
+    delete m_hChecker;
     delete m_tvGoods;
     delete m_healthCheckForm;
     delete m_dmCodeHandler;

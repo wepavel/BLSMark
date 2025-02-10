@@ -38,6 +38,7 @@ SOURCES += \
     core/dmcodewshandler.cpp \
     core/globalsettings.cpp \
     core/healthchecker.cpp \
+    core/httpmanager.cpp \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
     dialogs/settingsdialog.cpp \
@@ -58,6 +59,7 @@ SOURCES += \
 HEADERS += \
     core/dmcodewshandler.h \
     core/healthchecker.h \
+    core/httpmanager.h \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
