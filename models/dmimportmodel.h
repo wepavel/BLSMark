@@ -18,7 +18,7 @@ public:
         // Code,
         // Page,
         // DataMatrix,
-        IdColumn,
+        GTINColumn,
         CodeColumn,
         FilenameColumn,
         ImgColumn,
@@ -55,6 +55,7 @@ private:
     };
 
     QVector<RowData> m_data;
+    QSet<QString> m_gtins;
 };
 
 

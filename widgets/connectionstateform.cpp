@@ -20,6 +20,7 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
 
 ConnectionStateForm::~ConnectionStateForm()
 {
+
     delete mdl;
     //delete m_hChecker;
     delete m_tvGoods;

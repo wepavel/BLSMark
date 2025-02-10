@@ -10,13 +10,16 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include <QFileInfo>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QMessageBox>
+#include <QJsonDocument>
 
 #include "core/globalsettings.h"
 #include "models/dmimportmodel.h"
 #include "crud/cruddmcode.h"
 #include "dialogs/doubleprogressdialog.h"
-#include "qnetworkaccessmanager.h"
-#include <QMessageBox>
+
 
 
 namespace Ui {
@@ -52,6 +55,7 @@ private:
     DoubleProgressDialog *m_doubleProgressDialog;
     QNetworkAccessManager *httpManager;
 
+
     QString lastUsedDirectory = QDir::homePath();
     // CRUDDMCode db = CRUDDMCode("QSQLITE", gSettings.getAppPath() + "/mydb.sqlite");
     CRUDDMCode db = CRUDDMCode("QSQLITE", "C:/Users/Wepal/Documents/mydb.sqlite");
@@ -74,6 +78,34 @@ private:
     void insertGtinInDb(const QString& gtin);
     void insertAllGtinsAndDmCodes();
     void insertAllDmCodes();
+
+    QUrl createApiUrl(const QString &endpoint) const {
+        return QUrl(QString("http://%1:%2/api/v1/code-processing/%3")
+                        .arg(gSettings.getBackendServiceIP())
+                        .arg(gSettings.getBackendServicePort())
+                        .arg(endpoint));
+    }
+
+    QNetworkReply* sendJsonRequest(const QUrl &url, const QJsonDocument &jsonDoc, bool isPost = true) {
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        if (isPost) {
+            return httpManager->post(request, jsonDoc.toJson());
+        } else {
+            return httpManager->get(request);
+        }
+    }
+
+    void handleNetworkReply(QNetworkReply *reply, const std::function<void(const QByteArray&)> &successCallback) {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray responseData = reply->readAll();
+            successCallback(responseData);
+        } else {
+            qDebug() << "Network Error: " << reply->errorString();
+        }
+        reply->deleteLater();
+    }
 };
 
 #endif // DMIMPORTFORM_H

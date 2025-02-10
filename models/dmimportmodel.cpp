@@ -15,7 +15,7 @@ QVariant DMImportModel::headerData(int section, Qt::Orientation orientation, int
         // case Column::Number: return tr("№");
         // case Column::Code: return tr("C");
         // case Column::Page: return tr("Страница");
-            case Column::IdColumn: return tr("ID");
+            case Column::GTINColumn: return tr("GTIN");
             case Column::CodeColumn: return tr("Код");
             case Column::FilenameColumn: return tr("Имя файла");
             case Column::ImgColumn: return tr("Base64");
@@ -51,7 +51,7 @@ QVariant DMImportModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole)
     {
         switch (static_cast<Column>(index.column())) {
-        case Column::IdColumn: return rowData.gtin;
+        case Column::GTINColumn: return rowData.gtin;
         case Column::CodeColumn: return rowData.code;
         case Column::FilenameColumn: return rowData.filename;
         case Column::ImgColumn: return "Image";
@@ -65,7 +65,7 @@ QVariant DMImportModel::data(const QModelIndex &index, int role) const
     else if (role == Qt::ToolTipRole)
     {
         switch (static_cast<Column>(index.column())) {
-        case Column::IdColumn:
+        case Column::GTINColumn:
             return QString("ID товара %1").arg(rowData.gtin);
         case Column::CodeColumn:
             return QString("Code: %1").arg(rowData.code);
@@ -128,6 +128,7 @@ void DMImportModel::addRow(const QString& gtin,
 {
     beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
     m_data.append({gtin, code, filename, imgBase64});
+    m_gtins.insert(gtin);
     emit dataHasBeenAdded();
     endInsertRows();
 }
@@ -136,17 +137,14 @@ void DMImportModel::clear()
 {
     beginResetModel();
     m_data.clear();
+    m_gtins.clear();
     emit dataHasBeenCleared();
     endResetModel();
 }
 
 QSet<QString> DMImportModel::getAllGtins() const
 {
-    QSet<QString> allGtins;
-    for(const RowData& data: m_data){
-        allGtins.insert(data.gtin);
-    }
-    return allGtins;
+    return m_gtins;
 }
 
 QList<QString> DMImportModel::getAllDmCodes() const

@@ -1,8 +1,5 @@
 #include "dmimportform.h"
-#include "dialogs/nameinputdialog.h"
 #include "dminfoform.h"
-#include "qnetworkaccessmanager.h"
-#include "qnetworkreply.h"
 #include "ui_dmimportform.h"
 
 #include <QFileDialog>
@@ -10,8 +7,8 @@
 #include <QtConcurrent>
 #include <QFuture>
 #include <QFutureWatcher>
-#include <QListView>
-#include <QTreeView>
+#include <QInputDialog>
+
 
 #include "widgets/dminfoform.h"
 #include "sqlmodels/dmcodemodel.h"
@@ -494,99 +491,77 @@ QString DMImportForm::getHashForCode(const QString &code)
     return QCryptographicHash::hash(code.toUtf8(), QCryptographicHash::Sha256).toHex();
 }
 
-void DMImportForm::insertGtinInDb(const QString& gtin)
-{
-    NameInputDialog d(this);
-    if (d.exec() == QDialog::Accepted){
-        QString name = d.getName();
-        QUrl url = QUrl(QString("http://%1:%2/api/v1/code-processing/add-gtin")
-                            .arg(gSettings.getBackendServiceIP())
-                            .arg(gSettings.getBackendServicePort()));;
-        QNetworkRequest httpRequest(url);
-        httpRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-        QJsonObject data;
-        data["name"] = name;
-        data["code"] = gtin;
-        QJsonDocument doc(data);
-        QByteArray jsonData = doc.toJson();
-        QNetworkReply *reply = httpManager->post(httpRequest, jsonData);
-        connect(reply, &QNetworkReply::finished, this, [reply, name, gtin]() { // Capture name and gtin
-            if (reply->error() == QNetworkReply::NoError) {
-                QByteArray responseData = reply->readAll();
+void DMImportForm::insertGtinInDb(const QString& gtin) {
+    while (true) {
+        bool ok;
+        QString name = QInputDialog::getText(this, tr("Ввод имени товара"),
+                                             tr("Введите имя для GTIN: %1").arg(gtin),
+                                             QLineEdit::Normal, "", &ok);
+
+        if (!ok) {
+            QMessageBox::warning(this, tr("Отмена загрузки"),
+                                 tr("Загрузка отменена пользователем."));
+            return;
+        }
+
+        if (name.isEmpty()) {
+            QMessageBox::warning(this, tr("Ошибка ввода"),
+                                 tr("Имя товара не может быть пустым. Пожалуйста, введите имя."));
+            continue;
+        }
+
+        // Если имя введено корректно, отправляем запрос
+        QJsonObject data{{"code", gtin}, {"name", name}};
+        QNetworkReply *reply = sendJsonRequest(createApiUrl("add-gtin"), QJsonDocument(data));
+
+        connect(reply, &QNetworkReply::finished, this, [this, reply, gtin, name]() {
+            handleNetworkReply(reply, [gtin, name](const QByteArray& responseData) {
                 qDebug() << "GTIN:" << gtin << ", Name: " << name << " - Response: " << responseData;
-            } else {
-                qDebug() << "GTIN:" << gtin << ", Name: " << name << " - Error: " << reply->errorString();
-            }
-            reply->deleteLater();
-        }, Qt::QueuedConnection);
+            });
+        });
+
+        break; // Выходим из цикла после успешного ввода и отправки запроса
     }
 }
 
 void DMImportForm::insertAllGtinsAndDmCodes() {
     QSet<QString> gtins = importModel->getAllGtins();
+    QEventLoop loop;
+    int processedCount = 0;
 
     for (const QString& gtin : gtins) {
-        QUrl url = QUrl(QString("http://%1:%2/api/v1/code-processing/is-gtin/")
-                            .arg(gSettings.getBackendServiceIP())
-                            .arg(gSettings.getBackendServicePort()));
+        QUrl url = createApiUrl("is-gtin/");
         url.setPath(url.path() + QUrl::toPercentEncoding(gtin));
+        QNetworkReply* reply = sendJsonRequest(url, QJsonDocument(), false);
 
-        QNetworkRequest httpRequest(url);
-
-        QNetworkReply* reply = httpManager->get(httpRequest);
-
-        connect(reply, &QNetworkReply::finished, this, [gtin, reply, this]() {
-            QByteArray responseData = reply->readAll();
-            if (reply->error() == QNetworkReply::NoError) {
+        connect(reply, &QNetworkReply::finished, this, [&, gtin, reply]() {
+            handleNetworkReply(reply, [&](const QByteArray& responseData) {
                 if (responseData == gtinIsNotInDb) {
                     insertGtinInDb(gtin);
                 }
-            } else {
-                qDebug() << "Error: " << reply->errorString();
-            }
-
-            reply->deleteLater();
-        }, Qt::QueuedConnection);
-
-        connect(reply, &QNetworkReply::errorOccurred, this, [this, reply](QNetworkReply::NetworkError error) {
-            reply->deleteLater();
-        }, Qt::QueuedConnection);
+            });
+            if (++processedCount == gtins.size()) loop.quit();
+        });
     }
 
-    // и только после того как все gtin вставлены нам надо вставить dm codes
-    //  insertAllDmCodes()
-};
+    loop.exec();
+    insertAllDmCodes();
+}
 
-void DMImportForm::insertAllDmCodes()
-{
-    QUrl url = QUrl(QString("http://%1:%2/api/v1/code-processing/add-dmcodes")
-                        .arg(gSettings.getBackendServiceIP())
-                        .arg(gSettings.getBackendServicePort()));
+void DMImportForm::insertAllDmCodes() {
     QJsonArray arr;
-    for(const QString& dmCode: importModel->getAllDmCodes()){
-        QJsonObject obj;
-        obj["dm_code"] = dmCode;
-        arr.append(obj);
+    for (const QString& dmCode : importModel->getAllDmCodes()) {
+        arr.append(QJsonObject{{"dm_code", dmCode}});
     }
-    QNetworkRequest httpRequest(url);
-    httpRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QJsonDocument doc(arr);
-    QByteArray jsonData = doc.toJson();
-    QNetworkReply *reply = httpManager->post(httpRequest, jsonData);
+    QNetworkReply *reply = sendJsonRequest(createApiUrl("add-dmcodes"), QJsonDocument(arr));
 
-    connect(reply, &QNetworkReply::finished, this, [reply, this]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray responseData = reply->readAll();
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        handleNetworkReply(reply, [this](const QByteArray& responseData) {
             qDebug() << "insertAllDmCodes NO ERROR: " << responseData;
-            QMessageBox::information(this, "Сообщение об успешной загрузке Qr-кодов",
-                                     "Коды были успешно загружены в БД!");
-        } else {
-            qDebug() << "insertAllDmCodes ERROR: " << reply->errorString();
-            QMessageBox::critical(this, "Произошла ошибка!", reply->errorString());
-        }
-        reply->deleteLater();
-    }, Qt::QueuedConnection);
+            QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
+        });
+    });
 }
 
 void DMImportForm::on_pb_load_in_db_clicked()
