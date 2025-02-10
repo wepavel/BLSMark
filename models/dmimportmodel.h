@@ -18,6 +18,7 @@ public:
         // Code,
         // Page,
         // DataMatrix,
+        GTINColumn,
         CodeColumn,
         FilenameColumn,
         ImgColumn,
@@ -33,17 +34,28 @@ public:
     // bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    void addRow(const QString &code, const QString &filename, const QString &imgBase64);
+    void addRow(const QString& gtin,
+                const QString &code,
+                const QString &filename,
+                const QString &imgBase64);
     void clear();
+    QSet<QString> getAllGtins() const;
+    QList<QString> getAllDmCodes() const;
+
+signals:
+    void dataHasBeenAdded();
+    void dataHasBeenCleared();
 
 private:
     struct RowData {
+        QString gtin;
         QString code;
         QString filename;
         QString imgBase64;
     };
 
     QVector<RowData> m_data;
+    QSet<QString> m_gtins;
 };
 
 

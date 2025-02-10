@@ -1196,6 +1196,7 @@ QProgressBar {
 
 QProgressBar::chunk {
     background-color: #fb9804;
+	border-radius: 4px;
 }
 
 QDateEdit {

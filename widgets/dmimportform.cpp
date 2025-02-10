@@ -1,4 +1,5 @@
 #include "dmimportform.h"
+#include "dminfoform.h"
 #include "ui_dmimportform.h"
 
 #include <QFileDialog>
@@ -6,20 +7,33 @@
 #include <QtConcurrent>
 #include <QFuture>
 #include <QFutureWatcher>
-#include <QListView>
-#include <QTreeView>
+#include <QInputDialog>
+
 
 #include "widgets/dminfoform.h"
 #include "sqlmodels/dmcodemodel.h"
+#include "dialogs/invaliddmcodesinfodialog.h"
 
-
+#define gtinIsNotInDb "false"
 
 DMImportForm::DMImportForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::DMImportForm)
     , importModel(new DMImportModel(this))
+    , httpManager(new HttpManager(this))
 {
     ui->setupUi(this);
+    //ui->pb_load_in_db->setEnabled(false);
+    ui->pb_load_in_db->setFocusPolicy(Qt::NoFocus);
+
+    connect(importModel, &DMImportModel::dataHasBeenAdded,
+            [this](){ui->pb_load_in_db->setEnabled(true);});
+    connect(importModel, &DMImportModel::dataHasBeenCleared,
+            [this](){ui->pb_load_in_db->setEnabled(true);});
+
+    connect(httpManager, &HttpManager::requestError, [&](const QString& err){
+        QMessageBox::critical(this, "Ошибка с БД", err);
+    });
 
     setAcceptDrops(true);
     setupImportTable();
@@ -42,6 +56,7 @@ DMImportForm::DMImportForm(QWidget *parent)
 DMImportForm::~DMImportForm()
 {
     delete ui;
+    delete httpManager;
 }
 
 
@@ -136,11 +151,7 @@ void DMImportForm::recieve_dm_data(QString row)
     // if (m_doubleProgressDialog->getFileProgress()<100) {
     //     m_doubleProgressDialog->setFileProgress(doc_progress);
     // }
-    m_doubleProgressDialog->setFileProgress(doc_progress);
-    // if (m_doubleProgressDialog->getFilesProgress()<100) {
-    //     m_doubleProgressDialog->setFilesProgress(docs_progress);
-    // }
-    m_doubleProgressDialog->setFilesProgress(docs_progress);
+
     // DMCodeModel new_code(code, QString("%1.png").arg(getHashForCode(code)));
 
     // QSqlQuery query(*m_db);
@@ -158,8 +169,21 @@ void DMImportForm::recieve_dm_data(QString row)
     // }
     // saveImage(dm_code, img_base64);
 
-    importModel->addRow(dm_code, file_path, "");
+    DMInfoForm::DataMatrixAttrs dmAttrs;
+    bool dmValidated = DMInfoForm::validateDataMatrix(dm_code, dmAttrs);
 
+    if(dmValidated) {
+        QString gtin = dmAttrs.gtin;
+        importModel->addRow(gtin, dm_code, getFileNameFromPath(file_path), "");
+    } else {
+        invalideDmCodesPaths.insert(file_path);
+    }
+
+    m_doubleProgressDialog->setFileProgress(doc_progress);
+    // if (m_doubleProgressDialog->getFilesProgress()<100) {
+    //     m_doubleProgressDialog->setFilesProgress(docs_progress);
+    // }
+    m_doubleProgressDialog->setFilesProgress(docs_progress);
     // if (progressDialog->wasCanceled()) {
     //     // Здесь логика для прерывания процесса
     // }
@@ -188,6 +212,12 @@ void DMImportForm::complete_process()
         qDebug() << "Progress dialog has been destroyed";
     });
     m_doubleProgressDialog->deleteLater();
+
+    if(!invalideDmCodesPaths.isEmpty()){
+        InvalidDmCodesInfoDialog d(invalideDmCodesPaths);
+        d.exec();
+    }
+    invalideDmCodesPaths.clear();
 
     // connect(progressDialog, &QProgressDialog::c)
     // if(progressDialog != nullptr) {
@@ -423,6 +453,12 @@ void DMImportForm::showBigAmountWarning()
                          QMessageBox::Ok);
 }
 
+QString DMImportForm::getFileNameFromPath(const QString &filePath)
+{
+    QFileInfo fileInfo(filePath);
+    return fileInfo.fileName();
+}
+
 
 bool DMImportForm::writeImageToDisk(const QString &code, const QString &base64Image)
 {
@@ -459,6 +495,65 @@ QString DMImportForm::getHashForCode(const QString &code)
     return QCryptographicHash::hash(code.toUtf8(), QCryptographicHash::Sha256).toHex();
 }
 
+void DMImportForm::insertGtinInDb(const QString& gtin) {
+    while (true) {
+    bool ok;
+    QString name = QInputDialog::getText(this, tr("Ввод имени товара"),
+                                         tr("Введите имя для GTIN: %1").arg(gtin),
+                                         QLineEdit::Normal, "", &ok);
 
+    if (!ok) {
+        QMessageBox::warning(this, tr("Отмена загрузки"),
+                             tr("Загрузка отменена пользователем."));
+        return;
+    }
 
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, tr("Ошибка ввода"),
+                             tr("Имя товара не может быть пустым. Пожалуйста, введите имя."));
+        continue;
+    }
+
+    // Если имя введено корректно, отправляем запрос
+    QJsonObject data{{"code", gtin}, {"name", name}};
+    QUrl url = HttpManager::createApiUrl("add-gtin");
+    httpManager->makeRequest(url,  QJsonDocument(data), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData){
+        qDebug() << "GTIN:" << gtin << ", Name: " << name << " - Response: " << responseData;
+    });
+
+    break; // Выходим из цикла после успешного ввода и отправки запроса
+    }
+}
+
+void DMImportForm::insertAllGtinsAndDmCodes() {
+    QSet<QString> gtins = importModel->getAllGtins();
+
+    for (const QString& gtin : gtins) {
+        QUrl url = HttpManager::createApiUrl("is-gtin/");
+        url.setPath(url.path() + QUrl::toPercentEncoding(gtin));
+        httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Get, [&](const QByteArray& responseData){
+            if (responseData == gtinIsNotInDb) {
+                insertGtinInDb(gtin);
+            }
+        });
+    }
+    insertAllDmCodes();
+}
+
+void DMImportForm::insertAllDmCodes() {
+    QJsonArray arr;
+    for (const QString& dmCode : importModel->getAllDmCodes()) {
+        arr.append(QJsonObject{{"dm_code", dmCode}});
+    }
+
+    QUrl url = HttpManager::createApiUrl("add-dmcodes");
+    httpManager->makeRequest(url, QJsonDocument(arr), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData){
+        QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
+    });
+}
+
+void DMImportForm::on_pb_load_in_db_clicked()
+{
+    insertAllGtinsAndDmCodes();
+}
 
