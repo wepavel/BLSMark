@@ -39,6 +39,7 @@ SOURCES += \
     core/globalsettings.cpp \
     core/healthchecker.cpp \
     core/httpmanager.cpp \
+    core/messager.cpp \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
     dialogs/settingsdialog.cpp \
@@ -51,6 +52,7 @@ SOURCES += \
     widgets/connectionstateform.cpp \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp \
+    widgets/errorlogwidget.cpp \
     widgets/healthcheckform.cpp \
     widgets/healthunitform.cpp \
     dialogs/invaliddmcodesinfodialog.cpp \
@@ -60,6 +62,7 @@ HEADERS += \
     core/dmcodewshandler.h \
     core/healthchecker.h \
     core/httpmanager.h \
+    core/messager.h \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
@@ -76,6 +79,7 @@ HEADERS += \
     widgets/connectionstateform.h \
     widgets/dmimportform.h \
     widgets/dminfoform.h \
+    widgets/errorlogwidget.h \
     widgets/healthcheckform.h \
     widgets/healthunitform.h \
     dialogs/invaliddmcodesinfodialog.h \
@@ -88,6 +92,7 @@ FORMS += \
     widgets/connectionstateform.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui \
+    widgets/errorlogwidget.ui \
     widgets/healthcheckform.ui \
     widgets/healthunitform.ui \
     dialogs/invaliddmcodesinfodialog.ui

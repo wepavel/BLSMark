@@ -14,6 +14,8 @@
 #include "sqlmodels/dmcodemodel.h"
 #include "dialogs/invaliddmcodesinfodialog.h"
 
+#include <core/messager.h>
+
 #define gtinIsNotInDb "false"
 
 DMImportForm::DMImportForm(QWidget *parent)
@@ -214,8 +216,9 @@ void DMImportForm::complete_process()
     m_doubleProgressDialog->deleteLater();
 
     if(!invalideDmCodesPaths.isEmpty()){
-        InvalidDmCodesInfoDialog d(invalideDmCodesPaths);
-        d.exec();
+        Messager::instance().sendMessage("lkslkgjdklsfj");
+        // InvalidDmCodesInfoDialog d(invalideDmCodesPaths);
+        // d.exec();
     }
     invalideDmCodesPaths.clear();
 
