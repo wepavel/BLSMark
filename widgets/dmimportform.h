@@ -58,7 +58,7 @@ private:
 
     QString lastUsedDirectory = QDir::homePath();
     // CRUDDMCode db = CRUDDMCode("QSQLITE", gSettings.getAppPath() + "/mydb.sqlite");
-    CRUDDMCode db = CRUDDMCode("QSQLITE", "C:/Users/Wepal/Documents/mydb.sqlite");
+    // CRUDDMCode db = CRUDDMCode("QSQLITE", "C:/Users/Wepal/Documents/mydb.sqlite");
 
     // QSqlDatabase* m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
     QSet<QString> invalideDmCodesPaths = {"Путь до файла1", "Путь до файла2", "Путь до файла3","Путь до файла4"};
