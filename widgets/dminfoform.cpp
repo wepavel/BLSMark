@@ -66,7 +66,7 @@ DMInfoForm::DMInfoForm(const QString &dmCode, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->lbl_img->setFixedSize(500,500); // Установите нужный размер
+    ui->lbl_img->setFixedSize(150,150); // Установите нужный размер
     ui->lbl_img->setScaledContents(true);
     ui->le_dm_code->setText(dmCode);
 
@@ -76,7 +76,7 @@ DMInfoForm::DMInfoForm(const QString &dmCode, QWidget *parent)
     if(dmValidated) setDMFields(dmAttrs);
 
     QString code = prepareDataMatrix(dmCode);
-    QPixmap img = generateDataMatrix(code, 1000);
+    QPixmap img = generateDataMatrix(code, 20);
     ui->lbl_img->setPixmap(img);
 
 }

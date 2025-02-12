@@ -31,9 +31,9 @@ DMImportForm::DMImportForm(QWidget *parent)
     connect(importModel, &DMImportModel::dataHasBeenCleared,
             [this](){ui->pb_load_in_db->setEnabled(true);});
 
-    connect(httpManager, &HttpManager::requestError, [&](const QString& err){
-        QMessageBox::critical(this, "Ошибка с БД", err);
-    });
+    // connect(httpManager, &HttpManager::requestError, [&](const QString& err){
+    //     QMessageBox::critical(this, "Ошибка с БД", err);
+    // });
 
     setAcceptDrops(true);
     setupImportTable();
@@ -432,7 +432,8 @@ QString DMImportForm::getHashForCode(const QString &code)
     return QCryptographicHash::hash(code.toUtf8(), QCryptographicHash::Sha256).toHex();
 }
 
-void DMImportForm::insertGtinInDb(const QString& gtin) {
+bool DMImportForm::insertGtinInDb(const QString& gtin) {
+    bool insertGtinSuccess = true; // Флаг для отслеживания успеха
     while (true) {
     bool ok;
     QString name = QInputDialog::getText(this, tr("Ввод имени товара"),
@@ -442,7 +443,7 @@ void DMImportForm::insertGtinInDb(const QString& gtin) {
     if (!ok) {
         QMessageBox::warning(this, tr("Отмена загрузки"),
                              tr("Загрузка отменена пользователем."));
-        return;
+        return false;
     }
 
     if (name.isEmpty()) {
@@ -454,25 +455,45 @@ void DMImportForm::insertGtinInDb(const QString& gtin) {
     // Если имя введено корректно, отправляем запрос
     QJsonObject data{{"code", gtin}, {"name", name}};
     QUrl url = HttpManager::createApiUrl("add-gtin");
-    httpManager->makeRequest(url,  QJsonDocument(data), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData){
+    httpManager->makeRequest(url,  QJsonDocument(data), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
+        if (statusCode!=200 && statusCode!=-1) {
+            QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось выполнить запрос!"));
+            insertGtinSuccess = false;
+        } else if (statusCode==-1) {
+            QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось отправить запрос на сервер!"));
+            insertGtinSuccess = false;
+        }
         qDebug() << "GTIN:" << gtin << ", Name: " << name << " - Response: " << responseData;
     });
 
     break; // Выходим из цикла после успешного ввода и отправки запроса
     }
+    return insertGtinSuccess;
 }
 
 void DMImportForm::insertAllGtinsAndDmCodes() {
     QSet<QString> gtins = importModel->getAllGtins();
+    bool insertGtinSuccess = true; // Флаг для отслеживания успеха
 
     for (const QString& gtin : gtins) {
         QUrl url = HttpManager::createApiUrl("is-gtin/");
         url.setPath(url.path() + QUrl::toPercentEncoding(gtin));
-        httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Get, [&](const QByteArray& responseData){
-            if (responseData == gtinIsNotInDb) {
-                insertGtinInDb(gtin);
+        httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Get, [&](const QByteArray& responseData, int statusCode){
+            if (statusCode!=200 && statusCode!=-1) {
+                QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось выполнить запрос!"));
+                insertGtinSuccess = false;
+            } else if (statusCode==-1) {
+                QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось отправить запрос на сервер!"));
+                insertGtinSuccess = false;
+            } else {
+                if (!insertGtinInDb(gtin)) {
+                    insertGtinSuccess = false; // Устанавливаем флаг в false
+                    return; // Выходим из цикла, чтобы не обрабатывать остальные GTIN
+                }
             }
+
         });
+        if (!insertGtinSuccess) return;
     }
     insertAllDmCodes();
 }
@@ -484,13 +505,23 @@ void DMImportForm::insertAllDmCodes() {
     }
 
     QUrl url = HttpManager::createApiUrl("add-dmcodes");
-    httpManager->makeRequest(url, QJsonDocument(arr), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData){
-        QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
+    httpManager->makeRequest(url, QJsonDocument(arr), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
+        if (!responseData.isEmpty()) {
+            qDebug() << responseData;
+        } else {
+            QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
+        }
+
     });
+    auto x = 1;
 }
 
 void DMImportForm::on_pb_load_in_db_clicked()
 {
+    if (importModel->rowCount()<=0) {
+        QMessageBox::warning(this, tr("Внимание!"), tr("Невозможно загрузить в\nбазу данных пустую таблицу!"));
+        return;
+    }
     insertAllGtinsAndDmCodes();
 }
 
