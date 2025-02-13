@@ -7,9 +7,11 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
+
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
 #include "widgets/dmimportform.h"
+#include "widgets/dmexportform.h"
 #include "widgets/dminfoform.h"
 #include <widgets/connectionstateform.h>
 
@@ -23,13 +25,16 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("BLS Mark");
     qDebug() << "ID_MAIN: " << QThread::currentThreadId();
 
+    DMExportForm* csvExporter = new DMExportForm(this);
+    ui->tab_export->layout()->addWidget(csvExporter);
 
-
-    DMImportForm* pdf_importer = new DMImportForm(this);
-    ui->tab_import->layout()->addWidget(pdf_importer);
+    DMImportForm* pdfImporter = new DMImportForm(this);
+    ui->tab_import->layout()->addWidget(pdfImporter);
 
     ConnectionStateForm* conStateForm = new ConnectionStateForm(this);
     ui->tab_main->layout()->addWidget(conStateForm);
+
+
 
     setup_menubar();
     fill_logo();
