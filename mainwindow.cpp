@@ -23,8 +23,6 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("BLS Mark");
     qDebug() << "ID_MAIN: " << QThread::currentThreadId();
 
-
-
     DMImportForm* pdf_importer = new DMImportForm(this);
     ui->tab_import->layout()->addWidget(pdf_importer);
 

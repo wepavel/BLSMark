@@ -1,9 +1,18 @@
 #include "messager.h"
+#include "qmutex.h"
 
 Messager &Messager::instance()
 {
-    static Messager instance;
-    return instance;
+    static QMutex mutex;
+    static Messager* instance = nullptr;
+
+    if (!instance) {
+        QMutexLocker locker(&mutex);
+        if (!instance) {
+            instance = new Messager();
+        }
+    }
+    return *instance;
 }
 
 Messager::Messager() {
