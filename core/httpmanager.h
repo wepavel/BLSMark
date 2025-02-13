@@ -18,7 +18,7 @@ public:
     void makeRequest(const QUrl &url,
                      const QJsonDocument &jsonDoc,
                      const HttpMethod &method,
-                     const std::function<void(const QByteArray&)> &successCallback);
+                     const std::function<void(const QByteArray&, int)> &callback);
 
     static QUrl createApiUrl(const QString &endpoint);
 

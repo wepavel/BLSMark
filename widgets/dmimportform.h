@@ -75,7 +75,7 @@ private:
     QString getFileNameFromPath(const QString& filePath);
     static bool writeImageToDisk(const QString &code, const QString &base64Image);
     static QString getHashForCode(const QString &code);
-    void insertGtinInDb(const QString& gtin);
+    bool insertGtinInDb(const QString& gtin);
     void insertAllGtinsAndDmCodes();
     void insertAllDmCodes();
 
