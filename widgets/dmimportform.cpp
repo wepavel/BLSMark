@@ -249,8 +249,16 @@ void DMImportForm::files_were_dropped(QStringList filePaths, QStringList dirs)
     startReadDm(gSettings.getDataMatrixExtractPath(), gsPath);
 }
 
+void DMImportForm::on_pb_load_in_db_clicked()
+{
+    if (importModel->rowCount()<=0) {
+        QMessageBox::warning(this, tr("Внимание!"), tr("Невозможно загрузить в\nбазу данных пустую таблицу!"));
+        return;
+    }
+    insertAllGtinsAndDmCodes();
+}
 
-//-----------------------PRIVATE SLOTS-----------------------
+//-----------------------PRIVATE FUNCS-----------------------
 void DMImportForm::startReadDm(const QString &program, const QStringList &arguments)
 {
     importModel->clear();
@@ -516,12 +524,5 @@ void DMImportForm::insertAllDmCodes() {
     auto x = 1;
 }
 
-void DMImportForm::on_pb_load_in_db_clicked()
-{
-    if (importModel->rowCount()<=0) {
-        QMessageBox::warning(this, tr("Внимание!"), tr("Невозможно загрузить в\nбазу данных пустую таблицу!"));
-        return;
-    }
-    insertAllGtinsAndDmCodes();
-}
+
 

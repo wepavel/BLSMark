@@ -5,6 +5,8 @@
 
 #include <QTimer>
 
+#define HTTP_REQUEST_TIMEOUT 3000
+
 HttpManager::HttpManager(QObject *parent)
     : QNetworkAccessManager{parent}
 {
@@ -42,7 +44,7 @@ void HttpManager::makeRequest(const QUrl &url,
 
     // Устанавливаем таймер на 5 секунд (можно изменить по необходимости)
     timer.setSingleShot(true);
-    timer.setInterval(500);
+    timer.setInterval(HTTP_REQUEST_TIMEOUT);
 
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
