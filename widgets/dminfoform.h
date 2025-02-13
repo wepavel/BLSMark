@@ -33,6 +33,7 @@ public:
     //---Structs
     struct DataMatrixAttrs
     {
+        QString dm_code = "-";
         QString gtin = "-";
         QString serialNumber = "-";
         int countryCode = 0;

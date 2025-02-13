@@ -40,11 +40,11 @@ DMImportForm::DMImportForm(QWidget *parent)
     setAcceptDrops(true);
     setupImportTable();
 
-    if (db.createTable<DMCodeModel>()) {
-        qDebug() << "User table created successfully";
-    } else {
-        qDebug() << "Failed to create DMCodeModel table";
-    }
+    // if (db.createTable<DMCodeModel>()) {
+    //     qDebug() << "User table created successfully";
+    // } else {
+    //     qDebug() << "Failed to create DMCodeModel table";
+    // }
 
     // m_db->setDatabaseName(gSettings.getAppPath()+"/mydb.sqlite");
     // m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
@@ -176,7 +176,8 @@ void DMImportForm::recieve_dm_data(QString row)
 
     if(dmValidated) {
         QString gtin = dmAttrs.gtin;
-        importModel->addRow(gtin, dm_code, getFileNameFromPath(file_path), "");
+        QString normalized_dm_code = dmAttrs.dm_code;
+        importModel->addRow(gtin, normalized_dm_code, getFileNameFromPath(file_path), "");
     } else {
         invalideDmCodesPaths.insert(file_path);
     }
@@ -193,7 +194,8 @@ void DMImportForm::recieve_dm_data(QString row)
 
 void DMImportForm::recieve_err_data(QString row)
 {
-    qDebug() << row;
+    // qDebug() << row;
+    invalideDmCodesPaths.insert(row);
 }
 
 void DMImportForm::complete_process()
@@ -278,6 +280,7 @@ void DMImportForm::startReadDm(const QString &program, const QStringList &argume
 
                         if (!line.isEmpty()) {
                             QString lineStr = QString::fromUtf8(line).trimmed();
+                            qDebug() << lineStr;
                             if(lineStr.startsWith("Payload: ")) {
                                 QMetaObject::invokeMethod(this, "recieve_dm_data",
                                                           Qt::QueuedConnection, Q_ARG(QString, lineStr));
@@ -304,72 +307,6 @@ void DMImportForm::startReadDm(const QString &program, const QStringList &argume
     connect(watcher, &QFutureWatcher<void>::destroyed, this, [](){qDebug() << "Watcher destroyed";});
 }
 
-// void DMImportForm::startReadDm(const QString &program, const QStringList &arguments)
-// {
-//     importModel->clear();
-
-//     QFuture<void> future = QtConcurrent::run([=]() {
-//         QProcess process;
-//         process.setProcessChannelMode(QProcess::SeparateChannels);
-//         process.start(program, arguments);
-
-//         if (process.waitForStarted())
-//         {
-//             QMetaObject::invokeMethod(this, "init_process",
-//                                       Qt::QueuedConnection);
-
-//             QByteArray stdoutBuffer;
-//             QByteArray stderrBuffer;
-
-//             while (process.state() == QProcess::Running) {
-//                 process.waitForReadyRead(100); // Wait for 100ms
-
-//                 // Handle stdout
-//                 if (process.bytesAvailable()) {
-//                     stdoutBuffer += process.readAllStandardOutput();
-//                     int lineEnd;
-//                     while ((lineEnd = stdoutBuffer.indexOf('\n')) != -1) {
-//                         QByteArray line = stdoutBuffer.left(lineEnd);
-//                         stdoutBuffer = stdoutBuffer.mid(lineEnd + 1);
-
-//                         if (!line.isEmpty()) {
-//                             QString lineStr = QString::fromUtf8(line).trimmed();
-//                             QMetaObject::invokeMethod(this, "recieve_dm_data",
-//                                                       Qt::QueuedConnection, Q_ARG(QString, lineStr));
-//                         }
-//                     }
-//                 }
-
-//                 // Handle stderr
-//                 if (process.bytesAvailable()) {
-//                     stderrBuffer += process.readAllStandardError();
-//                     int lineEnd;
-//                     while ((lineEnd = stderrBuffer.indexOf('\n')) != -1) {
-//                         QByteArray line = stderrBuffer.left(lineEnd);
-//                         stderrBuffer = stderrBuffer.mid(lineEnd + 1);
-
-//                         if (!line.isEmpty()) {
-//                             QString lineStr = QString::fromUtf8(line).trimmed();
-//                             QMetaObject::invokeMethod(this, "recieve_err_data",
-//                                                       Qt::QueuedConnection, Q_ARG(QString, lineStr));
-//                         }
-//                     }
-//                 }
-//             }
-//             QMetaObject::invokeMethod(this, "complete_process", Qt::QueuedConnection);
-//         }
-//         else
-//         {
-//             QMetaObject::invokeMethod(this, "processError", Qt::QueuedConnection,
-//                                       Q_ARG(QString, "Failed to start process: " + process.errorString()));
-//         }
-//     });
-
-//     QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
-//     watcher->setFuture(future);
-//     connect(watcher, &QFutureWatcher<void>::finished, watcher, &QFutureWatcher<void>::deleteLater);
-//     connect(watcher, &QFutureWatcher<void>::destroyed, this, [](){qDebug() << "Watcher destroyed";});
-// }
 
 void DMImportForm::setupImportTable()
 {

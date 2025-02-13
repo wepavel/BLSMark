@@ -66,22 +66,17 @@ DMInfoForm::DMInfoForm(const QString &dmCode, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->lbl_img->setFixedSize(120, 120); // Установите нужный размер
+    ui->lbl_img->setFixedSize(500,500); // Установите нужный размер
     ui->lbl_img->setScaledContents(true);
     ui->le_dm_code->setText(dmCode);
 
     DataMatrixAttrs dmAttrs;
     bool dmValidated = validateDataMatrix(dmCode, dmAttrs);
 
-    if(dmValidated) {
-        setDMFields(dmAttrs);
-        QString code = prepareDataMatrix(dmCode);
-        QPixmap img = generateDataMatrix(code, 10);
-        ui->lbl_img->setPixmap(img);
-    }
-    // setDMFields(dmAttrs);
+    if(dmValidated) setDMFields(dmAttrs);
+
     QString code = prepareDataMatrix(dmCode);
-    QPixmap img = generateDataMatrix(code, 10);
+    QPixmap img = generateDataMatrix(code, 1000);
     ui->lbl_img->setPixmap(img);
 
 }
@@ -156,9 +151,9 @@ bool DMInfoForm::validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& 
     // QRegularExpression shortFormatRegex("^(?:\\x{00E8})?01\\d{14}21[1-5].{5}<GS>93.{4}$");
     QRegularExpression shortFormatRegexNoCountry(R"(^01\d{14}21[A-Za-z].{5,13}<GS>93.{4}$)");
 
-    if (longFormatRegex.match(normalizedCode).hasMatch() || shortFormatRegex.match(normalizedCode).hasMatch()) {
-        attrs = parseDataMatrix(normalizedCode);
+    attrs = parseDataMatrix(normalizedCode);
 
+    if (longFormatRegex.match(normalizedCode).hasMatch() || shortFormatRegex.match(normalizedCode).hasMatch()) {
         // Проверка GTIN
         if (attrs.gtin.length() != 14 || !attrs.gtin.toULongLong()) return false;
 
@@ -177,10 +172,9 @@ bool DMInfoForm::validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& 
             if (attrs.verificationKey.length() != 4) return false;
             if (attrs.verificationKeyValue != QString("-")) return false;
         }
-
+        attrs.dm_code = normalizedCode;
         return true;
     } else if (longFormatRegexNoCountry.match(normalizedCode).hasMatch() || shortFormatRegexNoCountry.match(normalizedCode).hasMatch()) {
-        attrs = parseDataMatrix(normalizedCode);
 
         // Проверка GTIN
         if (attrs.gtin.length() != 14 || !attrs.gtin.toULongLong()) return false;
@@ -200,6 +194,7 @@ bool DMInfoForm::validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& 
             if (attrs.verificationKey.length() != 4) return false;
             if (attrs.verificationKeyValue != QString("-")) return false;
         }
+        attrs.dm_code = normalizedCode;
         return true;
     }
 
@@ -214,22 +209,54 @@ QString DMInfoForm::prepareDataMatrix(const QString &code)
     return result;
 }
 
+// QPixmap DMInfoForm::generateDataMatrix(const QString& data, int size)
+// {
+//     DmtxEncode *enc = dmtxEncodeCreate();
+//     dmtxEncodeSetProp(enc, DmtxPropPixelPacking, DmtxPack24bppRGB);
+//     dmtxEncodeSetProp(enc, DmtxPropWidth, size);
+//     dmtxEncodeSetProp(enc, DmtxPropHeight, size);
+
+//     QByteArray dataBytes = data.toUtf8();
+//     dmtxEncodeDataMatrix(enc, dataBytes.length(), (unsigned char*)dataBytes.data());
+
+//     int width = dmtxImageGetProp(enc->image, DmtxPropWidth);
+//     int height = dmtxImageGetProp(enc->image, DmtxPropHeight);
+
+//     QImage image(width, height, QImage::Format_RGB32);
+//     int bytesPerPixel = dmtxImageGetProp(enc->image, DmtxPropBytesPerPixel);
+//     int rowPadBytes = dmtxImageGetProp(enc->image, DmtxPropRowPadBytes);
+//     int rowSizeBytes = dmtxImageGetProp(enc->image, DmtxPropRowSizeBytes);
+
+//     for (int y = 0; y < height; y++) {
+//         for (int x = 0; x < width; x++) {
+//             int offset = y * rowSizeBytes + x * bytesPerPixel;
+//             unsigned char *pxl = enc->image->pxl + offset;
+//             image.setPixel(x, y, qRgb(pxl[0], pxl[1], pxl[2]));
+//         }
+//     }
+
+//     dmtxEncodeDestroy(&enc);
+
+//     return QPixmap::fromImage(image);
+// }
+
 QPixmap DMInfoForm::generateDataMatrix(const QString& data, int size)
 {
     DmtxEncode *enc = dmtxEncodeCreate();
     dmtxEncodeSetProp(enc, DmtxPropPixelPacking, DmtxPack24bppRGB);
-    dmtxEncodeSetProp(enc, DmtxPropWidth, size);
-    dmtxEncodeSetProp(enc, DmtxPropHeight, size);
+    dmtxEncodeSetProp(enc, DmtxPropScheme, DmtxSchemeAscii);
 
     QByteArray dataBytes = data.toUtf8();
-    dmtxEncodeDataMatrix(enc, dataBytes.length(), (unsigned char*)dataBytes.data());
+    if (dmtxEncodeDataMatrix(enc, dataBytes.length(), (unsigned char*)dataBytes.data()) == DmtxFail) {
+        dmtxEncodeDestroy(&enc);
+        return QPixmap(); // Возвращаем пустой QPixmap в случае ошибки
+    }
 
     int width = dmtxImageGetProp(enc->image, DmtxPropWidth);
     int height = dmtxImageGetProp(enc->image, DmtxPropHeight);
 
     QImage image(width, height, QImage::Format_RGB32);
     int bytesPerPixel = dmtxImageGetProp(enc->image, DmtxPropBytesPerPixel);
-    int rowPadBytes = dmtxImageGetProp(enc->image, DmtxPropRowPadBytes);
     int rowSizeBytes = dmtxImageGetProp(enc->image, DmtxPropRowSizeBytes);
 
     for (int y = 0; y < height; y++) {
@@ -241,6 +268,11 @@ QPixmap DMInfoForm::generateDataMatrix(const QString& data, int size)
     }
 
     dmtxEncodeDestroy(&enc);
+
+    // Масштабируем изображение до заданного размера
+    if (image.width() != size || image.height() != size) {
+        image = image.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
 
     return QPixmap::fromImage(image);
 }
@@ -259,11 +291,11 @@ void DMInfoForm::setDMFields(const DataMatrixAttrs &attrs)
 
 QString DMInfoForm::normalizeGS(QString input)
 {
-
-
     // Удаляем символ FNC1 в начале, если он есть
     if (input.startsWith(QChar(232)) || input.startsWith(QChar(29)))
         input.remove(0, 1);
+    else if (input.startsWith(QString("<GS>")))
+        input.remove(0, 4);
 
     return input.replace(QChar(29), "<GS>");
 }
