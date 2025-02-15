@@ -25,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     setup_notifications_widgets();
-
     // qDebug() << "Основной поток " << QThread::currentThreadId();
     // QtConcurrent::run([](){
     //     Messager::instance().addMessage("Первое сообщение в другом потоке!");
