@@ -137,4 +137,10 @@ void MainWindow::setup_notifications_widgets()
     Messager::instance().addMessage("msg", Error);
     Messager::instance().addMessage("msg", Warning);
     Messager::instance().addMessage("msg", Info);
+    Messager::instance().addMessage("1", Error);
+    Messager::instance().addMessage("2", Error);
+    Messager::instance().addMessage("3", Error);
+    Messager::instance().addMessage("4", Error);
+    Messager::instance().addMessage("5", Error);
+    Messager::instance().addMessage("6", Error);
 }

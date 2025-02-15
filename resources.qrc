@@ -12,6 +12,8 @@
         <file>img/warning.png</file>
         <file>img/info.png</file>
         <file>img/warn.png</file>
+        <file>img/noerror.png</file>
+        <file>img/nowarn.png</file>
     </qresource>
     <qresource prefix="/qss_icons">
         <file>styles/qdarkstyle/rc/branch_closed.png</file>

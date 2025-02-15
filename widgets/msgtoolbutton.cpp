@@ -26,7 +26,7 @@ void MsgToolButton::setMessageCount(const int& notificationCount,
 
         if(notificationCount == 0){
             ui->tb_warning->setText("");
-            ui->tb_warning->setIcon(QIcon(":/images/img/yes.png"));
+            ui->tb_warning->setIcon(QIcon(":/images/img/nowarn.png"));
         }
 
         if(notificationCount > 0){
@@ -41,7 +41,7 @@ void MsgToolButton::setMessageCount(const int& notificationCount,
 
         if(errorCount == 0){
             ui->tb_error->setText("");
-            ui->tb_error->setIcon(QIcon(":/images/img/yes.png"));
+            ui->tb_error->setIcon(QIcon(":/images/img/noerror.png"));
         }
 
         if(errorCount > 0){
@@ -100,7 +100,6 @@ void MsgToolButton::on_tb_error_clicked()
 {
     emit tb_clicked(MsgType::Error);
 }
-
 
 void MsgToolButton::on_tb_info_clicked()
 {
