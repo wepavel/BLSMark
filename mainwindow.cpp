@@ -125,13 +125,13 @@ void MainWindow::setup_notifications_widgets()
     ErrorToolButton* e = new ErrorToolButton(0, this);
 
     connect(&Messager::instance(), &Messager::errorWasAdded,
-            e, &ErrorToolButton::incrementNotificationCount);
+            e, &ErrorToolButton::incrementNotificationCount, Qt::QueuedConnection);
 
     connect(Messager::instance().getView(), &ErrorLogWidget::dataHasBeenCleared,
-            e, &ErrorToolButton::clearAllNotifications);
+            e, &ErrorToolButton::clearAllNotifications, Qt::QueuedConnection);
 
     connect(e, &ErrorToolButton::tb_clicked,
-            &Messager::instance(), &Messager::showErrors);
+            &Messager::instance(), &Messager::showErrors, Qt::QueuedConnection);
 
     ui->menubar->setCornerWidget(e, Qt::TopRightCorner);
 }
