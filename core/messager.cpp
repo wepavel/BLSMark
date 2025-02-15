@@ -16,26 +16,28 @@ Messager &Messager::instance()
 }
 
 Messager::Messager() {
-    errorView = new ErrorLogWidget();
+    msgView = new MsgLogWidget();
 }
 
-void Messager::addMessage(const QString& msg, bool shoulShow)
+void Messager::addMessage(const QString& msg,
+                          const MsgType& type,
+                          bool shoulShow)
 {
-    errorView->addMsg(msg);
-    emit errorWasAdded();
+    msgView->addMsg(msg, type);
+    emit msgWasAdded(type);
     if (shoulShow){
-        errorView->show();
+        msgView->showWithOpenTab(type);
     }
 }
 
-void Messager::showErrors()
+void Messager::show()
 {
-    errorView->show();
+    msgView->show();
 }
 
-ErrorLogWidget *Messager::getView()
+MsgLogWidget *Messager::getView()
 {
-    return errorView;
+    return msgView;
 }
 
 

@@ -14,7 +14,7 @@
 #include "core/stylemanager.h"
 #include "widgets/dmimportform.h"
 #include "widgets/dminfoform.h"
-#include "widgets/errortoolbutton.h"
+#include "widgets/msgtoolbutton.h"
 #include <widgets/connectionstateform.h>
 
 
@@ -121,16 +121,20 @@ void MainWindow::setup_menubar()
 
 void MainWindow::setup_notifications_widgets()
 {
-    ErrorToolButton* e = new ErrorToolButton(0, this);
+    MsgToolButton* e = new MsgToolButton(this);
 
-    connect(&Messager::instance(), &Messager::errorWasAdded,
-            e, &ErrorToolButton::incrementNotificationCount, Qt::QueuedConnection);
+    connect(&Messager::instance(), &Messager::msgWasAdded,
+            e, &MsgToolButton::incrementMessageCount, Qt::QueuedConnection);
 
-    connect(Messager::instance().getView(), &ErrorLogWidget::dataHasBeenCleared,
-            e, &ErrorToolButton::clearAllNotifications, Qt::QueuedConnection);
+    connect(Messager::instance().getView(), &MsgLogWidget::dataHasBeenCleared,
+            e, &MsgToolButton::clearAll, Qt::QueuedConnection);
 
-    connect(e, &ErrorToolButton::tb_clicked,
-            &Messager::instance(), &Messager::showErrors, Qt::QueuedConnection);
+    connect(e, &MsgToolButton::tb_clicked,
+            Messager::instance().getView(), &MsgLogWidget::showWithOpenTab, Qt::QueuedConnection);
 
     ui->menubar->setCornerWidget(e, Qt::TopRightCorner);
+
+    Messager::instance().addMessage("msg", Error);
+    Messager::instance().addMessage("msg", Warning);
+    Messager::instance().addMessage("msg", Info);
 }

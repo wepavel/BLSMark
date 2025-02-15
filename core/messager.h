@@ -2,25 +2,27 @@
 #define MESSAGER_H
 
 #include "qobject.h"
-#include "widgets/errorlogwidget.h"
+#include "widgets/msglogwidget.h"
 
 class Messager: public QObject {
     Q_OBJECT
 
 public:
     static Messager& instance();
-    void addMessage(const QString& msg, bool shoulShow = false);
-    void showErrors();
-    ErrorLogWidget* getView();
+    void addMessage(const QString& msg,
+                    const MsgType& type,
+                    bool shoulShow = false);
+    void show();
+    MsgLogWidget* getView();
 
 private:
     Messager();
-    ErrorLogWidget* errorView = nullptr;
+    MsgLogWidget* msgView = nullptr;
     Messager(const Messager&) = delete;
     Messager& operator=(const Messager&) = delete;
 
 signals:
-    void errorWasAdded();
+    void msgWasAdded(MsgType type);
 };
 
 #endif // MESSAGER_H

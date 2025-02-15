@@ -52,11 +52,11 @@ SOURCES += \
     widgets/connectionstateform.cpp \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp \
-    widgets/errorlogwidget.cpp \
-    widgets/errortoolbutton.cpp \
     widgets/healthcheckform.cpp \
     widgets/healthunitform.cpp \
     dialogs/invaliddmcodesinfodialog.cpp \
+    widgets/msglogwidget.cpp \
+    widgets/msgtoolbutton.cpp \
     widgets/statelabel.cpp
 
 HEADERS += \
@@ -80,11 +80,11 @@ HEADERS += \
     widgets/connectionstateform.h \
     widgets/dmimportform.h \
     widgets/dminfoform.h \
-    widgets/errorlogwidget.h \
-    widgets/errortoolbutton.h \
     widgets/healthcheckform.h \
     widgets/healthunitform.h \
     dialogs/invaliddmcodesinfodialog.h \
+    widgets/msglogwidget.h \
+    widgets/msgtoolbutton.h \
     widgets/statelabel.h
 
 FORMS += \
@@ -94,11 +94,11 @@ FORMS += \
     widgets/connectionstateform.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui \
-    widgets/errorlogwidget.ui \
-    widgets/errortoolbutton.ui \
     widgets/healthcheckform.ui \
     widgets/healthunitform.ui \
-    dialogs/invaliddmcodesinfodialog.ui
+    dialogs/invaliddmcodesinfodialog.ui \
+    widgets/msglogwidget.ui \
+    widgets/msgtoolbutton.ui
 
 RESOURCES += \
     resources.qrc \
