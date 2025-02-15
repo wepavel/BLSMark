@@ -28,6 +28,7 @@ private:
     void fill_logo();
     void toggle_theme();
     void setup_menubar();
+    void setup_notifications_widgets();
 
 };
 #endif // MAINWINDOW_H

@@ -13,14 +13,17 @@ class ErrorLogWidget : public QWidget
 
 public:
     explicit ErrorLogWidget(QWidget *parent = nullptr);
+    void addMsg(const QString& msg);
     ~ErrorLogWidget();
 
 private slots:
     void on_pb_clear_clicked();
 
+signals:
+    void dataHasBeenCleared();
+
 private:
     Ui::ErrorLogWidget *ui;
-    void addMsg(const QString& msg);
 };
 
 #endif // ERRORLOGWIDGET_H

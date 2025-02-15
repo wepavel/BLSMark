@@ -16,9 +16,26 @@ Messager &Messager::instance()
 }
 
 Messager::Messager() {
-
+    errorView = new ErrorLogWidget();
 }
 
-void Messager::sendMessage(const QString& msg) {
-    emit sendMsg(msg);
+void Messager::addMessage(const QString& msg, bool shoulShow)
+{
+    errorView->addMsg(msg);
+    emit errorWasAdded();
+    if (shoulShow){
+        errorView->show();
+    }
 }
+
+void Messager::showErrors()
+{
+    errorView->show();
+}
+
+ErrorLogWidget *Messager::getView()
+{
+    return errorView;
+}
+
+

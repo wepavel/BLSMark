@@ -218,7 +218,7 @@ void DMImportForm::complete_process()
     m_doubleProgressDialog->deleteLater();
 
     if(!invalideDmCodesPaths.isEmpty()){
-        Messager::instance().sendMessage("lkslkgjdklsfj");
+        //Messager::instance().sendMessage("lkslkgjdklsfj");
         // InvalidDmCodesInfoDialog d(invalideDmCodesPaths);
         // d.exec();
     }

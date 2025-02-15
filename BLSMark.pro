@@ -53,6 +53,7 @@ SOURCES += \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp \
     widgets/errorlogwidget.cpp \
+    widgets/errortoolbutton.cpp \
     widgets/healthcheckform.cpp \
     widgets/healthunitform.cpp \
     dialogs/invaliddmcodesinfodialog.cpp \
@@ -80,6 +81,7 @@ HEADERS += \
     widgets/dmimportform.h \
     widgets/dminfoform.h \
     widgets/errorlogwidget.h \
+    widgets/errortoolbutton.h \
     widgets/healthcheckform.h \
     widgets/healthunitform.h \
     dialogs/invaliddmcodesinfodialog.h \
@@ -93,6 +95,7 @@ FORMS += \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui \
     widgets/errorlogwidget.ui \
+    widgets/errortoolbutton.ui \
     widgets/healthcheckform.ui \
     widgets/healthunitform.ui \
     dialogs/invaliddmcodesinfodialog.ui

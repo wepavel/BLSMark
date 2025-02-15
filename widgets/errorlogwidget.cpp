@@ -7,7 +7,6 @@ ErrorLogWidget::ErrorLogWidget(QWidget *parent)
     , ui(new Ui::ErrorLogWidget)
 {
     ui->setupUi(this);
-    connect(&Messager::instance(), &Messager::sendMsg, this, &ErrorLogWidget::addMsg);
 }
 
 ErrorLogWidget::~ErrorLogWidget()
@@ -18,10 +17,12 @@ ErrorLogWidget::~ErrorLogWidget()
 void ErrorLogWidget::on_pb_clear_clicked()
 {
     ui->lw_output->clear();
+    emit dataHasBeenCleared();
 }
 
 void ErrorLogWidget::addMsg(const QString &msg)
 {
+    qDebug() << "Добавляем сообщение: " << msg;
     ui->lw_output->addItem(msg);
 }
 

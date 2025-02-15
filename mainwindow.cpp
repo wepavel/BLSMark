@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include "core/messager.h"
+#include "qtconcurrentrun.h"
 #include "ui_mainwindow.h"
 #include <QPixmap>
 #include <QLabel>
@@ -7,10 +9,12 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QWidgetAction>
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
 #include "widgets/dmimportform.h"
 #include "widgets/dminfoform.h"
+#include "widgets/errortoolbutton.h"
 #include <widgets/connectionstateform.h>
 
 
@@ -20,8 +24,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setup_notifications_widgets();
+
+    // qDebug() << "Основной поток " << QThread::currentThreadId();
+    // QtConcurrent::run([](){
+    //     Messager::instance().addMessage("Первое сообщение в другом потоке!");
+    //     qDebug() << "Сообщение было создано в потоке: " << QThread::currentThreadId();
+    // });
+
     setWindowTitle("BLS Mark");
-    qDebug() << "ID_MAIN: " << QThread::currentThreadId();
 
     DMImportForm* pdf_importer = new DMImportForm(this);
     ui->tab_import->layout()->addWidget(pdf_importer);
@@ -70,7 +81,6 @@ auto MainWindow::fill_logo() -> void
     image_label->setFixedSize(120, 60); // Установите нужный размер
 
     ui->hl_logo->addWidget(image_label);
-
 }
 
 void MainWindow::toggle_theme()
@@ -108,4 +118,20 @@ void MainWindow::setup_menubar()
         SettingsDialog d(this);
         d.exec();
     });
+}
+
+void MainWindow::setup_notifications_widgets()
+{
+    ErrorToolButton* e = new ErrorToolButton(0, this);
+
+    connect(&Messager::instance(), &Messager::errorWasAdded,
+            e, &ErrorToolButton::incrementNotificationCount);
+
+    connect(Messager::instance().getView(), &ErrorLogWidget::dataHasBeenCleared,
+            e, &ErrorToolButton::clearAllNotifications);
+
+    connect(e, &ErrorToolButton::tb_clicked,
+            &Messager::instance(), &Messager::showErrors);
+
+    ui->menubar->setCornerWidget(e, Qt::TopRightCorner);
 }
