@@ -76,7 +76,7 @@ DMInfoForm::DMInfoForm(const QString &dmCode, QWidget *parent)
     if(dmValidated) setDMFields(dmAttrs);
 
     QString code = prepareDataMatrix(dmCode);
-    QPixmap img = generateDataMatrix(code, 20);
+    QPixmap img = generateDataMatrix(code, 1000);
     ui->lbl_img->setPixmap(img);
 
 }

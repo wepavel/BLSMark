@@ -50,6 +50,7 @@ SOURCES += \
     tables/autoscrolltableview.cpp \
     tables/dragdroptableview.cpp \
     widgets/connectionstateform.cpp \
+    widgets/dmexportform.cpp \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp \
     widgets/healthcheckform.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     tables/autoscrolltableview.h \
     tables/dragdroptableview.h \
     widgets/connectionstateform.h \
+    widgets/dmexportform.h \
     widgets/dmimportform.h \
     widgets/dminfoform.h \
     widgets/healthcheckform.h \
@@ -92,6 +94,7 @@ FORMS += \
     dialogs/settingsdialog.ui \
     mainwindow.ui \
     widgets/connectionstateform.ui \
+    widgets/dmexportform.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui \
     widgets/healthcheckform.ui \

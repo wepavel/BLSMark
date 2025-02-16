@@ -10,9 +10,11 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QWidgetAction>
+
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
 #include "widgets/dmimportform.h"
+#include "widgets/dmexportform.h"
 #include "widgets/dminfoform.h"
 #include "widgets/msgtoolbutton.h"
 #include <widgets/connectionstateform.h>
@@ -35,9 +37,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     DMImportForm* pdf_importer = new DMImportForm(this);
     ui->tab_import->layout()->addWidget(pdf_importer);
+    qDebug() << "ID_MAIN: " << QThread::currentThreadId();
+
+    DMExportForm* csvExporter = new DMExportForm(this);
+
+    DMImportForm* pdfImporter = new DMImportForm(this);
+    ui->tab_import->layout()->addWidget(pdfImporter);
+    ui->tab_export->layout()->addWidget(csvExporter);
 
     ConnectionStateForm* conStateForm = new ConnectionStateForm(this);
     ui->tab_main->layout()->addWidget(conStateForm);
+
+
 
     setup_menubar();
     fill_logo();

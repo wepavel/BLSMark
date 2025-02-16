@@ -83,7 +83,7 @@
      <item>
       <widget class="QPushButton" name="pb_load_in_db">
        <property name="text">
-        <string>Загрузить в БД</string>
+        <string>Загрузить в базу данных</string>
        </property>
       </widget>
      </item>
