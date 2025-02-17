@@ -61,7 +61,7 @@ private:
     // CRUDDMCode db = CRUDDMCode("QSQLITE", "C:/Users/Wepal/Documents/mydb.sqlite");
 
     // QSqlDatabase* m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
-    QSet<QString> invalideDmCodesPaths = {"Путь до файла1", "Путь до файла2", "Путь до файла3","Путь до файла4"};
+    QSet<QString> invalideDmCodesPaths = {};
     QStringList gtinsToInsert = {};
 
     //---Funcs
