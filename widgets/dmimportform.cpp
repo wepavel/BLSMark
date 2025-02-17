@@ -491,7 +491,7 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
                                             +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
                 insertGtinSuccess = false;
             } else if (statusCode==-1) {
-                messagerInst.addMessage("Не удалось отправить запрос на сервер! Код ответа: "+QString::number(statusCode)
+                messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
                                             +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
                 insertGtinSuccess = false; // также
             } else {
