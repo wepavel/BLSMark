@@ -487,18 +487,19 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
         url.setPath(url.path() + QUrl::toPercentEncoding(gtin));
         httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Get, [&](const QByteArray& responseData, int statusCode){
             if (statusCode!=200 && statusCode!=-1) {
-                QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось выполнить запрос!"));
+                messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
+                                            +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
                 insertGtinSuccess = false;
             } else if (statusCode==-1) {
-                QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось отправить запрос на сервер!"));
-                insertGtinSuccess = false;
+                messagerInst.addMessage("Не удалось отправить запрос на сервер! Код ответа: "+QString::number(statusCode)
+                                            +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+                insertGtinSuccess = false; // также
             } else {
                 if (!insertGtinInDb(gtin)) {
                     insertGtinSuccess = false; // Устанавливаем флаг в false
                     return; // Выходим из цикла, чтобы не обрабатывать остальные GTIN
                 }
             }
-
         });
         if (!insertGtinSuccess) return;
     }
@@ -514,13 +515,13 @@ void DMImportForm::insertAllDmCodes() {
     QUrl url = HttpManager::createApiUrl("add-dmcodes");
     httpManager->makeRequest(url, QJsonDocument(arr), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
         if (!responseData.isEmpty()) {
-            qDebug() << responseData;
+            messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
+                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
         } else {
             QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
+            messagerInst.addMessage("Успешная загрузка DM-кодов. DM-коды были успешно загружены в БД!", Info);
         }
-
     });
-    auto x = 1;
 }
 
 
