@@ -1,19 +1,14 @@
 #include "dmimportform.h"
 #include "dminfoform.h"
 #include "ui_dmimportform.h"
-
 #include <QFileDialog>
 #include <QProcess>
 #include <QtConcurrent>
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QInputDialog>
-
-
 #include "widgets/dminfoform.h"
 #include "sqlmodels/dmcodemodel.h"
-#include "dialogs/invaliddmcodesinfodialog.h"
-
 #include <core/messager.h>
 
 #define gtinIsNotInDb "false"
@@ -218,9 +213,10 @@ void DMImportForm::complete_process()
     m_doubleProgressDialog->deleteLater();
 
     if(!invalideDmCodesPaths.isEmpty()){
-        //Messager::instance().sendMessage("lkslkgjdklsfj");
-        // InvalidDmCodesInfoDialog d(invalideDmCodesPaths);
-        // d.exec();
+        for (const QString& path: invalideDmCodesPaths){
+            messagerInst.addMessage("Невалидный код: \"" + path + "\" не будет загружен!",
+                                            MsgType::Error, true);
+        }
     }
     invalideDmCodesPaths.clear();
 

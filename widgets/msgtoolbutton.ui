@@ -70,13 +70,13 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
+       <width>60</width>
        <height>40</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>60</width>
        <height>40</height>
       </size>
      </property>
@@ -88,6 +88,10 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources.qrc">
+       <normaloff>:/images/img/noerror.png</normaloff>:/images/img/noerror.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -110,13 +114,13 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
+       <width>60</width>
        <height>40</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>60</width>
        <height>40</height>
       </size>
      </property>
@@ -127,6 +131,10 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources.qrc">
+       <normaloff>:/images/img/nowarn.png</normaloff>:/images/img/nowarn.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -149,13 +157,13 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
+       <width>60</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>60</width>
        <height>40</height>
       </size>
      </property>

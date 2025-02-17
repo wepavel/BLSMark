@@ -10,11 +10,10 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QWidgetAction>
-
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
-#include "widgets/dmimportform.h"
 #include "widgets/dmexportform.h"
+#include "widgets/dmimportform.h"
 #include "widgets/dminfoform.h"
 #include "widgets/msgtoolbutton.h"
 #include <widgets/connectionstateform.h>
@@ -35,20 +34,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle("BLS Mark");
 
-    DMImportForm* pdf_importer = new DMImportForm(this);
-    ui->tab_import->layout()->addWidget(pdf_importer);
-    qDebug() << "ID_MAIN: " << QThread::currentThreadId();
-
     DMExportForm* csvExporter = new DMExportForm(this);
+    ui->tab_export->layout()->addWidget(csvExporter);
 
     DMImportForm* pdfImporter = new DMImportForm(this);
     ui->tab_import->layout()->addWidget(pdfImporter);
-    ui->tab_export->layout()->addWidget(csvExporter);
 
     ConnectionStateForm* conStateForm = new ConnectionStateForm(this);
     ui->tab_main->layout()->addWidget(conStateForm);
-
-
 
     setup_menubar();
     fill_logo();
@@ -106,8 +99,6 @@ void MainWindow::setup_menubar()
                                              tr("Введите код:"), QLineEdit::Normal,
                                              "", &ok);
 
-        qDebug() << "TEEEST";
-
         if (ok && !text.isEmpty()) {
             QDialog dialog;
 
@@ -145,13 +136,7 @@ void MainWindow::setup_notifications_widgets()
 
     ui->menubar->setCornerWidget(e, Qt::TopRightCorner);
 
-    Messager::instance().addMessage("msg", Error);
-    Messager::instance().addMessage("msg", Warning);
-    Messager::instance().addMessage("msg", Info);
-    Messager::instance().addMessage("1", Error);
-    Messager::instance().addMessage("2", Error);
-    Messager::instance().addMessage("3", Error);
-    Messager::instance().addMessage("4", Error);
-    Messager::instance().addMessage("5", Error);
-    Messager::instance().addMessage("6", Error);
+    // Messager::instance().addMessage("msg", Error);
+    // Messager::instance().addMessage("msg", Warning);
+    // Messager::instance().addMessage("msg", Info, true);
 }

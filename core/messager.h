@@ -4,6 +4,8 @@
 #include "qobject.h"
 #include "widgets/msglogwidget.h"
 
+#define messagerInst Messager::instance()
+
 class Messager: public QObject {
     Q_OBJECT
 

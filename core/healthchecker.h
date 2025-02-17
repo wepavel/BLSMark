@@ -8,6 +8,7 @@
 #include <QNetworkReply>
 #include <QWebSocket>
 #include "globalsettings.h"
+#include "messager.h"
 
 #define HTTP_REQUEST_INTERVAL_MS 500
 #define WS_RECONNECT_INTERVAL_MS 3000

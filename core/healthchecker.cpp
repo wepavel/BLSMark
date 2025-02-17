@@ -56,13 +56,16 @@ void HealthChecker::httpSendPingRequest()
             if (responseData == "pong") {
                 //qDebug() << "Received pong!";
                 emit deviceAvailableChanged("Сервис", true);
+                messagerInst.addMessage("HTTP: Сервис доступен!", Info);
             } else {
                 //qDebug() << "Unexpected response:" << responseData;
                 emit deviceAvailableChanged("Сервис", false);
+                messagerInst.addMessage("HTTP: Сервис недоступен!", Error);
             }
         } else {
             //qDebug() << "Error:" << reply->errorString();
             emit deviceAvailableChanged("Сервис", false);
+            messagerInst.addMessage("HTTP: Сервис недоступен!", Error);
         }
 
         // Удаляем объект ответа после завершения работы с ним
@@ -80,6 +83,7 @@ void HealthChecker::wsConnectToServer()
 {
     if (m_webSocket->state() != QAbstractSocket::ConnectedState) {
         qDebug() << "Attempting to connect to server with url " << m_websocketUrl;
+        messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
         m_webSocket->open(m_websocketUrl);
     }
 }
@@ -88,6 +92,7 @@ void HealthChecker::wsDisconnectFromServer()
 {
     if (m_webSocket->state() == QAbstractSocket::ConnectedState) {
         qDebug() << "Disconnecting from server...";
+        messagerInst.addMessage("WS: Disconnecting from server...", Info);
         m_webSocket->close();
     }
 }
@@ -112,13 +117,16 @@ void HealthChecker::on_ws_connected()
     m_webSocketReconnectTimer->stop();
     m_webSocketRequestTimer->start(WS_REQUEST_INTERVAL_MS);
     emit deviceWorksChanged("Сервис", true);
-    qDebug() << "Connected to server!";
+    //qDebug() << "Connected to server!";
+    messagerInst.addMessage("WS: Connected to server!", Info);
 }
 
 void HealthChecker::on_ws_disconnected()
 {
     qDebug() << "Disconnected from server!";
+    messagerInst.addMessage("WS: Disconnected from server!", Warning);
     emit deviceWorksChanged("Сервис", false);
+    messagerInst.addMessage("Сервис не работает!", Error);
     m_webSocketRequestTimer->stop();
     // Попытаться переподключиться через 3 секунды
     m_webSocketReconnectTimer->start(WS_RECONNECT_INTERVAL_MS);
@@ -132,6 +140,7 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
     // Проверим, был ли JSON корректно распарсен
     if (doc.isNull()) {
         qDebug() << "Invalid JSON format!";
+        messagerInst.addMessage("WS: on_ws_textMessageReceived::Invalid JSON format!", Error);
         return;
     }
 
@@ -148,13 +157,22 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
         bool heartbeat = messageObj.value("heartbeat").toBool();
 
         emit deviceAvailableChanged(getName(name), ping);
+        messagerInst.addMessage(QString("WS: Доступность устройства " +
+                                        getName(name) +
+                                        " изменилась на " +
+                                        QString(ping == true ? "<ДОСТУПЕН>" : "<НЕ ДОСТУПЕН>")),
+                                Info);
+
         emit deviceWorksChanged(getName(name), heartbeat);
-        // qDebug() << "Device:" << name;
-        // qDebug() << "  Ping:" << ping;
-        // qDebug() << "  Heartbeat:" << heartbeat;
+        messagerInst.addMessage(QString("WS: Работоспособность устройства " +
+                                        getName(name) +
+                                        " изменилась на " +
+                                        QString(ping == true ? "<ДОСТУПЕН>" : "<НЕ ДОСТУПЕН>")),
+                                Info);
     }
 
     deviceWorksChanged("Сервис", true);
+    messagerInst.addMessage("Сервис работает!", Info);
 }
 
 void HealthChecker::on_backend_service_ip_port_changed()
