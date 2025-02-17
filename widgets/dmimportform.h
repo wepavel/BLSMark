@@ -62,10 +62,6 @@ private:
 
     // QSqlDatabase* m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
     QSet<QString> invalideDmCodesPaths = {"Путь до файла1", "Путь до файла2", "Путь до файла3","Путь до файла4"};
-
-    // std::atomic<int> requestCount{0};
-    // bool dmCodesInserted = false; // Флаг, чтобы гарантировать однократный вызов insertAllDmCodes
-    // QMutex dmCodesMutex; // Защита доступа к dmCodesInserted
     QStringList gtinsToInsert = {};
 
     //---Funcs
@@ -78,34 +74,6 @@ private:
     bool insertGtinInDb(const QString& gtin);
     void insertAllGtinsAndDmCodes();
     void insertAllDmCodes();
-
-    // QUrl createApiUrl(const QString &endpoint) const {
-    //     return QUrl(QString("http://%1:%2/api/v1/code-processing/%3")
-    //                     .arg(gSettings.getBackendServiceIP())
-    //                     .arg(gSettings.getBackendServicePort())
-    //                     .arg(endpoint));
-    // }
-
-    // QNetworkReply* sendJsonRequest(const QUrl &url, const QJsonDocument &jsonDoc, bool isPost = true) {
-    //     QNetworkRequest request(url);
-    //     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-    //     if (isPost) {
-    //         return httpManager->post(request, jsonDoc.toJson());
-    //     } else {
-    //         return httpManager->get(request);
-    //     }
-    // }
-
-    // void handleNetworkReply(QNetworkReply *reply, const std::function<void(const QByteArray&)> &successCallback) {
-    //     if (reply->error() == QNetworkReply::NoError) {
-    //         QByteArray responseData = reply->readAll();
-    //         successCallback(responseData);
-    //     } else {
-    //         qDebug() << "Network Error: " << reply->errorString();
-    //     }
-    //     reply->deleteLater();
-    // }
 };
 
 #endif // DMIMPORTFORM_H

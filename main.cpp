@@ -6,6 +6,7 @@
 #include <QDebug>
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
+#include "widgets/msglogwidget.h"
 #include "widgets/healthcheckform.h"
 #include <core/healthchecker.h>
 

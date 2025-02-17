@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include "core/messager.h"
+#include "qtconcurrentrun.h"
 #include "ui_mainwindow.h"
 #include <QPixmap>
 #include <QLabel>
@@ -7,12 +9,13 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
-
+#include <QWidgetAction>
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
-#include "widgets/dmimportform.h"
 #include "widgets/dmexportform.h"
+#include "widgets/dmimportform.h"
 #include "widgets/dminfoform.h"
+#include "widgets/msgtoolbutton.h"
 #include <widgets/connectionstateform.h>
 
 
@@ -22,8 +25,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setup_notifications_widgets();
+    // qDebug() << "Основной поток " << QThread::currentThreadId();
+    // QtConcurrent::run([](){
+    //     Messager::instance().addMessage("Первое сообщение в другом потоке!");
+    //     qDebug() << "Сообщение было создано в потоке: " << QThread::currentThreadId();
+    // });
+
     setWindowTitle("BLS Mark");
-    qDebug() << "ID_MAIN: " << QThread::currentThreadId();
 
     DMExportForm* csvExporter = new DMExportForm(this);
     ui->tab_export->layout()->addWidget(csvExporter);
@@ -33,8 +42,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     ConnectionStateForm* conStateForm = new ConnectionStateForm(this);
     ui->tab_main->layout()->addWidget(conStateForm);
-
-
 
     setup_menubar();
     fill_logo();
@@ -77,7 +84,6 @@ auto MainWindow::fill_logo() -> void
     image_label->setFixedSize(120, 60); // Установите нужный размер
 
     ui->hl_logo->addWidget(image_label);
-
 }
 
 void MainWindow::toggle_theme()
@@ -92,8 +98,6 @@ void MainWindow::setup_menubar()
         QString text = QInputDialog::getText(this, tr("Проверка кода"),
                                              tr("Введите код:"), QLineEdit::Normal,
                                              "", &ok);
-
-        qDebug() << "TEEEST";
 
         if (ok && !text.isEmpty()) {
             QDialog dialog;
@@ -115,4 +119,24 @@ void MainWindow::setup_menubar()
         SettingsDialog d(this);
         d.exec();
     });
+}
+
+void MainWindow::setup_notifications_widgets()
+{
+    MsgToolButton* e = new MsgToolButton(this);
+
+    connect(&Messager::instance(), &Messager::msgWasAdded,
+            e, &MsgToolButton::incrementMessageCount, Qt::QueuedConnection);
+
+    connect(Messager::instance().getView(), &MsgLogWidget::dataHasBeenCleared,
+            e, &MsgToolButton::clearAll, Qt::QueuedConnection);
+
+    connect(e, &MsgToolButton::tb_clicked,
+            Messager::instance().getView(), &MsgLogWidget::showWithOpenTab, Qt::QueuedConnection);
+
+    ui->menubar->setCornerWidget(e, Qt::TopRightCorner);
+
+    // Messager::instance().addMessage("msg", Error);
+    // Messager::instance().addMessage("msg", Warning);
+    // Messager::instance().addMessage("msg", Info, true);
 }

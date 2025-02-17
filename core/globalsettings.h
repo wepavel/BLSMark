@@ -7,7 +7,6 @@
 #include <QObject>
 #include <QMetaEnum>
 #include <QCoreApplication>
-
 #include "stylemanager.h"
 
 
