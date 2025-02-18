@@ -461,7 +461,7 @@ bool DMImportForm::insertGtinInDb(const QString& gtin) {
 
     // Если имя введено корректно, отправляем запрос
     QJsonObject data{{"code", gtin}, {"name", name}};
-    QUrl url = HttpManager::createApiUrl("add-gtin");
+    QUrl url = HttpManager::createApiUrl("code-import/add-gtin");
     httpManager->makeRequest(url,  QJsonDocument(data), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
         if (statusCode!=200 && statusCode!=-1) {
             QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось выполнить запрос!"));
@@ -483,7 +483,7 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
     bool insertGtinSuccess = true; // Флаг для отслеживания успеха
 
     for (const QString& gtin : gtins) {
-        QUrl url = HttpManager::createApiUrl("is-gtin/");
+        QUrl url = HttpManager::createApiUrl("code-import/is-gtin/");
         url.setPath(url.path() + QUrl::toPercentEncoding(gtin));
         httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Get, [&](const QByteArray& responseData, int statusCode){
             if (statusCode!=200 && statusCode!=-1) {
@@ -512,7 +512,7 @@ void DMImportForm::insertAllDmCodes() {
         arr.append(QJsonObject{{"dm_code", dmCode}});
     }
 
-    QUrl url = HttpManager::createApiUrl("add-dmcodes");
+    QUrl url = HttpManager::createApiUrl("code-import/add-dmcodes");
     httpManager->makeRequest(url, QJsonDocument(arr), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
         if (!responseData.isEmpty()) {
             messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)

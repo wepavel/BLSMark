@@ -20,7 +20,7 @@ public:
                      const HttpMethod &method,
                      const std::function<void(const QByteArray&, int)> &callback);
 
-    static QUrl createApiUrl(const QString &endpoint);
+    static QUrl createApiUrl(const QString &path);
 
 signals:
     void requestError(const QString& err);
