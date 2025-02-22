@@ -461,7 +461,7 @@ bool DMImportForm::insertGtinInDb(const QString& gtin) {
 
     // Если имя введено корректно, отправляем запрос
     QJsonObject data{{"code", gtin}, {"name", name}};
-    QUrl url = HttpManager::createApiUrl("add-gtin");
+    QUrl url = HttpManager::createApiUrl("code-import/add-gtin");
     httpManager->makeRequest(url,  QJsonDocument(data), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
         if (statusCode!=200 && statusCode!=-1) {
             QMessageBox::warning(this, tr("Внимание!"), tr("Не удалось выполнить запрос!"));
@@ -483,7 +483,7 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
     bool insertGtinSuccess = true; // Флаг для отслеживания успеха
 
     for (const QString& gtin : gtins) {
-        QUrl url = HttpManager::createApiUrl("is-gtin/");
+        QUrl url = HttpManager::createApiUrl("code-import/is-gtin/");
         url.setPath(url.path() + QUrl::toPercentEncoding(gtin));
         httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Get, [&](const QByteArray& responseData, int statusCode){
             if (statusCode!=200 && statusCode!=-1) {
@@ -495,7 +495,7 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
                                             +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
                 insertGtinSuccess = false; // также
             } else {
-                if (!insertGtinInDb(gtin)) {
+                if (QString(responseData) == "false" && !insertGtinInDb(gtin)) {
                     insertGtinSuccess = false; // Устанавливаем флаг в false
                     return; // Выходим из цикла, чтобы не обрабатывать остальные GTIN
                 }
@@ -506,20 +506,69 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
     insertAllDmCodes();
 }
 
+QVariant ObjectOrArrayFromString(const QString& in)
+{
+    QVariant result;
+
+    QJsonDocument doc = QJsonDocument::fromJson(in.toUtf8());
+
+    // check validity of the document
+    if (!doc.isNull())
+    {
+        if (doc.isObject()) {
+            result = doc.object();
+        } else if (doc.isArray()) {
+            result = doc.array();
+        } else {
+            qDebug() << "Document is neither an object nor an array";
+        }
+    } else {
+        qDebug() << "Invalid JSON...\n" << in;
+    }
+
+    return result;
+}
+
 void DMImportForm::insertAllDmCodes() {
     QJsonArray arr;
     for (const QString& dmCode : importModel->getAllDmCodes()) {
         arr.append(QJsonObject{{"dm_code", dmCode}});
     }
 
-    QUrl url = HttpManager::createApiUrl("add-dmcodes");
+    QUrl url = HttpManager::createApiUrl("code-import/add-dmcodes");
     httpManager->makeRequest(url, QJsonDocument(arr), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
-        if (!responseData.isEmpty()) {
+        // QJsonObject obj = ObjectFromString(responseData);
+
+
+        // if (!responseData.isEmpty()) {
+        //     messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
+        //                                 +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+        // } else {
+        //     QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
+        //     messagerInst.addMessage("Успешная загрузка DM-кодов. DM-коды были успешно загружены в БД!", Info);
+        // }
+
+        if (statusCode!=200 && statusCode!=-1) {
+                messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
+                                            +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+        } else if (statusCode==-1) {
             messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
                                         +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
         } else {
-            QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
-            messagerInst.addMessage("Успешная загрузка DM-кодов. DM-коды были успешно загружены в БД!", Info);
+            QJsonArray result = ObjectOrArrayFromString(responseData).toJsonArray();
+            if (result.isEmpty()) {
+                QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
+                messagerInst.addMessage("Успешная загрузка DM-кодов. DM-коды были успешно загружены в БД!", Info);
+            } else {
+                for (const QJsonValue &value : qAsConst(result)) {
+                    QJsonObject jsonObject = value.toObject();
+                    QString message = QString("StatusCode: %1; Ошибка добавления кода %2! %3")
+                                          .arg(statusCode)
+                                          .arg(jsonObject.value("dm_code").toString())
+                                          .arg(jsonObject.value("problem").toString());
+                    messagerInst.addMessage(message, Warning, true);
+                }
+            }
         }
     });
 }

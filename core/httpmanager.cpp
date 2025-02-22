@@ -79,10 +79,10 @@ void HttpManager::makeRequest(const QUrl &url,
     reply->deleteLater();
 }
 
-QUrl HttpManager::createApiUrl(const QString &endpoint)
+QUrl HttpManager::createApiUrl(const QString &path)
 {
-    return QUrl(QString("http://%1:%2/api/v1/code-processing/%3")
+    return QUrl(QString("http://%1:%2/api/v1/%3")
                     .arg(gSettings.getBackendServiceIP())
                     .arg(gSettings.getBackendServicePort())
-                    .arg(endpoint));
+                    .arg(path));
 }
