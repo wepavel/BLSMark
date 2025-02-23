@@ -43,8 +43,8 @@ SOURCES += \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
     dialogs/settingsdialog.cpp \
-    goodsdatetimeedit.cpp \
-    gtinnamescombobox.cpp \
+    ui_components/goodsdatetimeedit.cpp \
+    ui_components/gtinnamescombobox.cpp \
     main.cpp \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
@@ -71,8 +71,8 @@ HEADERS += \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
     dialogs/settingsdialog.h \
-    goodsdatetimeedit.h \
-    gtinnamescombobox.h \
+    ui_components/goodsdatetimeedit.h \
+    ui_components/gtinnamescombobox.h \
     models/goodsmodel.h \
     models/unloadgoodsmodel.h \
     sqlmodels/baseentity.h \
