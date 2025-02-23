@@ -1,7 +1,10 @@
 #include "unloadgoodsmodel.h"
 
+#include "core/messager.h"
 #include "qbrush.h"
 #include "qdatetime.h"
+
+#include <qfile.h>
 
 UnloadGoodsModel::UnloadGoodsModel(QObject *parent)
     : QAbstractTableModel{parent}
@@ -15,6 +18,11 @@ int UnloadGoodsModel::rowCount(const QModelIndex &parent) const
 int UnloadGoodsModel::columnCount(const QModelIndex &parent) const
 {
     return Column::ColumnCount;
+}
+
+bool UnloadGoodsModel::isEmpty() const
+{
+    return m_data.size()==0;
 }
 
 QVariant UnloadGoodsModel::data(const QModelIndex &index, int role) const
@@ -71,6 +79,25 @@ void UnloadGoodsModel::addRow(const QString &code,
     beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
     m_data.append({goodName, code});
     endInsertRows();
+}
+
+QPair<bool, QString> UnloadGoodsModel::saveToCsv(const QString &fullPath)
+{
+    QFile file(fullPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        messagerInst.addMessage("Не удалось открыть файл для записи: "+fullPath, Error);
+        return QPair<bool, QString>(false, "Не удалось открыть файл для записи:"+fullPath);
+    }
+
+    QTextStream out(&file);
+
+    for (const RowData &row : m_data) {
+        out << row.code << "\n";
+    }
+
+    file.close();
+
+    return QPair<bool, QString>(true,"");
 }
 
 void UnloadGoodsModel::clear()

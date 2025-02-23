@@ -1,11 +1,14 @@
 #include "dmexportform.h"
 #include "core/messager.h"
+#include "qdir.h"
 #include "qjsonarray.h"
 #include "qjsondocument.h"
 #include "qjsonobject.h"
 #include "ui_dmexportform.h"
 #include <QCalendarWidget>
 #include <QDateEdit>
+#include <qfiledialog.h>
+#include <qmessagebox.h>
 
 DMExportForm::DMExportForm(QWidget *parent)
     : QWidget(parent)
@@ -55,10 +58,45 @@ void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode
             return;
         }
         QJsonArray jsonArray = jsonDoc.array();
+        if(jsonArray.isEmpty()){
+            QMessageBox::warning(this, tr("Внимание"), tr("Товаров по указанному запросу не найдено!"));
+            return;
+        }
         for (const QJsonValue &value : jsonArray) {
             auto obj = value.toObject();
             goodsMdl->addRow(obj["dm_code"].toString(), obj["product_name"].toString());
         }
+        this->choosenName=ui->cb_goods->currentText();
+        this->choosenDate=ui->dte_date->date().toString("yyyy_MM_dd");
+    }
+}
+
+
+void DMExportForm::on_pb_load_in_csv_clicked()
+{
+    if(goodsMdl->isEmpty()){
+        QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
+        return;
+    }
+    // Открываем диалог выбора папки
+    QString fileName = choosenDate+"_"+choosenName.trimmed().replace(" ","_")+".csv";
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Выберите папку для сохранения файла ")+fileName,
+                                                          QDir::homePath());
+
+    // Проверяем, выбрал ли пользователь папку
+    if (directory.isEmpty()) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не выбрана папка для сохранения!"));
+        return;
+    }
+
+    QString filePath = directory + "/" + fileName;
+
+    auto res = goodsMdl->saveToCsv(filePath);
+
+    if (res.first) {
+        QMessageBox::information(this, tr("Успех"), tr("Файл успешно сохранен в: ") + filePath);
+    } else {
+        QMessageBox::critical(this, tr("Ошибка"), res.second);
     }
 }
 
