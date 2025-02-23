@@ -17,6 +17,7 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
     initHealthChecker();
     initGoodsTable();
     m_tvGoods->verticalHeader()->setVisible(false); // убираем нумерацию строк
+    setFocusPolicy(Qt::NoFocus);
 }
 
 ConnectionStateForm::~ConnectionStateForm()
@@ -32,6 +33,8 @@ ConnectionStateForm::~ConnectionStateForm()
 void ConnectionStateForm::initGoodsTable()
 {
     m_tvGoods = new AutoScrollTableView(this);
+    m_tvGoods->setFocusPolicy(Qt::NoFocus);
+
     layout()->addWidget(m_tvGoods);
 
     mdl = new GoodsModel(m_tvGoods);
@@ -41,7 +44,7 @@ void ConnectionStateForm::initGoodsTable()
     m_tvGoods->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_tvGoods->setSelectionMode(QAbstractItemView::SingleSelection);
     m_tvGoods->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
-    m_tvGoods->setFocusPolicy(Qt::ClickFocus);
+    m_tvGoods->setFocusPolicy(Qt::NoFocus);
 
     connect(mdl, &GoodsModel::dataHasBeenAdded, m_tvGoods, &AutoScrollTableView::update);
 }

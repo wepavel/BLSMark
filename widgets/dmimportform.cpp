@@ -20,6 +20,7 @@ DMImportForm::DMImportForm(QWidget *parent)
     , httpManager(new HttpManager(this))
 {
     ui->setupUi(this);
+    ui->tw_dm_codes->setFocusPolicy(Qt::NoFocus);
     //ui->pb_load_in_db->setEnabled(false);
     ui->pb_load_in_db->setFocusPolicy(Qt::NoFocus);
 
@@ -495,7 +496,7 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
                                             +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
                 insertGtinSuccess = false; // также
             } else {
-                if (QString(responseData) == "false" && !insertGtinInDb(gtin)) {
+                if (QString::fromUtf8(responseData) == "false" && !insertGtinInDb(gtin)) {
                     insertGtinSuccess = false; // Устанавливаем флаг в false
                     return; // Выходим из цикла, чтобы не обрабатывать остальные GTIN
                 }

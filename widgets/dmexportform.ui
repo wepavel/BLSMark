@@ -6,40 +6,176 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>502</width>
-    <height>254</height>
+    <width>509</width>
+    <height>327</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QComboBox" name="comboBox"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="pb_calendar">
-       <property name="text">
-        <string>...</string>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+     </property>
+     <item row="1" column="2">
+      <widget class="GtinNamesComboBox" name="cb_goods">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>450</width>
+         <height>16777215</height>
+        </size>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QToolButton" name="toolButton_2">
+     <item row="1" column="1">
+      <widget class="QLabel" name="label">
+       <property name="maximumSize">
+        <size>
+         <width>120</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
-        <string>...</string>
+        <string>Категория товара:</string>
        </property>
       </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="GoodsDateTimeEdit" name="dte_date">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>450</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="displayFormat">
+        <string>dd.MM.yyyy</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" colspan="2">
+      <widget class="QPushButton" name="pb_search">
+       <property name="styleSheet">
+        <string notr="true">
+QPushButton:hover {
+    border: 1px solid #fb9f18; /* Границы появляются при наведении */
+}
+
+QPushButton:pressed {
+    background-color: gray; /* Изменение фона при нажатии */
+} 
+
+QPushButton:focus {
+    color: white;
+    background-color: gray; /* Изменение фона при нажатии */
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Поиск</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/images/img/search.png</normaloff>:/images/img/search.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="maximumSize">
+        <size>
+         <width>120</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Дата наклейки:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="2" column="0">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QTableView" name="tableView"/>
+   <item>
+    <widget class="QTableView" name="tv_goods"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pb_load_in_csv">
+     <property name="text">
+      <string>Вывести таблицу в .csv файл</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>GtinNamesComboBox</class>
+   <extends>QComboBox</extends>
+   <header>gtinnamescombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GoodsDateTimeEdit</class>
+   <extends>QDateTimeEdit</extends>
+   <header>goodsdatetimeedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
