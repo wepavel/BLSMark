@@ -2,12 +2,12 @@
 #include "core/globalsettings.h"
 #include "core/messager.h"
 #include "qcoreevent.h"
-#include "qevent.h"
-#include "qjsonarray.h"
-#include "qjsondocument.h"
-#include "qjsonobject.h"
-#include "qpainter.h"
-#include "qtextformat.h"
+#include <QEvent>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QPainter>
+#include <QTextFormat>
 
 
 GoodsCalendarWidget::GoodsCalendarWidget(QWidget *parent):

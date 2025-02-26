@@ -43,15 +43,15 @@ SOURCES += \
     core/stylemanager.cpp \
     dialogs/doubleprogressdialog.cpp \
     dialogs/settingsdialog.cpp \
-    ui_components/goodsdatetimeedit.cpp \
-    ui_components/gtinnamescombobox.cpp \
+    models/exportgoodsmodel.cpp \
     main.cpp \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
     models/goodsmodel.cpp \
-    models/unloadgoodsmodel.cpp \
     tables/autoscrolltableview.cpp \
     tables/dragdroptableview.cpp \
+    ui_components/goodsdatetimeedit.cpp \
+    ui_components/gtinnamescombobox.cpp \
     widgets/connectionstateform.cpp \
     widgets/dmexportform.cpp \
     widgets/dmimportform.cpp \
@@ -71,10 +71,8 @@ HEADERS += \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
     dialogs/settingsdialog.h \
-    ui_components/goodsdatetimeedit.h \
-    ui_components/gtinnamescombobox.h \
+    models/exportgoodsmodel.h \
     models/goodsmodel.h \
-    models/unloadgoodsmodel.h \
     sqlmodels/baseentity.h \
     sqlmodels/dmcodemodel.h \
     core/globalsettings.h \
@@ -83,6 +81,8 @@ HEADERS += \
     models/dmimportmodel.h \
     tables/autoscrolltableview.h \
     tables/dragdroptableview.h \
+    ui_components/goodsdatetimeedit.h \
+    ui_components/gtinnamescombobox.h \
     widgets/connectionstateform.h \
     widgets/dmexportform.h \
     widgets/dmimportform.h \

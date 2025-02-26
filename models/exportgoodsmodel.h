@@ -1,5 +1,5 @@
-#ifndef UNLOADGOODSMODEL_H
-#define UNLOADGOODSMODEL_H
+#ifndef EXPORTGOODSMODEL_H
+#define EXPORTGOODSMODEL_H
 
 #include <QAbstractTableModel>
 
@@ -36,4 +36,4 @@ public:
     void clear();
 };
 
-#endif // UNLOADGOODSMODEL_H
+#endif // EXPORTGOODSMODEL_H

@@ -2,7 +2,7 @@
 #define DMEXPORTFORM_H
 
 #include "core/httpmanager.h"
-#include "models/unloadgoodsmodel.h"
+#include "models/exportgoodsmodel.h"
 #include <QWidget>
 
 namespace Ui {
