@@ -1,46 +1,102 @@
 #include "dmexportform.h"
+#include "core/messager.h"
+#include "qdir.h"
+#include "qjsonarray.h"
+#include "qjsondocument.h"
+#include "qjsonobject.h"
 #include "ui_dmexportform.h"
-
 #include <QCalendarWidget>
 #include <QDateEdit>
+#include <qfiledialog.h>
+#include <qmessagebox.h>
 
 DMExportForm::DMExportForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::DMExportForm)
 {
     ui->setupUi(this);
+    ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_goods));
+    httpManager = new HttpManager(this);
+    goodsMdl = new UnloadGoodsModel(this);
+    ui->tv_goods->setModel(goodsMdl);
+    ui->tv_goods->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 DMExportForm::~DMExportForm()
 {
     delete ui;
+    delete httpManager;
+    delete goodsMdl;
 }
 
-void DMExportForm::on_pb_calendar_clicked()
+void DMExportForm::on_pb_search_clicked()
 {
-    // Создаем календарь
-    QCalendarWidget *calendar = new QCalendarWidget(this);
-    calendar->setWindowModality(Qt::ApplicationModal);
-    calendar->setWindowFlags(Qt::Popup);
+    goodsMdl->clear();
+    QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-dmcodes-by-date/%1/%2")
+                                             .arg(ui->cb_goods->getGtin())
+                                             .arg(ui->dte_date->date().toString("yyyy_MM_dd")));
+    httpManager->makeRequest(url,
+                             QJsonDocument(),
+                             HttpManager::HttpMethod::Get,
+                             std::bind(&DMExportForm::fillGoodsTable, this, std::placeholders::_1, std::placeholders::_2));
+}
 
-    // Убираем нумерацию недель
-    calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode)
+{
+    if (statusCode!=200 && statusCode!=-1) {
+        messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
+                                    +QString::number(statusCode)
+                                    +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+    } else if (statusCode==-1) {
+        messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
+                                    +QString::number(statusCode)
+                                    +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+    } else {
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+        if(!jsonDoc.isArray()){
+            qDebug() << "JSON is not an array!";
+            return;
+        }
+        QJsonArray jsonArray = jsonDoc.array();
+        if(jsonArray.isEmpty()){
+            QMessageBox::warning(this, tr("Внимание"), tr("Товаров по указанному запросу не найдено!"));
+            return;
+        }
+        for (const QJsonValue &value : jsonArray) {
+            auto obj = value.toObject();
+            goodsMdl->addRow(obj["dm_code"].toString(), obj["product_name"].toString());
+        }
+        this->choosenName=ui->cb_goods->currentText();
+        this->choosenDate=ui->dte_date->date().toString("yyyy_MM_dd");
+    }
+}
 
 
-    // Устанавливаем позицию календаря относительно кнопки
-    QPoint pos = ui->pb_calendar->mapToGlobal(QPoint(0, ui->pb_calendar->height()));
-    calendar->move(pos);
+void DMExportForm::on_pb_load_in_csv_clicked()
+{
+    if(goodsMdl->isEmpty()){
+        QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
+        return;
+    }
+    // Открываем диалог выбора папки
+    QString fileName = choosenDate+"_"+choosenName.trimmed().replace(" ","_")+".csv";
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Выберите папку для сохранения файла ")+fileName,
+                                                          QDir::homePath());
 
-    // Подключаем сигнал выбора даты
-    connect(calendar, &QCalendarWidget::clicked, this, [=](const QDate &date) {
-        // Предполагаем, что у вас есть QDateEdit с именем dateEdit
-        // Если нет, замените на соответствующий виджет или обработку
-        // ui->dateEdit->setDate(date);
-        calendar->close();
-        calendar->deleteLater();
-    });
+    // Проверяем, выбрал ли пользователь папку
+    if (directory.isEmpty()) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не выбрана папка для сохранения!"));
+        return;
+    }
 
-    // Показываем календарь
-    calendar->show();
+    QString filePath = directory + "/" + fileName;
+
+    auto res = goodsMdl->saveToCsv(filePath);
+
+    if (res.first) {
+        QMessageBox::information(this, tr("Успех"), tr("Файл успешно сохранен в: ") + filePath);
+    } else {
+        QMessageBox::critical(this, tr("Ошибка"), res.second);
+    }
 }
 

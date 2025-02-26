@@ -6,40 +6,141 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>502</width>
-    <height>254</height>
+    <width>509</width>
+    <height>327</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QComboBox" name="comboBox"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="pb_calendar">
+      <widget class="QLabel" name="label">
        <property name="text">
-        <string>...</string>
+        <string>Товар:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_2">
+      <widget class="GtinNamesComboBox" name="cb_goods">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>...</string>
+        <string>Дата:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="GoodsDateTimeEdit" name="dte_date">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="displayFormat">
+        <string>dd.MM.yyyy</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_search">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+QPushButton:hover {
+    border: 1px solid #fb9f18; /* Границы появляются при наведении */
+}
+
+QPushButton:pressed {
+    background-color: gray; /* Изменение фона при нажатии */
+} 
+
+QPushButton:focus {
+    color: white;
+    background-color: gray; /* Изменение фона при нажатии */
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Поиск</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/images/img/search.png</normaloff>:/images/img/search.png</iconset>
        </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QTableView" name="tableView"/>
+   <item>
+    <widget class="QTableView" name="tv_goods"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pb_load_in_csv">
+     <property name="text">
+      <string>Вывести таблицу в .csv файл</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>GtinNamesComboBox</class>
+   <extends>QComboBox</extends>
+   <header>gtinnamescombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GoodsDateTimeEdit</class>
+   <extends>QDateTimeEdit</extends>
+   <header>goodsdatetimeedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

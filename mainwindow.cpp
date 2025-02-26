@@ -24,7 +24,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    ui->tab_main->setFocusPolicy(Qt::NoFocus);
+    ui->tab_export->setFocusPolicy(Qt::NoFocus);
+    ui->tab_import->setFocusPolicy(Qt::NoFocus);
     setup_notifications_widgets();
     // qDebug() << "Основной поток " << QThread::currentThreadId();
     // QtConcurrent::run([](){

@@ -7,8 +7,8 @@ MsgToolButton::MsgToolButton(QWidget *parent)
     , ui(new Ui::MsgToolButton)
 {
     ui->setupUi(this);
-    ui->tb_error->setIconSize(QSize(30, 30));
-    ui->tb_warning->setIconSize(QSize(30, 30));
+    ui->tb_error->setIconSize(QSize(25, 25));
+    ui->tb_warning->setIconSize(QSize(25, 25));
 }
 
 void MsgToolButton::setMessageCount(const int& notificationCount,
@@ -33,6 +33,14 @@ void MsgToolButton::setMessageCount(const int& notificationCount,
             ui->tb_warning->setIcon(QIcon(":/images/img/warn.png"));
             ui->tb_warning->setText(QString::number(notificationCount));
         }
+
+        if(notificationCount > 9){
+            ui->tb_warning->setMaximumWidth(60);
+            ui->tb_warning->setMinimumWidth(60);
+        }  else {
+            ui->tb_warning->setMaximumWidth(50);
+            ui->tb_warning->setMinimumWidth(50);
+        }
         break;
     }
     case MsgType::Error:
@@ -47,6 +55,14 @@ void MsgToolButton::setMessageCount(const int& notificationCount,
         if(errorCount > 0){
             ui->tb_error->setIcon(QIcon(":/images/img/no.png"));
             ui->tb_error->setText(QString::number(errorCount));
+        }
+
+        if(notificationCount > 9){
+            ui->tb_error->setMaximumWidth(60);
+            ui->tb_error->setMinimumWidth(60);
+        } else {
+            ui->tb_error->setMaximumWidth(50);
+            ui->tb_error->setMinimumWidth(50);
         }
         break;
     }
