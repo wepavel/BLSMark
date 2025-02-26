@@ -1257,6 +1257,138 @@ QDateEdit::down-arrow:focus {
     image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
 }
 
+/* Стили для QDateTimeEdit */
+QDateTimeEdit {
+    selection-background-color: #fb9f18;
+    border-style: solid;
+    border: 1px solid #bcc1c6;
+    border-radius: 4px;
+    padding: 5px;
+    min-width: 75px;
+    color: #000000;
+    background-color: #f7f7f7;  /* Слегка серый фон */
+}
+
+QDateTimeEdit:hover,
+QDateTimeEdit:focus {
+    border: 1px solid #fb9f18;
+}
+
+QDateTimeEdit:on {
+    padding-top: 3px;
+    padding-left: 4px;
+    selection-background-color: #ffa000;
+}
+
+QDateTimeEdit::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 0px;
+    border-left-color: darkgray;
+    border-left-style: solid;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QDateTimeEdit::down-arrow {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
+}
+
+QDateTimeEdit::down-arrow:on,
+QDateTimeEdit::down-arrow:hover,
+QDateTimeEdit::down-arrow:focus {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+}
+
+QDateTimeEdit::up-arrow,
+QDateTimeEdit::down-arrow {
+    width: 10px;
+    height: 10px;
+}
+
+QDateTimeEdit::up-arrow {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/up_arrow_disabled.png);
+}
+
+QDateTimeEdit::up-arrow:on,
+QDateTimeEdit::up-arrow:hover,
+QDateTimeEdit::up-arrow:focus {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/up_arrow.png);
+}
+
+/* Стили для QCalendarWidget */
+QCalendarWidget {
+    background-color: #fefefe;
+    color: #000000;
+}
+
+QCalendarWidget QWidget#qt_calendar_navigationbar {
+    background-color: #f7f7f7;  /* Тот же слегка серый фон, что и у QDateTimeEdit */
+}
+
+QCalendarWidget QToolButton {
+    background-color: transparent;
+    color: #000000;
+}
+
+QCalendarWidget QToolButton::menu-indicator {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
+}
+
+QCalendarWidget QToolButton::menu-indicator:hover,
+QCalendarWidget QToolButton::menu-indicator:pressed {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+}
+
+QCalendarWidget QToolButton#qt_calendar_prevmonth {
+    qproperty-icon: url(:/qss_icons/styles/qdarkstyle/rc/left_arrow_disabled.png);
+}
+
+QCalendarWidget QToolButton#qt_calendar_nextmonth {
+    qproperty-icon: url(:/qss_icons/styles/qdarkstyle/rc/right_arrow_disabled.png);
+}
+
+QCalendarWidget QToolButton#qt_calendar_prevmonth:hover,
+QCalendarWidget QToolButton#qt_calendar_prevmonth:pressed {
+    qproperty-icon: url(:/qss_icons/styles/qdarkstyle/rc/left_arrow.png);
+}
+
+QCalendarWidget QToolButton#qt_calendar_nextmonth:hover,
+QCalendarWidget QToolButton#qt_calendar_nextmonth:pressed {
+    qproperty-icon: url(:/qss_icons/styles/qdarkstyle/rc/right_arrow.png);
+}
+
+QCalendarWidget QMenu {
+    background-color: #fefefe;
+    color: #000000;
+}
+
+QCalendarWidget QSpinBox {
+    color: #000000;
+    background-color: #fefefe;
+    selection-background-color: #fb9f18;
+    selection-color: #000000;
+}
+
+QCalendarWidget QTableView {
+    background-color: #fefefe;
+    alternate-background-color: #f5f5f5;
+    selection-background-color: #fb9f18;
+    selection-color: #000000;
+}
+
+QCalendarWidget QAbstractItemView:enabled {
+    color: #000000;
+    background-color: #fefefe;
+    selection-background-color: #fb9f18;
+    selection-color: #000000;
+}
+
+QCalendarWidget QAbstractItemView:disabled {
+    color: #bcc1c6;
+}
+
 QMenu::right-arrow 
 {
     margin: 0px; 

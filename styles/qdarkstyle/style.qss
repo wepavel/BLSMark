@@ -1242,6 +1242,72 @@ QDateEdit::down-arrow:focus {
     image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
 }
 
+QDateTimeEdit {
+    selection-background-color: #fb9f18;
+    border-style: solid;
+    border: 1px solid #76797C;
+    border-radius: 4px;
+    padding: 5px;
+    min-width: 75px;
+    color: #eff0f1;
+    background-color: #232629;
+}
+
+QDateTimeEdit:hover,
+QDateTimeEdit:focus {
+    border: 1px solid #fb9f18;
+}
+
+QDateTimeEdit:on {
+    padding-top: 3px;
+    padding-left: 4px;
+    selection-background-color: #4a4a4a;
+}
+
+QDateTimeEdit QAbstractItemView {
+    background-color: #232629;
+    border-radius: 2px;
+    border: 1px solid #76797C;
+    selection-background-color: #e69100;
+}
+
+QDateTimeEdit::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 0px;
+    border-left-color: darkgray;
+    border-left-style: solid;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QDateTimeEdit::down-arrow {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
+}
+
+QDateTimeEdit::down-arrow:on,
+QDateTimeEdit::down-arrow:hover,
+QDateTimeEdit::down-arrow:focus {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+}
+
+QDateTimeEdit::up-arrow,
+QDateTimeEdit::down-arrow {
+    width: 10px;
+    height: 10px;
+}
+
+QDateTimeEdit::up-arrow {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/up_arrow_disabled.png);
+}
+
+QDateTimeEdit::up-arrow:on,
+QDateTimeEdit::up-arrow:hover,
+QDateTimeEdit::up-arrow:focus {
+    image: url(:/qss_icons/styles/qdarkstyle/rc/up_arrow.png);
+}
+
 QMenu::right-arrow 
 {
     margin: 0px; 

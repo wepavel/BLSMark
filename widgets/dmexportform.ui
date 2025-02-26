@@ -131,12 +131,12 @@ QPushButton:focus {
   <customwidget>
    <class>GtinNamesComboBox</class>
    <extends>QComboBox</extends>
-   <header>gtinnamescombobox.h</header>
+   <header>ui_components/gtinnamescombobox.h</header>
   </customwidget>
   <customwidget>
    <class>GoodsDateTimeEdit</class>
    <extends>QDateTimeEdit</extends>
-   <header>goodsdatetimeedit.h</header>
+   <header>ui_components/goodsdatetimeedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>
