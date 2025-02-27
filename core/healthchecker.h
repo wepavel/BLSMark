@@ -48,6 +48,7 @@ private:
         {"plc","ПЛК"},
         {"scanner","Сканер"},
     };
+    QString lastServiceAvailMsg = "";
 
 private slots:
     void on_ws_connected();

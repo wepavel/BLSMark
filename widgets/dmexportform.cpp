@@ -18,7 +18,7 @@ DMExportForm::DMExportForm(QWidget *parent)
     ui->setupUi(this);
     ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_goods));
     httpManager = new HttpManager(this);
-    goodsMdl = new UnloadGoodsModel(this);
+    goodsMdl = new ExportGoodsModel(this);
     ui->tv_goods->setModel(goodsMdl);
     ui->tv_goods->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
@@ -36,10 +36,12 @@ void DMExportForm::on_pb_search_clicked()
     QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-dmcodes-by-date/%1/%2")
                                              .arg(ui->cb_goods->getGtin())
                                              .arg(ui->dte_date->date().toString("yyyy_MM_dd")));
+    ui->pb_search->setEnabled(false);
     httpManager->makeRequest(url,
                              QJsonDocument(),
                              HttpManager::HttpMethod::Get,
                              std::bind(&DMExportForm::fillGoodsTable, this, std::placeholders::_1, std::placeholders::_2));
+    ui->pb_search->setEnabled(true);
 }
 
 void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode)
@@ -60,7 +62,7 @@ void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode
         }
         QJsonArray jsonArray = jsonDoc.array();
         if(jsonArray.isEmpty()){
-            QMessageBox::warning(this, tr("Внимание"), tr("Товаров по указанному запросу не найдено!"));
+            QMessageBox::warning(this, tr("Внимание"), tr("Товары за указанную дату не найдены!"));
             return;
         }
         for (const QJsonValue &value : jsonArray) {
