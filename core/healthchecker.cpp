@@ -56,16 +56,22 @@ void HealthChecker::httpSendPingRequest()
             if (responseData == "pong") {
                 //qDebug() << "Received pong!";
                 emit deviceAvailableChanged("Сервис", true);
-                messagerInst.addMessage("HTTP: Сервис доступен!", Info);
+                if(lastServiceAvailMsg != "доступен")
+                    messagerInst.addMessage("HTTP: Сервис доступен!", Info);
+                lastServiceAvailMsg = "доступен";
             } else {
                 //qDebug() << "Unexpected response:" << responseData;
                 emit deviceAvailableChanged("Сервис", false);
-                messagerInst.addMessage("HTTP: Сервис недоступен!", Error);
+                if(lastServiceAvailMsg != "не доступен")
+                    messagerInst.addMessage("HTTP: Сервис недоступен!", Error);
+                lastServiceAvailMsg = "не доступен";
             }
         } else {
             //qDebug() << "Error:" << reply->errorString();
             emit deviceAvailableChanged("Сервис", false);
-            messagerInst.addMessage("HTTP: Сервис недоступен!", Error);
+            if(lastServiceAvailMsg != "не доступен")
+                messagerInst.addMessage("HTTP: Сервис недоступен!", Error);
+            lastServiceAvailMsg = "не доступен";
         }
 
         // Удаляем объект ответа после завершения работы с ним
@@ -172,7 +178,6 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
     }
 
     deviceWorksChanged("Сервис", true);
-    messagerInst.addMessage("Сервис работает!", Info);
 }
 
 void HealthChecker::on_backend_service_ip_port_changed()

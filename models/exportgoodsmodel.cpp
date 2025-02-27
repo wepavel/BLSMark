@@ -6,26 +6,26 @@
 
 #include <qfile.h>
 
-UnloadGoodsModel::UnloadGoodsModel(QObject *parent)
+ExportGoodsModel::ExportGoodsModel(QObject *parent)
     : QAbstractTableModel{parent}
 {}
 
-int UnloadGoodsModel::rowCount(const QModelIndex &parent) const
+int ExportGoodsModel::rowCount(const QModelIndex &parent) const
 {
     return m_data.size();
 }
 
-int UnloadGoodsModel::columnCount(const QModelIndex &parent) const
+int ExportGoodsModel::columnCount(const QModelIndex &parent) const
 {
     return Column::ColumnCount;
 }
 
-bool UnloadGoodsModel::isEmpty() const
+bool ExportGoodsModel::isEmpty() const
 {
     return m_data.size()==0;
 }
 
-QVariant UnloadGoodsModel::data(const QModelIndex &index, int role) const
+QVariant ExportGoodsModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
@@ -48,7 +48,7 @@ QVariant UnloadGoodsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QVariant UnloadGoodsModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ExportGoodsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -65,7 +65,7 @@ QVariant UnloadGoodsModel::headerData(int section, Qt::Orientation orientation, 
     return QVariant();
 }
 
-Qt::ItemFlags UnloadGoodsModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ExportGoodsModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return Qt::NoItemFlags;
@@ -73,7 +73,7 @@ Qt::ItemFlags UnloadGoodsModel::flags(const QModelIndex &index) const
     return QAbstractItemModel::flags(index);
 }
 
-void UnloadGoodsModel::addRow(const QString &code,
+void ExportGoodsModel::addRow(const QString &code,
                         const QString &goodName)
 {
     beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
@@ -81,7 +81,7 @@ void UnloadGoodsModel::addRow(const QString &code,
     endInsertRows();
 }
 
-QPair<bool, QString> UnloadGoodsModel::saveToCsv(const QString &fullPath)
+QPair<bool, QString> ExportGoodsModel::saveToCsv(const QString &fullPath)
 {
     QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -100,7 +100,7 @@ QPair<bool, QString> UnloadGoodsModel::saveToCsv(const QString &fullPath)
     return QPair<bool, QString>(true,"");
 }
 
-void UnloadGoodsModel::clear()
+void ExportGoodsModel::clear()
 {
     beginResetModel();
     m_data.clear();

@@ -25,7 +25,7 @@ private slots:
 private:
     Ui::DMExportForm *ui;
     HttpManager* httpManager;
-    UnloadGoodsModel* goodsMdl;
+    ExportGoodsModel* goodsMdl;
 
     QString choosenDate="";
     QString choosenName="";

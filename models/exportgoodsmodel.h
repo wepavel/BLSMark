@@ -3,7 +3,7 @@
 
 #include <QAbstractTableModel>
 
-class UnloadGoodsModel : public QAbstractTableModel
+class ExportGoodsModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
@@ -13,7 +13,7 @@ public:
         ColumnCount
     };
 
-    explicit UnloadGoodsModel(QObject *parent = nullptr);
+    explicit ExportGoodsModel(QObject *parent = nullptr);
 
 private:
     struct RowData {
