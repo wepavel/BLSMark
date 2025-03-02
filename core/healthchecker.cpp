@@ -8,6 +8,7 @@
 HealthChecker::HealthChecker(QObject *parent)
     : QObject{parent}
 {
+    initMaps();
     connect(&gSettings, &GlobalSettings::backendServiceIpPortChanged, this, &HealthChecker::on_backend_service_ip_port_changed);
     // http
     QString url = QString("http://%1:%2/api/v1/heartbeat/service-heartbeat/ping")
@@ -32,6 +33,11 @@ HealthChecker::HealthChecker(QObject *parent)
     m_webSocketRequestTimer = new QTimer(this);
     connect(m_webSocketReconnectTimer, &QTimer::timeout, this, &HealthChecker::wsConnectToServer);
     connect(m_webSocketRequestTimer, &QTimer::timeout, this, &HealthChecker::wsRequestStatesData);
+    m_reconnectDebugTimer = new QTimer(this);
+    connect(m_reconnectDebugTimer, &QTimer::timeout, this, [this](){
+        //qDebug() << "Attempting to connect to server with url " << m_websocketUrl;
+        messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
+    });
 
     wsConnectToServer();
 }
@@ -89,8 +95,9 @@ QWebSocket *HealthChecker::getConnection()
 void HealthChecker::wsConnectToServer()
 {
     if (m_webSocket->state() != QAbstractSocket::ConnectedState) {
-        qDebug() << "Attempting to connect to server with url " << m_websocketUrl;
-        messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
+
+        //qDebug() << "Attempting to connect to server with url " << m_websocketUrl;
+        //messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
         m_webSocket->open(m_websocketUrl);
     }
 }
@@ -119,9 +126,21 @@ QString HealthChecker::getName(QString name)
     return devNamesMap[name];
 }
 
+void HealthChecker::initMaps()
+{
+    devAvailMap["printer"] = false;
+    devAvailMap["plc"] = false;
+    devAvailMap["scanner"] = false;
+
+    devWorksMap["printer"] = false;
+    devWorksMap["plc"] = false;
+    devWorksMap["scanner"] = false;
+}
+
 void HealthChecker::on_ws_connected()
 {
     m_webSocketReconnectTimer->stop();
+    m_reconnectDebugTimer->stop();
     m_webSocketRequestTimer->start(WS_REQUEST_INTERVAL_MS);
     emit deviceWorksChanged("Сервер", true);
     //qDebug() << "Connected to server!";
@@ -137,6 +156,8 @@ void HealthChecker::on_ws_disconnected()
     m_webSocketRequestTimer->stop();
     // Попытаться переподключиться через 3 секунды
     m_webSocketReconnectTimer->start(WS_RECONNECT_INTERVAL_MS);
+    m_reconnectDebugTimer->start(WS_RECONNECT_DEBUG_INTERVAL_MS);
+    messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
 }
 
 void HealthChecker::on_ws_textMessageReceived(const QString &message)
@@ -163,19 +184,26 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
         bool ping = messageObj.value("ping").toBool();
         bool heartbeat = messageObj.value("heartbeat").toBool();
 
-        emit deviceAvailableChanged(getName(name), ping);
-        messagerInst.addMessage(QString("WS: Доступность устройства " +
-                                        getName(name) +
-                                        " изменилась на " +
-                                        QString(ping == true ? "<ДОСТУПЕН>" : "<НЕ ДОСТУПЕН>")),
-                                Info);
+        if(devAvailMap[name] != ping)
+        {
+            devAvailMap[name] = ping;
+            emit deviceAvailableChanged(getName(name), ping);
+            messagerInst.addMessage(QString("WS: Доступность устройства " +
+                                            getName(name).toUpper() +
+                                            " изменилась на " +
+                                            QString(ping == true ? "<ДОСТУПЕН>" : "<НЕ ДОСТУПЕН>")),
+                                    Info);
+        }
 
-        emit deviceWorksChanged(getName(name), heartbeat);
-        messagerInst.addMessage(QString("WS: Работоспособность устройства " +
-                                        getName(name) +
-                                        " изменилась на " +
-                                        QString(ping == true ? "<ДОСТУПЕН>" : "<НЕ ДОСТУПЕН>")),
-                                Info);
+        if(devWorksMap[name] != heartbeat){
+            devWorksMap[name] = heartbeat;
+            emit deviceWorksChanged(getName(name), heartbeat);
+            messagerInst.addMessage(QString("WS: Работоспособность устройства " +
+                                            getName(name).toUpper() +
+                                            " изменилась на " +
+                                            QString(heartbeat == true ? "<РАБОТАЕТ>" : "<НЕ РАБОТАЕТ>")),
+                                    Info);
+        }
     }
 
     deviceWorksChanged("Сервер", true);
@@ -204,10 +232,12 @@ HealthChecker::~HealthChecker()
 {
     m_webSocketReconnectTimer->stop();
     m_webSocketRequestTimer->stop();
+    m_reconnectDebugTimer->stop();
     wsDisconnectFromServer();
     delete httpManager;
     delete httpTimer;
     delete m_webSocketReconnectTimer;
     delete m_webSocketRequestTimer;
+    delete m_reconnectDebugTimer;
     delete m_webSocket;
 }

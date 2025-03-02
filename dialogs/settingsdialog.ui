@@ -346,13 +346,7 @@ QPushButton:focus {
      <item>
       <widget class="QPushButton" name="pb_apply">
        <property name="styleSheet">
-        <string notr="true">QPushButton:disabled {
-    background-color: #d3d3d3;  /* Светло-серый фон */
-    border: 1px solid #b0b0b0;  /* Тусклый серый цвет границы */
-    color: #a0a0a0;             /* Тусклый текст */
-    cursor: not-allowed;        /* Курсор &quot;недоступно&quot; */
-}
-</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Применить</string>

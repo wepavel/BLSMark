@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -40,7 +40,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="lw_common"/>
+        <widget class="AutoScrollListWidget" name="lw_common"/>
        </item>
       </layout>
      </widget>
@@ -65,7 +65,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="lw_errors"/>
+        <widget class="AutoScrollListWidget" name="lw_errors"/>
        </item>
       </layout>
      </widget>
@@ -93,7 +93,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="lw_warnings"/>
+        <widget class="AutoScrollListWidget" name="lw_warnings"/>
        </item>
       </layout>
      </widget>
@@ -118,7 +118,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="lw_info"/>
+        <widget class="AutoScrollListWidget" name="lw_info"/>
        </item>
       </layout>
      </widget>
@@ -133,6 +133,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>AutoScrollListWidget</class>
+   <extends>QListWidget</extends>
+   <header>tables/autoscrolllistwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
