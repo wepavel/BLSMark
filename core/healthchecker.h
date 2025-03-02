@@ -24,6 +24,16 @@ public:
     void httpSendPingRequest();
     QWebSocket* getConnection();
 
+signals:
+    void deviceAvailableChanged(QString devName, bool available);
+    void deviceWorksChanged(QString devName, bool works);
+
+private slots:
+    void on_ws_connected();
+    void on_ws_disconnected();
+    void on_ws_textMessageReceived(const QString &message);
+    void on_backend_service_ip_port_changed();
+
 private:
     // HTTP
     QNetworkAccessManager *httpManager;
@@ -45,20 +55,11 @@ private:
     QString getName(QString name);
     QMap<QString, QString> devNamesMap = {
         {"printer","Принтер"},
-        {"plc","ПЛК"},
+        {"plc","Аппликатор"},
         {"scanner","Сканер"},
     };
     QString lastServiceAvailMsg = "";
 
-private slots:
-    void on_ws_connected();
-    void on_ws_disconnected();
-    void on_ws_textMessageReceived(const QString &message);
-    void on_backend_service_ip_port_changed();
-
-signals:
-    void deviceAvailableChanged(QString devName, bool available);
-    void deviceWorksChanged(QString devName, bool works);
 };
 
 #endif // HEALTHCHECKER_H

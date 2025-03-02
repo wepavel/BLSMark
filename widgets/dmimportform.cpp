@@ -114,13 +114,8 @@ void DMImportForm::on_pb_load_dir_clicked()
 
 void DMImportForm::init_process()
 {
-    qDebug() << "init_process";
-    // progressDialog = new QProgressDialog("Импорт кодов...", "Отмена", 0, 100, this);
+    qDebug() << "Init import";
 
-    // progressDialog->setWindowModality(Qt::WindowModal);
-    // progressDialog->setMinimumDuration(0);
-    // progressDialog->setValue(0);
-    // progressDialog->exec();
     m_doubleProgressDialog = new DoubleProgressDialog();
     m_doubleProgressDialog->exec();
 
@@ -137,35 +132,6 @@ void DMImportForm::recieve_dm_data(QString row)
     quint8 doc_progress = cols.value(1).toUInt(); //Прогресс в одном документе
     QString dm_code = cols.value(2);
     QString file_path = cols.value(3);
-    // QString img_base64 = cols.value(4);
-
-    // qDebug() << "Doc progress: " << doc_progress << "; Docs progress: " << docs_progress;
-
-    // auto x = 1;
-    // if (progressDialog->value()<100) {
-    //     progressDialog->setValue(docs_progress);
-    // }
-
-    // if (m_doubleProgressDialog->getFileProgress()<100) {
-    //     m_doubleProgressDialog->setFileProgress(doc_progress);
-    // }
-
-    // DMCodeModel new_code(code, QString("%1.png").arg(getHashForCode(code)));
-
-    // QSqlQuery query(*m_db);
-
-    // auto dt = QDateTime::currentDateTime();
-    // QString request = QString("INSERT INTO %1 (code, img_path, import_date) VALUES ('sss', %2, '2024-12-23 11:48:42')")
-    //                       .arg("dmcodes", code, getHashForCode(code), dt.toString());
-    // query.prepare(request);
-
-    // qDebug() << "Exec query: " << query.exec();
-    // if (db.insert(new_code)) {
-    //     qDebug() << "New code inserted successfully";
-    // } else {
-    //     qDebug() << "New code not inserted";
-    // }
-    // saveImage(dm_code, img_base64);
 
     DMInfoForm::DataMatrixAttrs dmAttrs;
     bool dmValidated = DMInfoForm::validateDataMatrix(dm_code, dmAttrs);
@@ -179,13 +145,8 @@ void DMImportForm::recieve_dm_data(QString row)
     }
 
     m_doubleProgressDialog->setFileProgress(doc_progress);
-    // if (m_doubleProgressDialog->getFilesProgress()<100) {
-    //     m_doubleProgressDialog->setFilesProgress(docs_progress);
-    // }
+
     m_doubleProgressDialog->setFilesProgress(docs_progress);
-    // if (progressDialog->wasCanceled()) {
-    //     // Здесь логика для прерывания процесса
-    // }
 }
 
 void DMImportForm::recieve_err_data(QString row)
@@ -196,14 +157,8 @@ void DMImportForm::recieve_err_data(QString row)
 
 void DMImportForm::complete_process()
 {
-    qDebug() << "Complete process";
+    qDebug() << "Complete import";
 
-    // progressDialog->close();
-    // connect(progressDialog, &QProgressDialog::destroyed, this, [this](){
-    //     ui->tw_dm_codes->horizontalHeader()->setSectionResizeMode(DMImportModel::CodeColumn, QHeaderView::Interactive);;
-    //     qDebug() << "Progress dialog has been destroyed";
-    // });
-    // progressDialog->deleteLater();
     m_doubleProgressDialog->setFileProgress(100);
     m_doubleProgressDialog->setFilesProgress(100);
     m_doubleProgressDialog->close();
@@ -221,11 +176,6 @@ void DMImportForm::complete_process()
     }
     invalideDmCodesPaths.clear();
 
-    // connect(progressDialog, &QProgressDialog::c)
-    // if(progressDialog != nullptr) {
-    //     delete progressDialog;
-    //     progressDialog = nullptr;
-    // }
 }
 
 void DMImportForm::files_were_dropped(QStringList filePaths, QStringList dirs)
@@ -346,24 +296,6 @@ void DMImportForm::setupImportTable()
 
         QModelIndex codeIdx = model->index(row, DMImportModel::CodeColumn);
         QModelIndex filenameIdx = model->index(row, DMImportModel::FilenameColumn);
-        // QModelIndex imgIdx = model->index(row, DMImportModel::ImgColumn);
-        // qDebug() << "Page: " << model->data(pageIdx).toInt() << "; Code: " << model->data(codeIdx).toString();
-
-        // auto x = db.findById<DMCodeModel>(1);
-
-        // auto entity = db.findByCode<DMCodeModel>(model->data(codeIdx).toString());
-        // std::unique_ptr<DMCodeModel> entity = db.findByCode<DMCodeModel>(model->data(codeIdx).toString());
-        // QString raw_ptr = entity->m_code;
-        // DMCodeModel value = *raw_ptr;
-
-        // if (entity) {
-        //     // Объект найден
-        //     qDebug() << "Found entity with code:" << entity->m_code;
-        // } else {
-        //     // Объект не найден
-        //     qDebug() << "Entity not found";
-        // }
-
 
         QDialog dialog;
 
@@ -538,16 +470,7 @@ void DMImportForm::insertAllDmCodes() {
 
     QUrl url = HttpManager::createApiUrl("code-import/add-dmcodes");
     httpManager->makeRequest(url, QJsonDocument(arr), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
-        // QJsonObject obj = ObjectFromString(responseData);
 
-
-        // if (!responseData.isEmpty()) {
-        //     messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
-        //                                 +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
-        // } else {
-        //     QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
-        //     messagerInst.addMessage("Успешная загрузка DM-кодов. DM-коды были успешно загружены в БД!", Info);
-        // }
 
         if (statusCode!=200 && statusCode!=-1) {
                 messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
