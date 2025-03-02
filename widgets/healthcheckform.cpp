@@ -26,7 +26,7 @@ void HealthCheckForm::setAvailable(const QString& unitName, const bool available
 {
     if (unitsMap.contains(unitName))
     {
-        if(unitName == "Сервис" && available == false)
+        if(unitName == "Сервер" && available == false)
         {
             for(const QString &name: unitsOrder){
                 unitsMap[name]->setAvailable(false);
@@ -43,10 +43,10 @@ void HealthCheckForm::setWorks(const QString& unitName, const bool works)
 {
     if (unitsMap.contains(unitName))
     {
-        if(unitName == "Сервис" && works == false)
+        if(unitName == "Сервер" && works == false)
         {
             for(const QString &name: unitsOrder){
-                if(name == "Сервис")
+                if(name == "Сервер")
                     continue;
                 unitsMap[name]->setAvailable(false);
                 unitsMap[name]->setWorking(false);

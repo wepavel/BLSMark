@@ -85,10 +85,52 @@ void GoodsDateTimeEdit::getAllDays(const QDate& dt)
     QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-entry-dates/%1/%2")
                                              .arg(getGtin())
                                              .arg(date));
-    m_httpManager->makeRequest(url,
-                               QJsonDocument(),
-                               HttpManager::HttpMethod::Get,
-                               std::bind(&GoodsDateTimeEdit::getAllDaysSlot, this, std::placeholders::_1, std::placeholders::_2));
+    // m_httpManager->makeRequest(url,
+    //                            QJsonDocument(),
+    //                            HttpManager::HttpMethod::Get,
+    //                            std::bind(&GoodsDateTimeEdit::getAllDaysSlot, this, std::placeholders::_1, std::placeholders::_2));
+
+    qDebug() << "GetAllDays";
+    QNetworkReply* reply = m_httpManager->makeRequestAsync(url, QJsonDocument(), HttpManager::HttpMethod::Get);
+    if (!reply) {
+        messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-gtin-entry-dates!", Error, true);
+        return;
+    }
+
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        if (reply->error() != QNetworkReply::NoError) {
+            messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-gtin-entry-dates!", Error, true);
+            reply->deleteLater();
+            return;
+        }
+
+        QByteArray responseData = reply->readAll();
+        int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+        if (statusCode != 200) {
+        messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-gtin-entry-dates! Код ответа: "
+                                +QString::number(statusCode)
+                                +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            reply->deleteLater();
+            return;
+        }
+
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+        if(!jsonDoc.isArray()){
+            qDebug() << "JSON is not an array!";
+            return;
+        }
+        QJsonArray jsonArray = jsonDoc.array();
+        QList<QDate> dates;
+        for (const QJsonValue &value : jsonArray) {
+            QDate date = QDate::fromString(value.toString(), "yyyy_MM_dd");
+            dates.append(date);
+        }
+        m_calendar->setDatesToPaint(dates);
+        m_calendar->repaint();
+        m_calendar->update();
+        reply->deleteLater();
+    });
 }
 
 void GoodsDateTimeEdit::setCurrentGtin(const QString &newCurrentGtin)

@@ -8,11 +8,12 @@ class GtinNamesComboBox : public QComboBox
 {
 public:
     GtinNamesComboBox(QWidget* parent = nullptr);
+    ~GtinNamesComboBox();
     void updateNames();
     QString getGtin() const;
 
 private:
-    HttpManager* httpManager;
+    HttpManager* m_httpManager;
 
     void getAllGtinsNamesSlot(const QByteArray& responseData, int statusCode);
 

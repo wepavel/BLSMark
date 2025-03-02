@@ -78,7 +78,103 @@ void HttpManager::makeRequest(const QUrl &url,
 
     reply->deleteLater();
 }
+//-----------------------------------ASYNC REQUEST-----------------------------------
+QNetworkReply* HttpManager::makeRequestAsync(const QUrl &url,
+                                             const QJsonDocument &jsonDoc,
+                                             const HttpMethod &method)
+{
+    QNetworkRequest request(url);
+    QNetworkReply *reply = nullptr;
 
+    switch (method) {
+    case HttpMethod::Get:
+        reply = get(request);
+        break;
+    case HttpMethod::Post:
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        reply = post(request, jsonDoc.toJson());
+        break;
+    default:
+        emit requestError("Unknown HTTP method");
+        return nullptr;
+    }
+
+    if (reply) {
+        QTimer *timer = new QTimer(reply); // Таймер принадлежит reply
+        timer->setSingleShot(true);
+        timer->setInterval(HTTP_REQUEST_TIMEOUT);
+        timer->start();
+
+        connect(timer, &QTimer::timeout, this, &HttpManager::onAsyncTimeout);
+        connect(reply, &QNetworkReply::finished, [timer]() { timer->stop(); });
+        connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred), [timer]() { timer->stop(); });
+
+        reply->setProperty("timer", QVariant::fromValue(timer)); // Сохраняем таймер в reply
+    }
+
+    return reply;
+}
+
+
+void HttpManager::onReplyFinished()
+{
+    timeoutTimer->stop();
+
+    if (!currentReply) return;
+
+    int statusCode = currentReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (currentReply->error() == QNetworkReply::NoError) {
+        currentCallback(currentReply->readAll(), statusCode);
+    } else {
+        emit requestError(currentReply->errorString());
+        currentCallback(QByteArray(), -1);
+    }
+
+    currentReply->deleteLater();
+    currentReply = nullptr;
+    currentCallback = nullptr;
+}
+
+void HttpManager::onReplyErrorOccurred(QNetworkReply::NetworkError error)
+{
+    Q_UNUSED(error);
+    timeoutTimer->stop();
+    emit requestError(currentReply->errorString());
+    currentCallback(QByteArray(), -1);
+    currentReply->deleteLater();
+    currentReply = nullptr;
+    currentCallback = nullptr;
+}
+
+// void HttpManager::onTimeout()
+// {
+//     if (currentReply) {
+//         currentReply->abort();
+//         emit requestError("Connection timeout");
+//         currentCallback(QByteArray(), -1);
+//         currentReply->deleteLater();
+//         currentReply = nullptr;
+//         currentCallback = nullptr;
+//     }
+// }
+
+void HttpManager::onAsyncTimeout()
+{
+    QTimer *timer = qobject_cast<QTimer*>(sender());
+    if (timer) {
+        QNetworkReply *reply = qobject_cast<QNetworkReply*>(timer->parent());
+        if (reply) {
+            if (reply->isRunning()) {
+                reply->abort();
+                emit requestError("Async request timeout");
+            }
+            reply->deleteLater();
+        }
+        timer->deleteLater();
+    }
+}
+
+//-------------------------------CREATE URL-----------------------------------
 QUrl HttpManager::createApiUrl(const QString &path)
 {
     return QUrl(QString("http://%1:%2/api/v1/%3")
