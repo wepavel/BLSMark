@@ -48,6 +48,7 @@ SOURCES += \
     mainwindow.cpp \
     models/dmimportmodel.cpp \
     models/goodsmodel.cpp \
+    tables/autoscrolllistwidget.cpp \
     tables/autoscrolltableview.cpp \
     tables/dragdroptableview.cpp \
     ui_components/goodsdatetimeedit.cpp \
@@ -79,6 +80,7 @@ HEADERS += \
     core/stylemanager.h \
     mainwindow.h \
     models/dmimportmodel.h \
+    tables/autoscrolllistwidget.h \
     tables/autoscrolltableview.h \
     tables/dragdroptableview.h \
     ui_components/goodsdatetimeedit.h \

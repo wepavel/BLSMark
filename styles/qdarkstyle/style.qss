@@ -546,16 +546,16 @@ QPushButton {
 }
 
 QPushButton:disabled {
-    background-color: #10161d;
-    border-width: 2px;
-    border-color: #454545;
-    border-style: solid;
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 2px;
-    color: #454545;
+    background-color: #444444; /* Темно-серый цвет фона */
+    border: 1px solid #666666; /* Более светлая серая рамка */
+    color: #aaaaaa; /* Светло-серый цвет текста */
+    border-radius: 4px; /* Закругленные углы */
+    padding: 5px; /* Отступы внутри кнопки */
 }
 
 QPushButton:focus {

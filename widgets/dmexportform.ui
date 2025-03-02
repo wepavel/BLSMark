@@ -93,15 +93,6 @@
 QPushButton:hover {
     border: 1px solid #fb9f18; /* Границы появляются при наведении */
 }
-
-QPushButton:pressed {
-    background-color: gray; /* Изменение фона при нажатии */
-} 
-
-QPushButton:focus {
-    color: white;
-    background-color: gray; /* Изменение фона при нажатии */
-}
 </string>
        </property>
        <property name="text">

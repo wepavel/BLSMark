@@ -27,7 +27,7 @@ void MsgLogWidget::on_pb_clear_clicked()
 
 void MsgLogWidget::addMsg(const QString &msg, MsgType type)
 {
-    qDebug() << "Добавляем сообщение: " << msg;
+    //qDebug() << "Добавляем сообщение: " << msg;
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString dateTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");
 
@@ -89,6 +89,9 @@ void MsgLogWidget::showWithOpenTab(const MsgType &type)
     default:
         break;
     }
+    setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     show();
+    raise();
+    activateWindow();
 }
 

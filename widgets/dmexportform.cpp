@@ -6,7 +6,6 @@
 #include <QDateEdit>
 #include <QFileDialog>
 #include <QMessageBox>
-
 #include "dmexportform.h"
 #include "core/messager.h"
 #include "ui_dmexportform.h"
