@@ -51,8 +51,7 @@ void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode
                                     +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
     } else if (statusCode==-1) {
         messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
-                                    +QString::number(statusCode)
-                                    +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+                                    +QString::number(statusCode), Error, true);
     } else {
         QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
         if(!jsonDoc.isArray()){
@@ -96,7 +95,7 @@ void DMExportForm::on_pb_load_in_csv_clicked()
     auto res = goodsMdl->saveToCsv(filePath);
 
     if (res.first) {
-        QMessageBox::information(this, tr("Успех"), tr("Файл успешно сохранен в: ") + filePath);
+        QMessageBox::information(this, tr("Успех"), tr("Файл ") + filePath + tr(" успешно сохранен."));
     } else {
         QMessageBox::critical(this, tr("Ошибка"), res.second);
     }

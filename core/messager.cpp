@@ -15,6 +15,10 @@ Messager &Messager::instance()
     return *instance;
 }
 
+void Messager::destroyUI() {
+    msgView->close();
+};
+
 Messager::Messager() {
     msgView = new MsgLogWidget();
 }

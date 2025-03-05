@@ -1,7 +1,7 @@
-#include "msgtoolbutton.h"
-#include "qstyle.h"
 #include "ui_msgtoolbutton.h"
+#include <QStyle>
 
+#include "msgtoolbutton.h"
 MsgToolButton::MsgToolButton(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MsgToolButton)

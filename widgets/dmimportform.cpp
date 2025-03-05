@@ -463,6 +463,7 @@ QVariant ObjectOrArrayFromString(const QString& in)
 }
 
 void DMImportForm::insertAllDmCodes() {
+    ui->pb_load_in_db->setEnabled(false);
     QJsonArray arr;
     for (const QString& dmCode : importModel->getAllDmCodes()) {
         arr.append(QJsonObject{{"dm_code", dmCode}});
@@ -481,8 +482,8 @@ void DMImportForm::insertAllDmCodes() {
         } else {
             QJsonArray result = ObjectOrArrayFromString(responseData).toJsonArray();
             if (result.isEmpty()) {
-                QMessageBox::information(this, "Успешная загрузка DM-кодов", "DM-коды были успешно загружены в БД!");
-                messagerInst.addMessage("Успешная загрузка DM-кодов. DM-коды были успешно загружены в БД!", Info);
+                QMessageBox::information(this, tr("Успешная загрузка DM-кодов"), tr("DM-коды были успешно загружены в БД!"));
+                messagerInst.addMessage(tr("Успешная загрузка DM-кодов. DM-коды были успешно загружены в БД!"), Info);
             } else {
                 for (const QJsonValue &value : qAsConst(result)) {
                     QJsonObject jsonObject = value.toObject();
@@ -492,9 +493,11 @@ void DMImportForm::insertAllDmCodes() {
                                           .arg(jsonObject.value("problem").toString());
                     messagerInst.addMessage(message, Warning, true);
                 }
+                QMessageBox::warning(this, tr("Внимание!"), tr("Не все коды были успешно загружены!\nОбратите внимание на окно предупреждений!"));
             }
         }
     });
+    ui->pb_load_in_db->setEnabled(true);
 }
 
 

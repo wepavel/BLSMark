@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCloseEvent>
+#include "core/messager.h"
 #include "dialogs/settingsdialog.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,6 +21,23 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+signals:
+    void windowClosed(); // Пользовательский сигнал, который вызывается при закрытии
+
+protected:
+    void closeEvent(QCloseEvent *event) override {
+        // connect(this, &MainWindow::closeEvent,
+        //         &Messager::instance(), &Messager::destroyUI, Qt::QueuedConnection);
+
+        // connect(this, &MainWindow::, this, [this](){
+        //     auto x = 1;
+        //     auto y = 2;
+        //     qDebug() << "Close Event working";
+        // });
+        Messager::instance().destroyUI();
+        event->accept(); // Разрешаем закрытие окна
+    }
+
 private:
     //---Vars
     Ui::MainWindow *ui;
@@ -25,10 +45,11 @@ private:
 
 
     //---Funcs
-    void fill_logo();
-    void toggle_theme();
-    void setup_menubar();
-    void setup_notifications_widgets();
+    void fillLogo();
+    void toggleTheme();
+    void setupMenubar();
+    void setupNotificationsWidgets();
+    void checkLicense();
 
 };
 #endif // MAINWINDOW_H

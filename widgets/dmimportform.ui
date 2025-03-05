@@ -54,19 +54,6 @@
       <number>6</number>
      </property>
      <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
       <widget class="QPushButton" name="pb_load_file">
        <property name="text">
         <string>Загрузить файлы</string>
@@ -77,13 +64,6 @@
       <widget class="QPushButton" name="pb_load_dir">
        <property name="text">
         <string>Загрузить папку</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pb_load_in_db">
-       <property name="text">
-        <string>Загрузить в базу данных</string>
        </property>
       </widget>
      </item>
@@ -99,6 +79,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_load_in_db">
+       <property name="text">
+        <string>Загрузить в базу данных</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

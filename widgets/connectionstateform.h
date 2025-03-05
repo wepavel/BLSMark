@@ -2,6 +2,9 @@
 #define CONNECTIONSTATEFORM_H
 
 #include <QWidget>
+#include <QTableWidget>
+#include <QCheckBox>
+
 #include "core/dmcodewshandler.h"
 #include "core/healthchecker.h"
 #include "models/goodsmodel.h"
@@ -9,8 +12,7 @@
 #include "widgets/statelabel.h"
 #include "widgets/healthcheckform.h"
 #include "widgets/statelabel.h"
-#include <QTableWidget>
-#include <qcheckbox.h>
+
 
 namespace Ui {
 class ConnectionStateForm;
@@ -25,11 +27,14 @@ public:
     ~ConnectionStateForm();
 
 private:
+    //---Funcs
     Ui::ConnectionStateForm *ui;
     void initGoodsTable();
+    void initControlPanel();
     void initHealthChecker();
     QDateTime getDateTime(QString dtStr) const;
 
+    //---Vars
     GoodsModel* mdl;
     HealthChecker* m_hChecker;
     HealthCheckForm* m_healthCheckForm;

@@ -1,7 +1,6 @@
 #include "mainwindow.h"
-#include "core/messager.h"
-#include "qtconcurrentrun.h"
 #include "ui_mainwindow.h"
+#include <QtConcurrentRun>
 #include <QPixmap>
 #include <QLabel>
 #include <QSizeGrip>
@@ -10,8 +9,11 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QWidgetAction>
+
+
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
+#include "core/licensemanager.h"
 #include "widgets/dmexportform.h"
 #include "widgets/dmimportform.h"
 #include "widgets/dminfoform.h"
@@ -23,16 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    checkLicense();
     ui->setupUi(this);
     ui->tab_main->setFocusPolicy(Qt::NoFocus);
     ui->tab_export->setFocusPolicy(Qt::NoFocus);
     ui->tab_import->setFocusPolicy(Qt::NoFocus);
-    setup_notifications_widgets();
-    // qDebug() << "Основной поток " << QThread::currentThreadId();
-    // QtConcurrent::run([](){
-    //     Messager::instance().addMessage("Первое сообщение в другом потоке!");
-    //     qDebug() << "Сообщение было создано в потоке: " << QThread::currentThreadId();
-    // });
+    setupNotificationsWidgets();
 
     setWindowTitle("BLS Mark");
 
@@ -45,8 +43,8 @@ MainWindow::MainWindow(QWidget *parent)
     ConnectionStateForm* conStateForm = new ConnectionStateForm(this);
     ui->tab_main->layout()->addWidget(conStateForm);
 
-    setup_menubar();
-    fill_logo();
+    setupMenubar();
+    fillLogo();
     statusBar()->showMessage(tr("Offline mode"));
 }
 
@@ -55,7 +53,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-auto MainWindow::fill_logo() -> void
+auto MainWindow::fillLogo() -> void
 {
     QPixmap mark_pixmap(":/images/img/mark_full.png");
 
@@ -88,12 +86,12 @@ auto MainWindow::fill_logo() -> void
     ui->hl_logo->addWidget(image_label);
 }
 
-void MainWindow::toggle_theme()
+void MainWindow::toggleTheme()
 {
     styleManager.toggleTheme();
 }
 
-void MainWindow::setup_menubar()
+void MainWindow::setupMenubar()
 {
     connect(ui->act_check_code, &QAction::triggered, this, [this](){
         bool ok;
@@ -123,7 +121,7 @@ void MainWindow::setup_menubar()
     });
 }
 
-void MainWindow::setup_notifications_widgets()
+void MainWindow::setupNotificationsWidgets()
 {
     MsgToolButton* e = new MsgToolButton(this);
 
@@ -136,9 +134,24 @@ void MainWindow::setup_notifications_widgets()
     connect(e, &MsgToolButton::tb_clicked,
             Messager::instance().getView(), &MsgLogWidget::showWithOpenTab, Qt::QueuedConnection);
 
+
     ui->menubar->setCornerWidget(e, Qt::TopRightCorner);
 
     // Messager::instance().addMessage("msg", Error);
     // Messager::instance().addMessage("msg", Warning);
     // Messager::instance().addMessage("msg", Info, true);
+}
+
+void MainWindow::checkLicense()
+{
+    QString serial = LicenseManager::getMotherboardSerial();
+    QString currentHash = LicenseManager::createAugmentedHash(serial, LicenseManager::getDefaultSalt());
+
+    QString storedHash = LicenseManager::readHashFromRegistry();
+    if (storedHash!=currentHash) {
+        QMessageBox::warning(this, tr("Внимание!"), tr("Лицензия отсутствует или не валидна!"));
+        // QCoreApplication::exit(0);
+        QTimer::singleShot(0, qApp, SLOT(quit()));
+        // QCoreApplication::quit();
+    }
 }
