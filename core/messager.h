@@ -11,6 +11,7 @@ class Messager: public QObject {
 
 public:
     static Messager& instance();
+    void destroyUI();
     void addMessage(const QString& msg,
                     const MsgType& type,
                     bool shoulShow = false);

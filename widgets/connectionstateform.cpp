@@ -1,13 +1,11 @@
-#include "connectionstateform.h"
-#include "qdatetime.h"
-#include "qheaderview.h"
-#include "qjsondocument.h"
-#include "qjsonobject.h"
+#include <QDateTime>
+#include <QHeaderView>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 #include "ui_connectionstateform.h"
-
-
-#define ROW_COUNT 2
-#define COLUMN_COUNT 4
+#include "connectionstateform.h"
+#include "ui_components/gtinnamescombobox.h"
 
 ConnectionStateForm::ConnectionStateForm(QWidget *parent)
     : QWidget(parent)
@@ -15,6 +13,7 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
 {
     ui->setupUi(this);
     initHealthChecker();
+    initControlPanel();
     initGoodsTable();
     m_tvGoods->verticalHeader()->setVisible(false); // убираем нумерацию строк
     setFocusPolicy(Qt::NoFocus);
@@ -49,6 +48,30 @@ void ConnectionStateForm::initGoodsTable()
     connect(mdl, &GoodsModel::dataHasBeenAdded, m_tvGoods, &AutoScrollTableView::update);
 }
 
+void ConnectionStateForm::initControlPanel()
+{
+    auto gtin_cb = new GtinNamesComboBox(this);
+    gtin_cb->setFocusPolicy(Qt::NoFocus);
+    // auto hrz_layout = new QHBoxLayout(this);
+    // hrz_layout->addWidget(gtin_cb);
+    layout()->addWidget(gtin_cb);
+    // m_tvGoods = new AutoScrollTableView(this);
+    // m_tvGoods->setFocusPolicy(Qt::NoFocus);
+
+    // layout()->addWidget(m_tvGoods);
+
+    // mdl = new GoodsModel(m_tvGoods);
+    // m_tvGoods->setModel(mdl);
+    // m_tvGoods->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // //m_tvGoods->horizontalHeader()->setStretchLastSection(true);
+    // m_tvGoods->setSelectionBehavior(QAbstractItemView::SelectRows);
+    // m_tvGoods->setSelectionMode(QAbstractItemView::SingleSelection);
+    // m_tvGoods->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
+    // m_tvGoods->setFocusPolicy(Qt::NoFocus);
+
+    // connect(mdl, &GoodsModel::dataHasBeenAdded, m_tvGoods, &AutoScrollTableView::update);
+}
+
 void ConnectionStateForm::initHealthChecker()
 {
     m_healthCheckForm = new HealthCheckForm(this);
@@ -64,17 +87,18 @@ void ConnectionStateForm::initHealthChecker()
 
 QDateTime ConnectionStateForm::getDateTime(QString dtStr) const
 {
-    dtStr.replace("_", " ");  // Заменяем "_" наdtStr
+    // dtStr.replace("_", " ");  // Заменяем "_" наdtStr
     //dtStrрока должна выглядеть как "2025 02 01 12 11 09"
     //dtStrправильный формат "yyyy-MM-dd HH:mm:ss"
-    dtStr.remove(" ");
-    dtStr.insert(4, ":");
-    dtStr.insert(7, ":");
-    dtStr.insert(10, " ");
-    dtStr.insert(13, ":");
-    dtStr.insert(16, ":");
+    // dtStr.remove(" ");
+    // dtStr.insert(4, ":");
+    // dtStr.insert(7, ":");
+    // dtStr.insert(10, " ");
+    // dtStr.insert(13, ":");
+    // dtStr.insert(16, ":");
     // Преобразуем строку в объект QDateTime
-    QDateTime dateTime = QDateTime::fromString(dtStr, "yyyy:MM:dd HH:mm:ss");
+    // QDateTime dateTime = QDateTime::fromString(dtStr, "yyyy:MM:dd HH:mm:ss");
+    QDateTime dateTime = QDateTime::fromString(dtStr, "yyyy_MM_dd_HHmmss");
 
     // Проверяем, если строка не валидна
     if (!dateTime.isValid())

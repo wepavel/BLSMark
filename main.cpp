@@ -4,16 +4,22 @@
 #include <QIODevice>
 #include <QFile>
 #include <QDebug>
+#include <QMessageBox>
+
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
-#include "widgets/msglogwidget.h"
+#include "core/licensemanager.h"
+// #include "widgets/msglogwidget.h"
 #include "widgets/healthcheckform.h"
-#include <core/healthchecker.h>
+#include "core/healthchecker.h"
+#include "widgets/msglogwidget.h"
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+
 
     gSettings.loadSettings("/ini/settings.ini");
     styleManager.setTheme(gSettings.getTheme());
