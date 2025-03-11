@@ -184,10 +184,12 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
         bool ping = messageObj.value("ping").toBool();
         bool heartbeat = messageObj.value("heartbeat").toBool();
 
+        emit deviceAvailableChanged(getName(name), ping);
+        emit deviceWorksChanged(getName(name), heartbeat);
         if(devAvailMap[name] != ping)
         {
             devAvailMap[name] = ping;
-            emit deviceAvailableChanged(getName(name), ping);
+            // emit deviceAvailableChanged(getName(name), ping);
             messagerInst.addMessage(QString("WS: Доступность устройства " +
                                             getName(name).toUpper() +
                                             " изменилась на " +
@@ -197,7 +199,7 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
 
         if(devWorksMap[name] != heartbeat){
             devWorksMap[name] = heartbeat;
-            emit deviceWorksChanged(getName(name), heartbeat);
+            // emit deviceWorksChanged(getName(name), heartbeat);
             messagerInst.addMessage(QString("WS: Работоспособность устройства " +
                                             getName(name).toUpper() +
                                             " изменилась на " +

@@ -59,6 +59,7 @@ private:
         {"printer","Принтер"},
         {"plc","Аппликатор"},
         {"scanner","Сканер"},
+        {"database","База данных"},
     };
     QString lastServiceAvailMsg = "";
 

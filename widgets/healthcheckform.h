@@ -20,7 +20,7 @@ public:
 
 private:
     Ui::HealthCheckForm *ui;
-    QStringList unitsOrder = {"Сервер", "Сканер", "Принтер", "Аппликатор"};
+    QStringList unitsOrder = {"Сервер", "Сканер", "Принтер", "Аппликатор", "База данных"};
     QMap<QString, HealthUnitForm*> unitsMap;
 };
 
