@@ -14,9 +14,9 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
     ui->setupUi(this);
     initHealthChecker();
     initControlPanel();
-    initGoodsTable();
+    initProductsTable();
     initConnections();
-    m_tvGoods->verticalHeader()->setVisible(false); // убираем нумерацию строк
+    m_tvProducts->verticalHeader()->setVisible(false); // убираем нумерацию строк
     setFocusPolicy(Qt::NoFocus);
 }
 
@@ -25,28 +25,28 @@ ConnectionStateForm::~ConnectionStateForm()
 
     delete mdl;
     delete m_hChecker;
-    delete m_tvGoods;
+    delete m_tvProducts;
     delete m_healthCheckForm;
     delete m_dmCodeHandler;
 }
 
-void ConnectionStateForm::initGoodsTable()
+void ConnectionStateForm::initProductsTable()
 {
-    m_tvGoods = new AutoScrollTableView(this);
-    m_tvGoods->setFocusPolicy(Qt::NoFocus);
+    m_tvProducts = new AutoScrollTableView(this);
+    m_tvProducts->setFocusPolicy(Qt::NoFocus);
 
-    layout()->addWidget(m_tvGoods);
+    layout()->addWidget(m_tvProducts);
 
-    mdl = new GoodsModel(m_tvGoods);
-    m_tvGoods->setModel(mdl);
-    m_tvGoods->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    //m_tvGoods->horizontalHeader()->setStretchLastSection(true);
-    m_tvGoods->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_tvGoods->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_tvGoods->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
-    m_tvGoods->setFocusPolicy(Qt::NoFocus);
+    mdl = new ProductsModel(m_tvProducts);
+    m_tvProducts->setModel(mdl);
+    m_tvProducts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    //m_tvProducts->horizontalHeader()->setStretchLastSection(true);
+    m_tvProducts->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_tvProducts->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_tvProducts->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
+    m_tvProducts->setFocusPolicy(Qt::NoFocus);
 
-    connect(mdl, &GoodsModel::dataHasBeenAdded, m_tvGoods, &AutoScrollTableView::update);
+    connect(mdl, &ProductsModel::dataHasBeenAdded, m_tvProducts, &AutoScrollTableView::update);
 }
 
 void ConnectionStateForm::initControlPanel()
@@ -55,21 +55,21 @@ void ConnectionStateForm::initControlPanel()
     layout()->addWidget(controlPanelWidget);
     // auto hrz_layout = new QHBoxLayout(this);
     // hrz_layout->addWidget(gtin_cb);
-    // m_tvGoods = new AutoScrollTableView(this);
-    // m_tvGoods->setFocusPolicy(Qt::NoFocus);
+    // m_tvProducts = new AutoScrollTableView(this);
+    // m_tvProducts->setFocusPolicy(Qt::NoFocus);
 
-    // layout()->addWidget(m_tvGoods);
+    // layout()->addWidget(m_tvProducts);
 
-    // mdl = new GoodsModel(m_tvGoods);
-    // m_tvGoods->setModel(mdl);
-    // m_tvGoods->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    // //m_tvGoods->horizontalHeader()->setStretchLastSection(true);
-    // m_tvGoods->setSelectionBehavior(QAbstractItemView::SelectRows);
-    // m_tvGoods->setSelectionMode(QAbstractItemView::SingleSelection);
-    // m_tvGoods->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
-    // m_tvGoods->setFocusPolicy(Qt::NoFocus);
+    // mdl = new ProductsModel(m_tvProducts);
+    // m_tvProducts->setModel(mdl);
+    // m_tvProducts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // //m_tvProducts->horizontalHeader()->setStretchLastSection(true);
+    // m_tvProducts->setSelectionBehavior(QAbstractItemView::SelectRows);
+    // m_tvProducts->setSelectionMode(QAbstractItemView::SingleSelection);
+    // m_tvProducts->horizontalHeader()->setFocusPolicy(Qt::NoFocus);
+    // m_tvProducts->setFocusPolicy(Qt::NoFocus);
 
-    // connect(mdl, &GoodsModel::dataHasBeenAdded, m_tvGoods, &AutoScrollTableView::update);
+    // connect(mdl, &ProductsModel::dataHasBeenAdded, m_tvProducts, &AutoScrollTableView::update);
 }
 
 void ConnectionStateForm::initHealthChecker()

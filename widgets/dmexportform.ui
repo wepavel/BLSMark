@@ -24,7 +24,7 @@
       </widget>
      </item>
      <item>
-      <widget class="GtinNamesComboBox" name="cb_goods">
+      <widget class="GtinNamesComboBox" name="cb_products">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -53,7 +53,7 @@
       </widget>
      </item>
      <item>
-      <widget class="GoodsDateTimeEdit" name="dte_date">
+      <widget class="ProductsDateTimeEdit" name="dte_date">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -107,7 +107,7 @@ QPushButton:hover {
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="tv_goods"/>
+    <widget class="QTableView" name="tv_products"/>
    </item>
    <item>
     <widget class="QPushButton" name="pb_load_in_csv">
@@ -125,9 +125,9 @@ QPushButton:hover {
    <header>ui_components/gtinnamescombobox.h</header>
   </customwidget>
   <customwidget>
-   <class>GoodsDateTimeEdit</class>
+   <class>ProductsDateTimeEdit</class>
    <extends>QDateTimeEdit</extends>
-   <header>ui_components/goodsdatetimeedit.h</header>
+   <header>ui_components/productsdatetimeedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

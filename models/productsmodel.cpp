@@ -1,26 +1,26 @@
-#include "goodsmodel.h"
+#include "productsmodel.h"
 #include "qbrush.h"
 #include "qdatetime.h"
 
-GoodsModel::GoodsModel(QObject *parent)
+ProductsModel::ProductsModel(QObject *parent)
     : QAbstractTableModel{parent}
 {}
 
-int GoodsModel::rowCount(const QModelIndex &parent) const
+int ProductsModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
     return m_data.size();
 }
 
-int GoodsModel::columnCount(const QModelIndex &parent) const
+int ProductsModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
     return static_cast<int>(Column::ColumnCount);
 }
 
-QVariant GoodsModel::data(const QModelIndex &index, int role) const
+QVariant ProductsModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
@@ -28,7 +28,7 @@ QVariant GoodsModel::data(const QModelIndex &index, int role) const
     const RowData &rowData = m_data[index.row()];
 
     if (role == Qt::BackgroundRole) {
-        if (m_data[index.row()].timeStickOnGood == 0) {
+        if (m_data[index.row()].timeStickOnProduct == 0) {
             return QBrush(Qt::red); // Установим красный цвет фона
         }
     }
@@ -37,7 +37,7 @@ QVariant GoodsModel::data(const QModelIndex &index, int role) const
     {
         switch (static_cast<Column>(index.column())) {
         case Column::CodeColumn: return rowData.code;
-        case Column::GoodNameColumn: return rowData.goodName;
+        case Column::ProductNameColumn: return rowData.productName;
         case Column::CountryColumn: return rowData.country;
 
         case Column::TimeDbAdd: {
@@ -45,11 +45,11 @@ QVariant GoodsModel::data(const QModelIndex &index, int role) const
                 .toString("dd.MM.yyyy HH:mm:ss");
         }
 
-        case Column::TimeStickOnGood: {
-            if(rowData.timeStickOnGood == 0){
+        case Column::TimeStickOnProduct: {
+            if(rowData.timeStickOnProduct == 0){
                 return "";
             }
-            return QDateTime::fromSecsSinceEpoch(rowData.timeStickOnGood)
+            return QDateTime::fromSecsSinceEpoch(rowData.timeStickOnProduct)
                 .toString("dd.MM.yyyy HH:mm:ss");
         }
 
@@ -64,7 +64,7 @@ QVariant GoodsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QVariant GoodsModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ProductsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -72,10 +72,10 @@ QVariant GoodsModel::headerData(int section, Qt::Orientation orientation, int ro
     if (orientation == Qt::Horizontal) {
         switch (static_cast<Column>(section)) {
         case Column::CodeColumn: return tr("Код");
-        case Column::GoodNameColumn: return tr("Название");
+        case Column::ProductNameColumn: return tr("Название");
         case Column::CountryColumn: return tr("Страна производства");
         case Column::TimeDbAdd: return tr("Время добавления в БД");
-        case Column::TimeStickOnGood: return tr("Время наклейки QR-кода");
+        case Column::TimeStickOnProduct: return tr("Время наклейки QR-кода");
         default: return QVariant();
         }
     } else if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
@@ -84,7 +84,7 @@ QVariant GoodsModel::headerData(int section, Qt::Orientation orientation, int ro
     return QVariant();
 }
 
-Qt::ItemFlags GoodsModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ProductsModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return Qt::NoItemFlags;
@@ -92,19 +92,19 @@ Qt::ItemFlags GoodsModel::flags(const QModelIndex &index) const
     return QAbstractItemModel::flags(index);
 }
 
-void GoodsModel::addRow(const QString &code,
-                        const QString &goodName,
+void ProductsModel::addRow(const QString &code,
+                        const QString &productName,
                         const QString &country,
                         const qint64 &timeDbAdd,
-                        const qint64 &timeStickOnGood)
+                        const qint64 &timeStickOnProduct)
 {
     beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
-    m_data.append({code, goodName, country, timeDbAdd, timeStickOnGood});
+    m_data.append({code, productName, country, timeDbAdd, timeStickOnProduct});
     endInsertRows();
     emit dataHasBeenAdded();
 }
 
-void GoodsModel::clear()
+void ProductsModel::clear()
 {
     beginResetModel();
     m_data.clear();

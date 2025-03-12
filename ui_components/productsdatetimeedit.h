@@ -1,14 +1,14 @@
-#ifndef GOODSDATETIMEEDIT_H
-#define GOODSDATETIMEEDIT_H
+#ifndef PRODUCTSDATETIMEEDIT_H
+#define PRODUCTSDATETIMEEDIT_H
 
 #include "core/httpmanager.h"
 #include <QDateTimeEdit>
 #include <qcalendarwidget.h>
 
-class GoodsCalendarWidget : public QCalendarWidget
+class ProductsCalendarWidget : public QCalendarWidget
 {
 public:
-    GoodsCalendarWidget(QWidget* parent = nullptr);
+    ProductsCalendarWidget(QWidget* parent = nullptr);
 
     void setDatesToPaint(const QList<QDate> &newDatesToPaint);
 
@@ -20,11 +20,11 @@ protected:
 };
 
 
-class GoodsDateTimeEdit : public QDateTimeEdit
+class ProductsDateTimeEdit : public QDateTimeEdit
 {
 public:
-    GoodsDateTimeEdit(QWidget* parent = nullptr);
-    ~GoodsDateTimeEdit();
+    ProductsDateTimeEdit(QWidget* parent = nullptr);
+    ~ProductsDateTimeEdit();
 
     // QObject interface
 public:
@@ -37,7 +37,7 @@ public:
     void setGetGtinCallback(const std::function<QString ()> &newCallback);
 
 private:
-    GoodsCalendarWidget* m_calendar;
+    ProductsCalendarWidget* m_calendar;
     HttpManager* m_httpManager;
     QString currentGtin = "";
 
@@ -47,4 +47,4 @@ private:
     void getAllDaysSlot(const QByteArray &responseData, int statusCode);
 };
 
-#endif // GOODSDATETIMEEDIT_H
+#endif // PRODUCTSDATETIMEEDIT_H
