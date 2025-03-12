@@ -55,6 +55,7 @@ SOURCES += \
     ui_components/goodsdatetimeedit.cpp \
     ui_components/gtinnamescombobox.cpp \
     widgets/connectionstateform.cpp \
+    widgets/controlpanelform.cpp \
     widgets/dmexportform.cpp \
     widgets/dmimportform.cpp \
     widgets/dminfoform.cpp \
@@ -88,6 +89,7 @@ HEADERS += \
     ui_components/goodsdatetimeedit.h \
     ui_components/gtinnamescombobox.h \
     widgets/connectionstateform.h \
+    widgets/controlpanelform.h \
     widgets/dmexportform.h \
     widgets/dmimportform.h \
     widgets/dminfoform.h \
@@ -102,6 +104,7 @@ FORMS += \
     dialogs/settingsdialog.ui \
     mainwindow.ui \
     widgets/connectionstateform.ui \
+    widgets/controlpanelform.ui \
     widgets/dmexportform.ui \
     widgets/dmimportform.ui \
     widgets/dminfoform.ui \

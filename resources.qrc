@@ -15,6 +15,8 @@
         <file>img/noerror.png</file>
         <file>img/nowarn.png</file>
         <file>img/search.png</file>
+        <file>img/stop.svg</file>
+        <file>img/play.svg</file>
     </qresource>
     <qresource prefix="/qss_icons">
         <file>styles/qdarkstyle/rc/branch_closed.png</file>

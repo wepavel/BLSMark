@@ -29,6 +29,8 @@ signals:
     void deviceAvailableChanged(QString devName, bool available);
     void deviceWorksChanged(QString devName, bool works);
 
+    void sendApplicatorStateData(const QJsonObject& data);
+
 private slots:
     void on_ws_connected();
     void on_ws_disconnected();
@@ -61,6 +63,15 @@ private:
         {"scanner","Сканер"},
         {"database","База данных"},
     };
+
+    /**
+     * @brief eventsHandlerMap
+     * ключ - тип события
+     * значение - функция, которая вызывается для обработки данных QJsonObject
+     * этого события
+     */
+    QMap<QString, std::function<void(const QJsonObject &)>> eventsHandlerMap;
+
     QString lastServiceAvailMsg = "";
 
     // map для хранения последнего состояния доступности устройств
@@ -70,6 +81,8 @@ private:
     QMap<QString, bool> devWorksMap;
 
     void initMaps();
+    void processHeartbeatEvent(const QJsonObject& data);
+    void processApplicationStateEvent(const QJsonObject& data);
 };
 
 #endif // HEALTHCHECKER_H

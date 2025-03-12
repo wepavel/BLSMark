@@ -15,6 +15,7 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
     initHealthChecker();
     initControlPanel();
     initGoodsTable();
+    initConnections();
     m_tvGoods->verticalHeader()->setVisible(false); // убираем нумерацию строк
     setFocusPolicy(Qt::NoFocus);
 }
@@ -50,11 +51,10 @@ void ConnectionStateForm::initGoodsTable()
 
 void ConnectionStateForm::initControlPanel()
 {
-    auto gtin_cb = new GtinNamesComboBox(this);
-    gtin_cb->setFocusPolicy(Qt::NoFocus);
+    controlPanelWidget = new ControlPanelForm(this);
+    layout()->addWidget(controlPanelWidget);
     // auto hrz_layout = new QHBoxLayout(this);
     // hrz_layout->addWidget(gtin_cb);
-    layout()->addWidget(gtin_cb);
     // m_tvGoods = new AutoScrollTableView(this);
     // m_tvGoods->setFocusPolicy(Qt::NoFocus);
 
@@ -79,10 +79,14 @@ void ConnectionStateForm::initHealthChecker()
 
     m_hChecker = new HealthChecker(this);
     m_dmCodeHandler = new DmCodeWsHandler(m_hChecker->getConnection());
-    connect(m_dmCodeHandler, &DmCodeWsHandler::dmCodeReceived, this, &ConnectionStateForm::dm_code_received);
+}
 
+void ConnectionStateForm::initConnections()
+{
+    connect(m_dmCodeHandler, &DmCodeWsHandler::dmCodeReceived, this, &ConnectionStateForm::dm_code_received);
     connect(m_hChecker, &HealthChecker::deviceAvailableChanged, this, &ConnectionStateForm::device_available_changed);
     connect(m_hChecker, &HealthChecker::deviceWorksChanged, this, &ConnectionStateForm::device_works_changed);
+    connect(m_hChecker, &HealthChecker::sendApplicatorStateData, this->controlPanelWidget, &ControlPanelForm::processWsData);
 }
 
 QDateTime ConnectionStateForm::getDateTime(QString dtStr) const
