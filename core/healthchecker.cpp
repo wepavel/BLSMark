@@ -135,49 +135,17 @@ void HealthChecker::initMaps()
     devWorksMap["printer"] = false;
     devWorksMap["plc"] = false;
     devWorksMap["scanner"] = false;
+
+    eventsHandlerMap = {
+        {"heartbeat", std::bind(&HealthChecker::processHeartbeatEvent, this, std::placeholders::_1)},
+        {"applicator_state", std::bind(&HealthChecker::processApplicationStateEvent, this, std::placeholders::_1)}
+    };
 }
 
-void HealthChecker::on_ws_connected()
+void HealthChecker::processHeartbeatEvent(const QJsonObject &data)
 {
-    m_webSocketReconnectTimer->stop();
-    m_reconnectDebugTimer->stop();
-    m_webSocketRequestTimer->start(WS_REQUEST_INTERVAL_MS);
-    emit deviceWorksChanged("Сервер", true);
-    //qDebug() << "Connected to server!";
-    messagerInst.addMessage("WS: Connected to server!", Info);
-}
+    QJsonArray messagesArray = data.value("message").toArray();
 
-void HealthChecker::on_ws_disconnected()
-{
-    qDebug() << "Disconnected from server!";
-    messagerInst.addMessage("WS: Disconnected from server!", Warning);
-    emit deviceWorksChanged("Сервер", false);
-    messagerInst.addMessage("Сервер не работает!", Error);
-    m_webSocketRequestTimer->stop();
-    // Попытаться переподключиться через 3 секунды
-    m_webSocketReconnectTimer->start(WS_RECONNECT_INTERVAL_MS);
-    m_reconnectDebugTimer->start(WS_RECONNECT_DEBUG_INTERVAL_MS);
-    messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
-}
-
-void HealthChecker::on_ws_textMessageReceived(const QString &message)
-{
-    // Шаг 1: Десериализуем строку JSON в QJsonDocument
-    QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
-
-    // Проверим, был ли JSON корректно распарсен
-    if (doc.isNull()) {
-        qDebug() << "Invalid JSON format!";
-        messagerInst.addMessage("WS: on_ws_textMessageReceived::Invalid JSON format!", Error);
-        return;
-    }
-
-    // Шаг 2: Извлекаем объект данных
-    QJsonObject rootObj = doc.object();
-    QJsonObject dataObj = rootObj.value("data").toObject();
-    QJsonArray messagesArray = dataObj.value("message").toArray();
-
-    // Шаг 3: Перебираем сообщения и извлекаем булевые значения
     for (const QJsonValue &value : messagesArray) {
         QJsonObject messageObj = value.toObject();
         QString name = messageObj.value("name").toString();
@@ -209,6 +177,57 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
     }
 
     deviceWorksChanged("Сервер", true);
+}
+
+void HealthChecker::processApplicationStateEvent(const QJsonObject &data)
+{
+    emit sendApplicatorStateData(data);
+}
+
+void HealthChecker::on_ws_connected()
+{
+    m_webSocketReconnectTimer->stop();
+    m_reconnectDebugTimer->stop();
+    m_webSocketRequestTimer->start(WS_REQUEST_INTERVAL_MS);
+    emit deviceWorksChanged("Сервер", true);
+    //qDebug() << "Connected to server!";
+    messagerInst.addMessage("WS: Connected to server!", Info);
+}
+
+void HealthChecker::on_ws_disconnected()
+{
+    qDebug() << "Disconnected from server!";
+    messagerInst.addMessage("WS: Disconnected from server!", Warning);
+    emit deviceWorksChanged("Сервер", false);
+    messagerInst.addMessage("Сервер не работает!", Error);
+    m_webSocketRequestTimer->stop();
+    // Попытаться переподключиться через 3 секунды
+    m_webSocketReconnectTimer->start(WS_RECONNECT_INTERVAL_MS);
+    m_reconnectDebugTimer->start(WS_RECONNECT_DEBUG_INTERVAL_MS);
+    messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
+}
+
+void HealthChecker::on_ws_textMessageReceived(const QString &message)
+{
+    qDebug() << message;
+    // Шаг 1: Десериализуем строку JSON в QJsonDocument
+    QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+
+    // Проверим, был ли JSON корректно распарсен
+    if (doc.isNull()) {
+        qDebug() << "Invalid JSON format!";
+        messagerInst.addMessage("WS: on_ws_textMessageReceived::Invalid JSON format!", Error);
+        return;
+    }
+
+    // Шаг 2: Извлекаем объект данных
+    QJsonObject rootObj = doc.object();
+    QString event = rootObj.value("event").toString();
+    QJsonObject data = rootObj.value("data").toObject();
+
+    // вызываем функцию из eventsHandlerMap в зависимости от типа события
+    // с передачей в нее данных
+    eventsHandlerMap[event](data);
 }
 
 void HealthChecker::on_backend_service_ip_port_changed()

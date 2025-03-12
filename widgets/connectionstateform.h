@@ -12,6 +12,7 @@
 #include "widgets/statelabel.h"
 #include "widgets/healthcheckform.h"
 #include "widgets/statelabel.h"
+#include "controlpanelform.h"
 
 
 namespace Ui {
@@ -32,6 +33,7 @@ private:
     void initGoodsTable();
     void initControlPanel();
     void initHealthChecker();
+    void initConnections();
     QDateTime getDateTime(QString dtStr) const;
 
     //---Vars
@@ -40,6 +42,7 @@ private:
     HealthCheckForm* m_healthCheckForm;
     AutoScrollTableView* m_tvGoods;
     DmCodeWsHandler* m_dmCodeHandler;
+    ControlPanelForm* controlPanelWidget;
 
 private slots:
     void device_available_changed(QString devName, bool available);
