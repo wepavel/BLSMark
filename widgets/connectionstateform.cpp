@@ -140,7 +140,7 @@ void ConnectionStateForm::dm_code_received(const QString &msg)
         //bool is_long_format = messageObj.value("is_long_format").toBool();
         //QString verification_key = messageObj.value("verification_key").toString();
         //QString verification_key_value = messageObj.value("verification_key_value").toString();
-        QString upload_date = messageObj.value("upload_date").toString();
+        QString upload_date = messageObj.value("upload_time").toString();
         QString entry_time = messageObj.value("entry_time").toString();
         //QString export_time = messageObj.value("export_time").toString();
 
