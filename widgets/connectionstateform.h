@@ -7,7 +7,7 @@
 
 #include "core/dmcodewshandler.h"
 #include "core/healthchecker.h"
-#include "models/goodsmodel.h"
+#include "models/productsmodel.h"
 #include "tables/autoscrolltableview.h"
 #include "widgets/statelabel.h"
 #include "widgets/healthcheckform.h"
@@ -30,17 +30,17 @@ public:
 private:
     //---Funcs
     Ui::ConnectionStateForm *ui;
-    void initGoodsTable();
+    void initProductsTable();
     void initControlPanel();
     void initHealthChecker();
     void initConnections();
     QDateTime getDateTime(QString dtStr) const;
 
     //---Vars
-    GoodsModel* mdl;
+    ProductsModel* mdl;
     HealthChecker* m_hChecker;
     HealthCheckForm* m_healthCheckForm;
-    AutoScrollTableView* m_tvGoods;
+    AutoScrollTableView* m_tvProducts;
     DmCodeWsHandler* m_dmCodeHandler;
     ControlPanelForm* controlPanelWidget;
 

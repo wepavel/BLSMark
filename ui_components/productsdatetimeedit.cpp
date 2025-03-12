@@ -1,4 +1,4 @@
-#include "goodsdatetimeedit.h"
+#include "productsdatetimeedit.h"
 #include "core/globalsettings.h"
 #include "core/messager.h"
 #include "qcoreevent.h"
@@ -10,17 +10,17 @@
 #include <QTextFormat>
 
 
-GoodsCalendarWidget::GoodsCalendarWidget(QWidget *parent):
+ProductsCalendarWidget::ProductsCalendarWidget(QWidget *parent):
     QCalendarWidget(parent)
 {
 }
 
-void GoodsCalendarWidget::setDatesToPaint(const QList<QDate> &newDatesToPaint)
+void ProductsCalendarWidget::setDatesToPaint(const QList<QDate> &newDatesToPaint)
 {
     datesToPaint = newDatesToPaint;
 }
 
-void GoodsCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate date) const
+void ProductsCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate date) const
 {
     // Вызов базового метода для отрисовки ячейки
     QCalendarWidget::paintCell(painter, rect, date);
@@ -53,33 +53,33 @@ void GoodsCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate 
     }
 }
 
-GoodsDateTimeEdit::GoodsDateTimeEdit(QWidget* parent):
+ProductsDateTimeEdit::ProductsDateTimeEdit(QWidget* parent):
     QDateTimeEdit(parent)
 {
     m_httpManager = new HttpManager();
     setCalendarPopup(true);
-    m_calendar = new GoodsCalendarWidget();
+    m_calendar = new ProductsCalendarWidget();
     m_calendar->installEventFilter(this);
     setCalendarWidget(m_calendar);
     setDateTime(QDateTime::currentDateTime());
-    connect(m_calendar, &GoodsCalendarWidget::currentPageChanged, [this](const int year, const int month){
+    connect(m_calendar, &ProductsCalendarWidget::currentPageChanged, [this](const int year, const int month){
         QDate dt(year, month, 1);
         getAllDays(dt);
     });
 }
 
-GoodsDateTimeEdit::~GoodsDateTimeEdit()
+ProductsDateTimeEdit::~ProductsDateTimeEdit()
 {
     delete m_calendar;
     delete m_httpManager;
 }
 
-void GoodsDateTimeEdit::setGetGtinCallback(const std::function<QString ()> &newCallback)
+void ProductsDateTimeEdit::setGetGtinCallback(const std::function<QString ()> &newCallback)
 {
     getGtinCallback = newCallback;
 }
 
-void GoodsDateTimeEdit::getAllDays(const QDate& dt)
+void ProductsDateTimeEdit::getAllDays(const QDate& dt)
 {
     auto date = dt.toString("yyyy_MM");
     QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-entry-dates/%1/%2")
@@ -88,7 +88,7 @@ void GoodsDateTimeEdit::getAllDays(const QDate& dt)
     // m_httpManager->makeRequest(url,
     //                            QJsonDocument(),
     //                            HttpManager::HttpMethod::Get,
-    //                            std::bind(&GoodsDateTimeEdit::getAllDaysSlot, this, std::placeholders::_1, std::placeholders::_2));
+    //                            std::bind(&ProductsDateTimeEdit::getAllDaysSlot, this, std::placeholders::_1, std::placeholders::_2));
 
     qDebug() << "GetAllDays";
     QNetworkReply* reply = m_httpManager->makeRequestAsync(url, QJsonDocument(), HttpManager::HttpMethod::Get);
@@ -133,12 +133,12 @@ void GoodsDateTimeEdit::getAllDays(const QDate& dt)
     });
 }
 
-void GoodsDateTimeEdit::setCurrentGtin(const QString &newCurrentGtin)
+void ProductsDateTimeEdit::setCurrentGtin(const QString &newCurrentGtin)
 {
     currentGtin = newCurrentGtin;
 }
 
-bool GoodsDateTimeEdit::eventFilter(QObject *watched, QEvent *event)
+bool ProductsDateTimeEdit::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_calendar) {
         if (event->type() == QEvent::Show) {
@@ -148,7 +148,7 @@ bool GoodsDateTimeEdit::eventFilter(QObject *watched, QEvent *event)
     return QDateTimeEdit::eventFilter(watched, event);
 }
 
-void GoodsDateTimeEdit::getAllDaysSlot(const QByteArray &responseData, int statusCode)
+void ProductsDateTimeEdit::getAllDaysSlot(const QByteArray &responseData, int statusCode)
 {
     if (statusCode!=200 && statusCode!=-1) {
         messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-gtin-entry-dates! Код ответа: "

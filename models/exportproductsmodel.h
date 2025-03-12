@@ -1,30 +1,24 @@
-#ifndef GOODSMODEL_H
-#define GOODSMODEL_H
+#ifndef EXPORTPRODUCTSMODEL_H
+#define EXPORTPRODUCTSMODEL_H
 
 #include <QAbstractTableModel>
 
-class GoodsModel : public QAbstractTableModel
+class ExportProductsModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
     enum Column {
+        ProductNameColumn,
         CodeColumn,
-        GoodNameColumn,
-        CountryColumn,
-        TimeDbAdd,
-        TimeStickOnGood,
         ColumnCount
     };
 
-    explicit GoodsModel(QObject *parent = nullptr);
+    explicit ExportProductsModel(QObject *parent = nullptr);
 
 private:
     struct RowData {
+        QString productName;
         QString code;
-        QString goodName;
-        QString country;
-        qint64 timeDbAdd;
-        qint64 timeStickOnGood;
     };
 
     QVector<RowData> m_data;
@@ -32,18 +26,14 @@ private:
 public:
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
+    bool isEmpty() const;
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void addRow(const QString &code,
-                const QString &goodName,
-                const QString &country,
-                const qint64 &timeDbAdd,
-                const qint64 &timeStickOnGood);
+                const QString &productName);
+    QPair<bool, QString> saveToCsv(const QString& fullPath);
     void clear();
-
-signals:
-    void dataHasBeenAdded();
 };
 
-#endif // GOODSMODEL_H
+#endif // EXPORTPRODUCTSMODEL_H

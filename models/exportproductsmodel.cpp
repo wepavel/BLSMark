@@ -1,4 +1,4 @@
-#include "exportgoodsmodel.h"
+#include "exportproductsmodel.h"
 
 #include "core/messager.h"
 #include "qbrush.h"
@@ -6,26 +6,26 @@
 
 #include <qfile.h>
 
-ExportGoodsModel::ExportGoodsModel(QObject *parent)
+ExportProductsModel::ExportProductsModel(QObject *parent)
     : QAbstractTableModel{parent}
 {}
 
-int ExportGoodsModel::rowCount(const QModelIndex &parent) const
+int ExportProductsModel::rowCount(const QModelIndex &parent) const
 {
     return m_data.size();
 }
 
-int ExportGoodsModel::columnCount(const QModelIndex &parent) const
+int ExportProductsModel::columnCount(const QModelIndex &parent) const
 {
     return Column::ColumnCount;
 }
 
-bool ExportGoodsModel::isEmpty() const
+bool ExportProductsModel::isEmpty() const
 {
     return m_data.size()==0;
 }
 
-QVariant ExportGoodsModel::data(const QModelIndex &index, int role) const
+QVariant ExportProductsModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
@@ -36,7 +36,7 @@ QVariant ExportGoodsModel::data(const QModelIndex &index, int role) const
     {
         switch (static_cast<Column>(index.column())) {
         case Column::CodeColumn: return rowData.code;
-        case Column::ProductNameColumn: return rowData.goodName;
+        case Column::ProductNameColumn: return rowData.productName;
         default: return QVariant();
         }
     }
@@ -48,7 +48,7 @@ QVariant ExportGoodsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QVariant ExportGoodsModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ExportProductsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -65,7 +65,7 @@ QVariant ExportGoodsModel::headerData(int section, Qt::Orientation orientation, 
     return QVariant();
 }
 
-Qt::ItemFlags ExportGoodsModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ExportProductsModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return Qt::NoItemFlags;
@@ -73,15 +73,15 @@ Qt::ItemFlags ExportGoodsModel::flags(const QModelIndex &index) const
     return QAbstractItemModel::flags(index);
 }
 
-void ExportGoodsModel::addRow(const QString &code,
-                        const QString &goodName)
+void ExportProductsModel::addRow(const QString &code,
+                        const QString &productName)
 {
     beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
-    m_data.append({goodName, code});
+    m_data.append({productName, code});
     endInsertRows();
 }
 
-QPair<bool, QString> ExportGoodsModel::saveToCsv(const QString &fullPath)
+QPair<bool, QString> ExportProductsModel::saveToCsv(const QString &fullPath)
 {
     QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -100,7 +100,7 @@ QPair<bool, QString> ExportGoodsModel::saveToCsv(const QString &fullPath)
     return QPair<bool, QString>(true,"");
 }
 
-void ExportGoodsModel::clear()
+void ExportProductsModel::clear()
 {
     beginResetModel();
     m_data.clear();

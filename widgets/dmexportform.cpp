@@ -15,35 +15,35 @@ DMExportForm::DMExportForm(QWidget *parent)
     , ui(new Ui::DMExportForm)
 {
     ui->setupUi(this);
-    ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_goods));
+    ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_products));
     httpManager = new HttpManager(this);
-    goodsMdl = new ExportGoodsModel(this);
-    ui->tv_goods->setModel(goodsMdl);
-    ui->tv_goods->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    productModel = new ExportProductsModel(this);
+    ui->tv_products->setModel(productModel);
+    ui->tv_products->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 DMExportForm::~DMExportForm()
 {
     delete ui;
     delete httpManager;
-    delete goodsMdl;
+    delete productModel;
 }
 
 void DMExportForm::on_pb_search_clicked()
 {
-    goodsMdl->clear();
+    productModel->clear();
     QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-dmcodes-by-date/%1/%2")
-                                             .arg(ui->cb_goods->getGtin())
+                                             .arg(ui->cb_products->getGtin())
                                              .arg(ui->dte_date->date().toString("yyyy_MM_dd")));
     ui->pb_search->setEnabled(false);
     httpManager->makeRequest(url,
                              QJsonDocument(),
                              HttpManager::HttpMethod::Get,
-                             std::bind(&DMExportForm::fillGoodsTable, this, std::placeholders::_1, std::placeholders::_2));
+                             std::bind(&DMExportForm::fillProductsTable, this, std::placeholders::_1, std::placeholders::_2));
     ui->pb_search->setEnabled(true);
 }
 
-void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode)
+void DMExportForm::fillProductsTable(const QByteArray &responseData, int statusCode)
 {
     if (statusCode!=200 && statusCode!=-1) {
         messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
@@ -65,9 +65,9 @@ void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode
         }
         for (const QJsonValue &value : jsonArray) {
             auto obj = value.toObject();
-            goodsMdl->addRow(obj["dm_code"].toString(), obj["product_name"].toString());
+            productModel->addRow(obj["dm_code"].toString(), obj["product_name"].toString());
         }
-        this->choosenName=ui->cb_goods->currentText();
+        this->choosenName=ui->cb_products->currentText();
         this->choosenDate=ui->dte_date->date().toString("yyyy_MM_dd");
     }
 }
@@ -75,7 +75,7 @@ void DMExportForm::fillGoodsTable(const QByteArray &responseData, int statusCode
 
 void DMExportForm::on_pb_load_in_csv_clicked()
 {
-    if(goodsMdl->isEmpty()){
+    if(productModel->isEmpty()){
         QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
         return;
     }
@@ -92,7 +92,7 @@ void DMExportForm::on_pb_load_in_csv_clicked()
 
     QString filePath = directory + "/" + fileName;
 
-    auto res = goodsMdl->saveToCsv(filePath);
+    auto res = productModel->saveToCsv(filePath);
 
     if (res.first) {
         QMessageBox::information(this, tr("Успех"), tr("Файл ") + filePath + tr(" успешно сохранен."));

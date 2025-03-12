@@ -2,7 +2,7 @@
 #define DMEXPORTFORM_H
 
 #include "core/httpmanager.h"
-#include "models/exportgoodsmodel.h"
+#include "models/exportproductsmodel.h"
 #include <QWidget>
 
 namespace Ui {
@@ -25,12 +25,12 @@ private slots:
 private:
     Ui::DMExportForm *ui;
     HttpManager* httpManager;
-    ExportGoodsModel* goodsMdl;
+    ExportProductsModel* productModel;
 
     QString choosenDate="";
     QString choosenName="";
 
-    void fillGoodsTable(const QByteArray &responseData, int statusCode);
+    void fillProductsTable(const QByteArray &responseData, int statusCode);
 };
 
 #endif // DMEXPORTFORM_H
