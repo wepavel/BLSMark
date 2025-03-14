@@ -1,5 +1,7 @@
 #include "controlpanelform.h"
+#include "core/messager.h"
 #include "qjsonarray.h"
+#include "qjsondocument.h"
 #include "qjsonobject.h"
 #include "ui_controlpanelform.h"
 
@@ -11,6 +13,7 @@ ControlPanelForm::ControlPanelForm(QWidget *parent)
     ui->cb_gtin_names->setFocusPolicy(Qt::NoFocus);
     ui->pb_start_stop->setFocusPolicy(Qt::NoFocus);
     setSystemState(Stopped);
+    httpManager = new HttpManager(this);
 }
 
 ControlPanelForm::~ControlPanelForm()
@@ -56,14 +59,21 @@ void ControlPanelForm::setSystemState(const SystemState &state)
 
 void ControlPanelForm::setCurrentProduct(const QString &product)
 {
+    if(product.isEmpty()){
+        ui->lbl_currentProduct->setText("пусто");
+        ui->lbl_currentProduct->setStyleSheet("color: red;");
+        return;
+    }
     ui->lbl_currentProduct->setText(product);
+    ui->lbl_currentProduct->setStyleSheet("color: green;");
 }
 
-void ControlPanelForm::on_pb_start_stop_clicked()
+void ControlPanelForm::updateState()
 {
     switch (currentState) {
     case SystemState::Working:
     {
+
         setSystemState(Stopped);
         break;
     }
@@ -75,6 +85,27 @@ void ControlPanelForm::on_pb_start_stop_clicked()
     default:
         break;
     }
+}
+
+void ControlPanelForm::on_pb_start_stop_clicked()
+{
+    ui->pb_start_stop->setEnabled(false);
+    QUrl url = HttpManager::createApiUrl(QString("code-process/set-system-working/%1")
+                                             .arg(ui->cb_gtin_names->property("gtin_code").toString()));
+    httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
+        if (statusCode!=200 && statusCode!=-1) {
+            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: "+QString::number(statusCode)
+                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            ui->pb_start_stop->setEnabled(true);
+        } else if (statusCode==-1) {
+            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: "+QString::number(statusCode)
+                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            ui->pb_start_stop->setEnabled(true);
+        } else {
+            ui->pb_start_stop->setEnabled(true);
+            updateState();
+        }
+    });
 }
 
 void ControlPanelForm::processWsData(const QJsonObject &data)
