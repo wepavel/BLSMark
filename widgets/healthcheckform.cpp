@@ -8,6 +8,7 @@ HealthCheckForm::HealthCheckForm(QWidget *parent)
     ui->setupUi(this);
     QSpacerItem *left_spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     layout()->addItem(left_spacer);
+    layout()->setContentsMargins(0,0,0,0);
 
     for(const QString &name: unitsOrder){
         unitsMap[name] = new HealthUnitForm(name,this);

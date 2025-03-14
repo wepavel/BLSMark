@@ -20,6 +20,9 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="sizeConstraint">
     <enum>QLayout::SizeConstraint::SetFixedSize</enum>
    </property>
@@ -27,7 +30,7 @@
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>9</number>
+    <number>0</number>
    </property>
    <item>
     <widget class="QLabel" name="lbl_title">
@@ -44,6 +47,12 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>6</number>
+     </property>
      <item>
       <widget class="QLabel" name="lbl_available">
        <property name="font">

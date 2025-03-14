@@ -75,7 +75,7 @@ void GtinNamesComboBox::updateNames()
                     textWasFoundInResponse = true;
                 }
                 QString code = obj.value("code").toString();
-                setProperty(name.toUtf8(), code);
+                setProperty("gtin_code", code);
                 addItem(name);
                 // Выводим значения
                 qDebug() << "Name:" << name << ", GTIN (code):" << code;
@@ -92,7 +92,7 @@ void GtinNamesComboBox::updateNames()
 
 QString GtinNamesComboBox::getGtin() const
 {
-    auto p = property(currentText().toUtf8()).toString();
+    auto p = property("gtin_code").toString();
     return p;
 }
 
@@ -135,7 +135,7 @@ void GtinNamesComboBox::getAllGtinsNamesSlot(const QByteArray &responseData, int
                     textWasFoundInResponse = true;
                 }
                 QString code = obj.value("code").toString();
-                setProperty(name.toUtf8(), code);
+                setProperty("gtin_code", code);
                 addItem(name);
                 // Выводим значения
                 qDebug() << "Name:" << name << ", GTIN (code):" << code;

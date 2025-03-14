@@ -1,6 +1,7 @@
 #ifndef CONTROLPANELFORM_H
 #define CONTROLPANELFORM_H
 
+#include "core/httpmanager.h"
 #include <QWidget>
 
 namespace Ui {
@@ -33,6 +34,8 @@ private slots:
 private:
     Ui::ControlPanelForm *ui;
     SystemState currentState = Stopped;
+    HttpManager *httpManager;
+    void updateState();
 };
 
 #endif // CONTROLPANELFORM_H
