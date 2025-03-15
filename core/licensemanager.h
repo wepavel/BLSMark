@@ -15,6 +15,8 @@ public:
     static QString createAugmentedHash(const QString& input, const QString &salt);
     static void writeHashToRegistry(const QString& hash);
     static QString readHashFromRegistry();
+    static QString readHashFromRegistryWithValidation(const QString& serial, const QString& salt);
+
     static bool checkLicense(const QString &salt);
     static bool removeFromRegistry(const QString& key, const QString& valueName = QString());
 
