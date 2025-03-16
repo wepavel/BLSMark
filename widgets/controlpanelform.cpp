@@ -91,7 +91,7 @@ void ControlPanelForm::on_pb_start_stop_clicked()
 {
     ui->pb_start_stop->setEnabled(false);
     QUrl url = HttpManager::createApiUrl(QString("code-process/set-system-working/%1")
-                                             .arg(ui->cb_gtin_names->property("gtin_code").toString()));
+                                             .arg(ui->cb_gtin_names->getGtin()));
     httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
         if (statusCode!=200 && statusCode!=-1) {
             messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: "+QString::number(statusCode)
