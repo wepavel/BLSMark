@@ -24,9 +24,12 @@ public:
     void setProductsLeftCount(const int& leftCount);
     void setSystemState(const SystemState& state);
     void setCurrentProduct(const QString& product);
+    void setControlPanelActive(const bool& active);
 
 public slots:
     void processWsData(const QJsonObject& data);
+    void serverWorksChanged(QString devName, bool works);
+    void serverAvailableChanged(QString devName, bool available);
 
 private slots:
     void on_pb_start_stop_clicked();
