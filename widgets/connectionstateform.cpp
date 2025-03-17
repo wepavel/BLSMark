@@ -87,6 +87,8 @@ void ConnectionStateForm::initConnections()
     connect(m_hChecker, &HealthChecker::deviceAvailableChanged, this, &ConnectionStateForm::device_available_changed);
     connect(m_hChecker, &HealthChecker::deviceWorksChanged, this, &ConnectionStateForm::device_works_changed);
     connect(m_hChecker, &HealthChecker::sendApplicatorStateData, this->controlPanelWidget, &ControlPanelForm::processWsData);
+    connect(m_hChecker, &HealthChecker::deviceWorksChanged, this->controlPanelWidget, &ControlPanelForm::serverWorksChanged);
+    connect(m_hChecker, &HealthChecker::deviceAvailableChanged, this->controlPanelWidget, &ControlPanelForm::serverAvailableChanged);
 }
 
 QDateTime ConnectionStateForm::getDateTime(QString dtStr) const

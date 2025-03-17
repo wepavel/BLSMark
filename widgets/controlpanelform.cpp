@@ -68,6 +68,20 @@ void ControlPanelForm::setCurrentProduct(const QString &product)
     ui->lbl_currentProduct->setStyleSheet("color: green;");
 }
 
+void ControlPanelForm::setControlPanelActive(const bool &active)
+{
+    if(active == false){
+        setSystemState(Stopped);
+        setCurrentProduct("");
+        setProductsLeftCount(0);
+        ui->pb_start_stop->setEnabled(false);
+        ui->cb_gtin_names->setEnabled(false);
+    } else {
+        ui->pb_start_stop->setEnabled(true);
+        ui->cb_gtin_names->setEnabled(true);
+    }
+}
+
 void ControlPanelForm::updateState()
 {
     switch (currentState) {
@@ -125,5 +139,27 @@ void ControlPanelForm::processWsData(const QJsonObject &data)
     // qDebug() << currentProduct
     //          << remainder
     //          << inWork;
+}
+
+void ControlPanelForm::serverWorksChanged(QString devName, bool works)
+{
+    //qDebug() << devName << "works: " << works;
+
+    if(devName!="Сервер"){
+        return;
+    }
+
+    setControlPanelActive(works);
+}
+
+void ControlPanelForm::serverAvailableChanged(QString devName, bool available)
+{
+    //qDebug() << devName << "available: " << available;
+
+    if(devName!="Сервер"){
+        return;
+    }
+
+    setControlPanelActive(available);
 }
 
