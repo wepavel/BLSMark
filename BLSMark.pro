@@ -49,6 +49,7 @@ SOURCES += \
     models/dmimportmodel.cpp \
     models/exportproductsmodel.cpp \
     models/productsmodel.cpp \
+    models/productsremaindmodel.cpp \
     tables/autoscrolllistwidget.cpp \
     tables/autoscrolltableview.cpp \
     tables/dragdroptableview.cpp \
@@ -63,6 +64,7 @@ SOURCES += \
     widgets/healthunitform.cpp \
     widgets/msglogwidget.cpp \
     widgets/msgtoolbutton.cpp \
+    widgets/productsform.cpp \
     widgets/statelabel.cpp
 
 HEADERS += \
@@ -77,6 +79,7 @@ HEADERS += \
     dialogs/settingsdialog.h \
     models/exportproductsmodel.h \
     models/productsmodel.h \
+    models/productsremaindmodel.h \
     sqlmodels/baseentity.h \
     sqlmodels/dmcodemodel.h \
     core/globalsettings.h \
@@ -97,6 +100,7 @@ HEADERS += \
     widgets/healthunitform.h \
     widgets/msglogwidget.h \
     widgets/msgtoolbutton.h \
+    widgets/productsform.h \
     widgets/statelabel.h
 
 FORMS += \
@@ -111,7 +115,8 @@ FORMS += \
     widgets/healthcheckform.ui \
     widgets/healthunitform.ui \
     widgets/msglogwidget.ui \
-    widgets/msgtoolbutton.ui
+    widgets/msgtoolbutton.ui \
+    widgets/productsform.ui
 
 RESOURCES += \
     resources.qrc \
