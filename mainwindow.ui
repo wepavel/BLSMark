@@ -105,7 +105,7 @@
      <x>0</x>
      <y>0</y>
      <width>510</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -143,6 +143,7 @@
      <string>Инструменты</string>
     </property>
     <addaction name="act_check_code"/>
+    <addaction name="act_open_product_from"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -161,6 +162,11 @@
   <action name="act_check_code">
    <property name="text">
     <string>Проверка кода</string>
+   </property>
+  </action>
+  <action name="act_open_product_from">
+   <property name="text">
+    <string>Список наименований</string>
    </property>
   </action>
  </widget>

@@ -299,3 +299,16 @@ QString DMInfoForm::normalizeGS(QString input)
 
     return input.replace(QChar(29), "<GS>");
 }
+
+
+QString DMInfoForm::exportDataMatrix(QString code)
+{
+    if (code.startsWith(QChar(232)) || code.startsWith(QChar(29)))
+        code.remove(0, 1);
+    else if (code.startsWith(QString("<GS>")))
+        code.remove(0, 4);
+    code.replace("<GS>", QChar(29));
+
+    return code;
+}
+

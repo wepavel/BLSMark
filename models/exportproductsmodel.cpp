@@ -1,5 +1,6 @@
 #include "exportproductsmodel.h"
 
+#include "widgets/dminfoform.h"
 #include "core/messager.h"
 #include "qbrush.h"
 #include "qdatetime.h"
@@ -92,7 +93,7 @@ QPair<bool, QString> ExportProductsModel::saveToCsv(const QString &fullPath)
     QTextStream out(&file);
 
     for (const RowData &row : m_data) {
-        out << row.code << "\n";
+        out <<  DMInfoForm::exportDataMatrix(row.code) << "\n";
     }
 
     file.close();

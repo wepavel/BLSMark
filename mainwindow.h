@@ -38,6 +38,9 @@ protected:
         event->accept(); // Разрешаем закрытие окна
     }
 
+private slots:
+    void on_act_open_product_from_triggered();
+
 private:
     //---Vars
     Ui::MainWindow *ui;

@@ -19,6 +19,7 @@
 #include "widgets/dminfoform.h"
 #include "widgets/msgtoolbutton.h"
 #include <widgets/connectionstateform.h>
+#include <widgets/productsform.h>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -155,3 +156,23 @@ void MainWindow::checkLicense()
         // QCoreApplication::quit();
     }
 }
+
+void MainWindow::on_act_open_product_from_triggered()
+{
+
+
+    QDialog dialog;
+    dialog.setWindowTitle(tr("Список наименований"));
+
+    QWidget *widget;
+    widget = new ProductsForm(&dialog);
+
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+    layout->addWidget(widget);
+    dialog.setLayout(layout);
+
+    // Настройка вашего виджета
+
+    int result = dialog.exec();
+}
+

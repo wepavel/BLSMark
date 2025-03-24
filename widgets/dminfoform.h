@@ -71,6 +71,7 @@ public:
     static bool validateDataMatrix(const QString &dataMatrix, DataMatrixAttrs& attrs);
     static QPixmap generateDataMatrix(const QString& data, int size);
     static QString prepareDataMatrix(const QString &code);
+    static QString exportDataMatrix(QString code);
 
 private:
     Ui::DMInfoForm *ui;
