@@ -209,7 +209,7 @@ void HealthChecker::on_ws_disconnected()
 
 void HealthChecker::on_ws_textMessageReceived(const QString &message)
 {
-    qDebug() << message;
+    //qDebug() << message;
     // Шаг 1: Десериализуем строку JSON в QJsonDocument
     QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
 

@@ -78,7 +78,7 @@ void GtinNamesComboBox::updateNames()
                 setProperty(name.toUtf8(), code);
                 addItem(name);
                 // Выводим значения
-                qDebug() << "Name:" << name << ", GTIN (code):" << code;
+                //qDebug() << "Name:" << name << ", GTIN (code):" << code;
             }
         }
 

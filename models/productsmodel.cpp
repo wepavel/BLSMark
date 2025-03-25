@@ -17,7 +17,7 @@ int ProductsModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return static_cast<int>(Column::ColumnCount);
+    return Column::ColumnCount;
 }
 
 QVariant ProductsModel::data(const QModelIndex &index, int role) const
