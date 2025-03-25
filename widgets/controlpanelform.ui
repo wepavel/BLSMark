@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>844</width>
-    <height>48</height>
+    <width>934</width>
+    <height>51</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -110,8 +110,11 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="styleSheet">
+      <string notr="true">color: red;</string>
+     </property>
      <property name="text">
-      <string>нет данных</string>
+      <string>0</string>
      </property>
     </widget>
    </item>
