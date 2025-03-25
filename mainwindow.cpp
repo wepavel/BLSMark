@@ -10,7 +10,6 @@
 #include <QInputDialog>
 #include <QWidgetAction>
 
-
 #include "core/globalsettings.h"
 #include "core/stylemanager.h"
 #include "core/licensemanager.h"
@@ -159,19 +158,17 @@ void MainWindow::checkLicense()
 
 void MainWindow::on_act_open_product_from_triggered()
 {
-
-
     QDialog dialog;
     dialog.setWindowTitle(tr("Список наименований"));
 
+    QVBoxLayout *layout = new QVBoxLayout();
+    dialog.setLayout(layout);
+    dialog.resize(500,500);
+    dialog.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     QWidget *widget;
     widget = new ProductsForm(&dialog);
-
-    QVBoxLayout *layout = new QVBoxLayout(&dialog);
     layout->addWidget(widget);
-    dialog.setLayout(layout);
-
-    // Настройка вашего виджета
 
     int result = dialog.exec();
 }

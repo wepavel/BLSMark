@@ -49,6 +49,7 @@ SOURCES += \
     models/dmimportmodel.cpp \
     models/exportproductsmodel.cpp \
     models/productsmodel.cpp \
+    models/productsremaindfiltermodel.cpp \
     models/productsremaindmodel.cpp \
     tables/autoscrolllistwidget.cpp \
     tables/autoscrolltableview.cpp \
@@ -79,6 +80,7 @@ HEADERS += \
     dialogs/settingsdialog.h \
     models/exportproductsmodel.h \
     models/productsmodel.h \
+    models/productsremaindfiltermodel.h \
     models/productsremaindmodel.h \
     sqlmodels/baseentity.h \
     sqlmodels/dmcodemodel.h \

@@ -32,13 +32,13 @@ public slots:
     void serverAvailableChanged(QString devName, bool available);
 
 private slots:
-    void on_pb_start_stop_clicked();
+    void on_pb_start_clicked();
+    void on_pb_stop_clicked();
 
 private:
     Ui::ControlPanelForm *ui;
     SystemState currentState = Stopped;
     HttpManager *httpManager;
-    void updateState();
 };
 
 #endif // CONTROLPANELFORM_H
