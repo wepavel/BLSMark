@@ -1,5 +1,7 @@
 #include "exportproductsmodel.h"
 
+#include "qjsonarray.h"
+#include "qjsonobject.h"
 #include "widgets/dminfoform.h"
 #include "core/messager.h"
 #include "qbrush.h"
@@ -10,6 +12,17 @@
 ExportProductsModel::ExportProductsModel(QObject *parent)
     : QAbstractTableModel{parent}
 {}
+
+QJsonArray ExportProductsModel::getDmCodesArray()
+{
+    QJsonArray arr;
+    for(const RowData& r: m_data){
+        QJsonObject o;
+        o["dm_code"] = r.code;
+        arr.append(o);
+    }
+    return arr;
+}
 
 int ExportProductsModel::rowCount(const QModelIndex &parent) const
 {

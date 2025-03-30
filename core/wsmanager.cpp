@@ -2,14 +2,13 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QThread>
+#include "wsmanager.h"
 
-#include "healthchecker.h"
-
-HealthChecker::HealthChecker(QObject *parent)
+WsManager::WsManager(QObject *parent)
     : QObject{parent}
 {
     initMaps();
-    connect(&gSettings, &GlobalSettings::backendServiceIpPortChanged, this, &HealthChecker::on_backend_service_ip_port_changed);
+    connect(&gSettings, &GlobalSettings::backendServiceIpPortChanged, this, &WsManager::on_backend_service_ip_port_changed);
     // http
     QString url = QString("http://%1:%2/api/v1/heartbeat/service-heartbeat/ping")
                         .arg(gSettings.getBackendServiceIP())
@@ -18,7 +17,7 @@ HealthChecker::HealthChecker(QObject *parent)
     httpManager = new QNetworkAccessManager(this);
     httpTimer = new QTimer(this);
     httpTimer->setInterval(HTTP_REQUEST_INTERVAL_MS);
-    connect(httpTimer, &QTimer::timeout, this, &HealthChecker::httpSendPingRequest);
+    connect(httpTimer, &QTimer::timeout, this, &WsManager::httpSendPingRequest);
     httpTimer->start();
 
     // websocket
@@ -26,13 +25,13 @@ HealthChecker::HealthChecker(QObject *parent)
                          .arg(gSettings.getBackendServiceIP())
                          .arg(gSettings.getBackendServicePort());
     m_webSocket = new QWebSocket();
-    connect(m_webSocket, &QWebSocket::connected, this, &HealthChecker::on_ws_connected);
-    connect(m_webSocket, &QWebSocket::disconnected, this, &HealthChecker::on_ws_disconnected);
-    connect(m_webSocket, &QWebSocket::textMessageReceived, this, &HealthChecker::on_ws_textMessageReceived);
+    connect(m_webSocket, &QWebSocket::connected, this, &WsManager::on_ws_connected);
+    connect(m_webSocket, &QWebSocket::disconnected, this, &WsManager::on_ws_disconnected);
+    connect(m_webSocket, &QWebSocket::textMessageReceived, this, &WsManager::on_ws_textMessageReceived);
     m_webSocketReconnectTimer = new QTimer(this);
     m_webSocketRequestTimer = new QTimer(this);
-    connect(m_webSocketReconnectTimer, &QTimer::timeout, this, &HealthChecker::wsConnectToServer);
-    connect(m_webSocketRequestTimer, &QTimer::timeout, this, &HealthChecker::wsRequestStatesData);
+    connect(m_webSocketReconnectTimer, &QTimer::timeout, this, &WsManager::wsConnectToServer);
+    connect(m_webSocketRequestTimer, &QTimer::timeout, this, &WsManager::wsRequestStatesData);
     m_reconnectDebugTimer = new QTimer(this);
     connect(m_reconnectDebugTimer, &QTimer::timeout, this, [this](){
         //qDebug() << "Attempting to connect to server with url " << m_websocketUrl;
@@ -42,7 +41,7 @@ HealthChecker::HealthChecker(QObject *parent)
     wsConnectToServer();
 }
 
-void HealthChecker::httpSendPingRequest()
+void WsManager::httpSendPingRequest()
 {
     if (httpIsRequestInProgress)
         return;
@@ -87,12 +86,12 @@ void HealthChecker::httpSendPingRequest()
     });
 }
 
-QWebSocket *HealthChecker::getConnection()
+QWebSocket *WsManager::getConnection()
 {
     return m_webSocket;
 }
 
-void HealthChecker::wsConnectToServer()
+void WsManager::wsConnectToServer()
 {
     if (m_webSocket->state() != QAbstractSocket::ConnectedState) {
 
@@ -102,7 +101,7 @@ void HealthChecker::wsConnectToServer()
     }
 }
 
-void HealthChecker::wsDisconnectFromServer()
+void WsManager::wsDisconnectFromServer()
 {
     if (m_webSocket->state() == QAbstractSocket::ConnectedState) {
         qDebug() << "Disconnecting from server...";
@@ -111,7 +110,7 @@ void HealthChecker::wsDisconnectFromServer()
     }
 }
 
-void HealthChecker::wsRequestStatesData()
+void WsManager::wsRequestStatesData()
 {
     QJsonObject message;
     message["type"] = "heartbeat";
@@ -121,12 +120,12 @@ void HealthChecker::wsRequestStatesData()
     m_webSocket->sendTextMessage(jsonMessage);
 }
 
-QString HealthChecker::getName(QString name)
+QString WsManager::getName(QString name)
 {
     return devNamesMap[name];
 }
 
-void HealthChecker::initMaps()
+void WsManager::initMaps()
 {
     devAvailMap["printer"] = false;
     devAvailMap["plc"] = false;
@@ -137,12 +136,12 @@ void HealthChecker::initMaps()
     devWorksMap["scanner"] = false;
 
     eventsHandlerMap = {
-        {"heartbeat", std::bind(&HealthChecker::processHeartbeatEvent, this, std::placeholders::_1)},
-        {"applicator_state", std::bind(&HealthChecker::processApplicationStateEvent, this, std::placeholders::_1)}
+        {"heartbeat", std::bind(&WsManager::processHeartbeatEvent, this, std::placeholders::_1)},
+        {"applicator_state", std::bind(&WsManager::processApplicationStateEvent, this, std::placeholders::_1)}
     };
 }
 
-void HealthChecker::processHeartbeatEvent(const QJsonObject &data)
+void WsManager::processHeartbeatEvent(const QJsonObject &data)
 {
     QJsonArray messagesArray = data.value("message").toArray();
 
@@ -179,12 +178,12 @@ void HealthChecker::processHeartbeatEvent(const QJsonObject &data)
     deviceWorksChanged("Сервер", true);
 }
 
-void HealthChecker::processApplicationStateEvent(const QJsonObject &data)
+void WsManager::processApplicationStateEvent(const QJsonObject &data)
 {
     emit sendApplicatorStateData(data);
 }
 
-void HealthChecker::on_ws_connected()
+void WsManager::on_ws_connected()
 {
     m_webSocketReconnectTimer->stop();
     m_reconnectDebugTimer->stop();
@@ -194,7 +193,7 @@ void HealthChecker::on_ws_connected()
     messagerInst.addMessage("WS: Connected to server!", Info);
 }
 
-void HealthChecker::on_ws_disconnected()
+void WsManager::on_ws_disconnected()
 {
     qDebug() << "Disconnected from server!";
     messagerInst.addMessage("WS: Disconnected from server!", Warning);
@@ -207,7 +206,7 @@ void HealthChecker::on_ws_disconnected()
     messagerInst.addMessage(QString("WS: Attempting to connect to server with url "+m_websocketUrl), Warning);
 }
 
-void HealthChecker::on_ws_textMessageReceived(const QString &message)
+void WsManager::on_ws_textMessageReceived(const QString &message)
 {
     //qDebug() << message;
     // Шаг 1: Десериализуем строку JSON в QJsonDocument
@@ -227,10 +226,12 @@ void HealthChecker::on_ws_textMessageReceived(const QString &message)
 
     // вызываем функцию из eventsHandlerMap в зависимости от типа события
     // с передачей в нее данных
-    eventsHandlerMap[event](data);
+    if (eventsHandlerMap.contains(event)){
+        eventsHandlerMap[event](data);
+    }
 }
 
-void HealthChecker::on_backend_service_ip_port_changed()
+void WsManager::on_backend_service_ip_port_changed()
 {
     // Обновление url для http
     QString url = QString("http://%1:%2/api/v1/heartbeat/service-heartbeat/ping")
@@ -249,7 +250,7 @@ void HealthChecker::on_backend_service_ip_port_changed()
     wsConnectToServer();
 }
 
-HealthChecker::~HealthChecker()
+WsManager::~WsManager()
 {
     m_webSocketReconnectTimer->stop();
     m_webSocketRequestTimer->stop();

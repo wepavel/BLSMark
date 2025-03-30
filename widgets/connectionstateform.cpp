@@ -77,18 +77,18 @@ void ConnectionStateForm::initHealthChecker()
     m_healthCheckForm = new HealthCheckForm(this);
     layout()->addWidget(m_healthCheckForm);
 
-    m_hChecker = new HealthChecker(this);
+    m_hChecker = new WsManager(this);
     m_dmCodeHandler = new DmCodeWsHandler(m_hChecker->getConnection());
 }
 
 void ConnectionStateForm::initConnections()
 {
     connect(m_dmCodeHandler, &DmCodeWsHandler::dmCodeReceived, this, &ConnectionStateForm::dm_code_received);
-    connect(m_hChecker, &HealthChecker::deviceAvailableChanged, this, &ConnectionStateForm::device_available_changed);
-    connect(m_hChecker, &HealthChecker::deviceWorksChanged, this, &ConnectionStateForm::device_works_changed);
-    connect(m_hChecker, &HealthChecker::sendApplicatorStateData, this->controlPanelWidget, &ControlPanelForm::processWsData);
-    connect(m_hChecker, &HealthChecker::deviceWorksChanged, this->controlPanelWidget, &ControlPanelForm::serverWorksChanged);
-    connect(m_hChecker, &HealthChecker::deviceAvailableChanged, this->controlPanelWidget, &ControlPanelForm::serverAvailableChanged);
+    connect(m_hChecker, &WsManager::deviceAvailableChanged, this, &ConnectionStateForm::device_available_changed);
+    connect(m_hChecker, &WsManager::deviceWorksChanged, this, &ConnectionStateForm::device_works_changed);
+    connect(m_hChecker, &WsManager::sendApplicatorStateData, this->controlPanelWidget, &ControlPanelForm::processWsData);
+    connect(m_hChecker, &WsManager::deviceWorksChanged, this->controlPanelWidget, &ControlPanelForm::serverWorksChanged);
+    connect(m_hChecker, &WsManager::deviceAvailableChanged, this->controlPanelWidget, &ControlPanelForm::serverAvailableChanged);
 }
 
 QDateTime ConnectionStateForm::getDateTime(QString dtStr) const

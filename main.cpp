@@ -11,7 +11,7 @@
 #include "core/licensemanager.h"
 // #include "widgets/msglogwidget.h"
 #include "widgets/healthcheckform.h"
-#include "core/healthchecker.h"
+#include "core/wsmanager.h"
 #include "widgets/msglogwidget.h"
 
 

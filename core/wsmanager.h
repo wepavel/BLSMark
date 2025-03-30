@@ -1,5 +1,5 @@
-#ifndef HEALTHCHECKER_H
-#define HEALTHCHECKER_H
+#ifndef WSMANAGER_H
+#define WSMANAGER_H
 
 #include "qtimer.h"
 #include <QObject>
@@ -15,12 +15,12 @@
 #define WS_RECONNECT_DEBUG_INTERVAL_MS 10000
 #define WS_REQUEST_INTERVAL_MS 2000
 
-class HealthChecker : public QObject
+class WsManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit HealthChecker(QObject *parent = nullptr);
-    ~HealthChecker();
+    explicit WsManager(QObject *parent = nullptr);
+    ~WsManager();
 
     void httpSendPingRequest();
     QWebSocket* getConnection();
@@ -85,4 +85,4 @@ private:
     void processApplicationStateEvent(const QJsonObject& data);
 };
 
-#endif // HEALTHCHECKER_H
+#endif // WSMANAGER_H

@@ -6,7 +6,7 @@
 #include <QCheckBox>
 
 #include "core/dmcodewshandler.h"
-#include "core/healthchecker.h"
+#include "core/wsmanager.h"
 #include "models/productsmodel.h"
 #include "tables/autoscrolltableview.h"
 #include "widgets/statelabel.h"
@@ -38,7 +38,7 @@ private:
 
     //---Vars
     ProductsModel* mdl;
-    HealthChecker* m_hChecker;
+    WsManager* m_hChecker;
     HealthCheckForm* m_healthCheckForm;
     AutoScrollTableView* m_tvProducts;
     DmCodeWsHandler* m_dmCodeHandler;

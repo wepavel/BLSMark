@@ -32,7 +32,8 @@ DMExportForm::~DMExportForm()
 void DMExportForm::on_pb_search_clicked()
 {
     productModel->clear();
-    QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-dmcodes-by-date/%1/%2")
+    QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-dmcodes-by-date/%1/%2/%3")
+                                             .arg(ui->chb_exported->isChecked())
                                              .arg(ui->cb_products->getGtin())
                                              .arg(ui->dte_date->date().toString("yyyy_MM_dd")));
     ui->pb_search->setEnabled(false);
@@ -72,6 +73,80 @@ void DMExportForm::fillProductsTable(const QByteArray &responseData, int statusC
     }
 }
 
+QVariant DMExportForm::ObjectOrArrayFromString(const QString& in)
+{
+    QVariant result;
+
+    QJsonDocument doc = QJsonDocument::fromJson(in.toUtf8());
+
+    // check validity of the document
+    if (!doc.isNull())
+    {
+        if (doc.isObject()) {
+            result = doc.object();
+        } else if (doc.isArray()) {
+            result = doc.array();
+        } else {
+            qDebug() << "Document is neither an object nor an array";
+        }
+    } else {
+        qDebug() << "Invalid JSON...\n" << in;
+    }
+
+    return result;
+}
+
+
+void DMExportForm::exportDmCodes(const QJsonArray& dmCodesArray)
+{
+    QUrl url = HttpManager::createApiUrl("code-export/export_dmcodes");
+
+    QNetworkReply* reply = httpManager->makeRequestAsync(url,
+                                                         QJsonDocument(dmCodesArray),
+                                                         HttpManager::HttpMethod::Get);
+    if (!reply) {
+        messagerInst.addMessage("Не удалось выполнить get запрос code-export/export_dmcodes", Error, true);
+        return;
+    }
+
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        if (reply->error() != QNetworkReply::NoError) {
+            messagerInst.addMessage("Не удалось выполнить get запрос code-export/export_dmcodes", Error, true);
+            reply->deleteLater();
+            return;
+        }
+
+        QByteArray responseData = reply->readAll();
+        int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+        if (statusCode != 200) {
+            messagerInst.addMessage("Не удалось выполнить get запрос code-export/export_dmcodes"
+                                        +QString::number(statusCode)
+                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            reply->deleteLater();
+            return;
+        }
+
+        QJsonArray result = ObjectOrArrayFromString(responseData).toJsonArray();
+
+        if (result.isEmpty())
+        {
+            QMessageBox::information(this, tr("Успешный экспорт DM-кодов"), tr("DM-коды были успешно экспортированы!"));
+            messagerInst.addMessage(tr("Успешный экспорт DM-кодов. DM-коды были успешно экспортированы!"), Info);
+        } else {
+            for (const QJsonValue &value : qAsConst(result)) {
+                QJsonObject jsonObject = value.toObject();
+                QString message = QString("StatusCode: %1; Ошибка экспорта кода %2! %3")
+                                      .arg(statusCode)
+                                      .arg(jsonObject.value("dm_code").toString())
+                                      .arg(jsonObject.value("problem").toString());
+                messagerInst.addMessage(message, Warning, true);
+            }
+            QMessageBox::warning(this, tr("Внимание!"), tr("Не все коды были успешно эскпортированы!\nОбратите внимание на окно предупреждений!"));
+        }
+    });
+}
+
 
 void DMExportForm::on_pb_load_in_csv_clicked()
 {
@@ -94,10 +169,17 @@ void DMExportForm::on_pb_load_in_csv_clicked()
 
     auto res = productModel->saveToCsv(filePath);
 
+
     if (res.first) {
-        QMessageBox::information(this, tr("Успех"), tr("Файл ") + filePath + tr(" успешно сохранен."));
+        //QMessageBox::information(this, tr("Успех"), tr("Файл ") + filePath + tr(" успешно сохранен."));
+        exportDmCodes(productModel->getDmCodesArray());
     } else {
         QMessageBox::critical(this, tr("Ошибка"), res.second);
     }
+}
+
+void DMExportForm::on_chb_exported_stateChanged(int checked)
+{
+    ui->dte_date->setShowExportedCodes(checked);
 }
 

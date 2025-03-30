@@ -37,11 +37,11 @@ CONFIG(release, debug|release) {
 SOURCES += \
     core/dmcodewshandler.cpp \
     core/globalsettings.cpp \
-    core/healthchecker.cpp \
     core/httpmanager.cpp \
     core/licensemanager.cpp \
     core/messager.cpp \
     core/stylemanager.cpp \
+    core/wsmanager.cpp \
     dialogs/doubleprogressdialog.cpp \
     dialogs/settingsdialog.cpp \
     main.cpp \
@@ -70,10 +70,10 @@ SOURCES += \
 
 HEADERS += \
     core/dmcodewshandler.h \
-    core/healthchecker.h \
     core/httpmanager.h \
     core/licensemanager.h \
     core/messager.h \
+    core/wsmanager.h \
     crud/crudbase.h \
     crud/cruddmcode.h \
     dialogs/doubleprogressdialog.h \
