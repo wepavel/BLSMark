@@ -14,6 +14,7 @@ public:
     };
 
     explicit ExportProductsModel(QObject *parent = nullptr);
+    QJsonArray getDmCodesArray();
 
 private:
     struct RowData {

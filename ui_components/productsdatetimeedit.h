@@ -36,10 +36,13 @@ public:
 
     void setGetGtinCallback(const std::function<QString ()> &newCallback);
 
+    void setShowExportedCodes(bool newShowExportedCodes);
+
 private:
     ProductsCalendarWidget* m_calendar;
     HttpManager* m_httpManager;
     QString currentGtin = "";
+    bool showExportedCodes = false;
 
     std::function<QString()> getGtinCallback;
     QString getGtin(){return getGtinCallback();};

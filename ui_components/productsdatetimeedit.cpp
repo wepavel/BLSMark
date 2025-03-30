@@ -79,18 +79,20 @@ void ProductsDateTimeEdit::setGetGtinCallback(const std::function<QString ()> &n
     getGtinCallback = newCallback;
 }
 
+void ProductsDateTimeEdit::setShowExportedCodes(bool newShowExportedCodes)
+{
+    showExportedCodes = newShowExportedCodes;
+    //qDebug() << showExportedCodes;
+}
+
 void ProductsDateTimeEdit::getAllDays(const QDate& dt)
 {
     auto date = dt.toString("yyyy_MM");
-    QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-entry-dates/%1/%2")
+    QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-entry-dates/%1/%2/%3")
+                                             .arg(this->showExportedCodes)
                                              .arg(getGtin())
                                              .arg(date));
-    // m_httpManager->makeRequest(url,
-    //                            QJsonDocument(),
-    //                            HttpManager::HttpMethod::Get,
-    //                            std::bind(&ProductsDateTimeEdit::getAllDaysSlot, this, std::placeholders::_1, std::placeholders::_2));
 
-    qDebug() << "GetAllDays";
     QNetworkReply* reply = m_httpManager->makeRequestAsync(url, QJsonDocument(), HttpManager::HttpMethod::Get);
     if (!reply) {
         messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-gtin-entry-dates!", Error, true);

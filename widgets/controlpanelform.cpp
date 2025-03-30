@@ -91,9 +91,9 @@ void ControlPanelForm::processWsData(const QJsonObject &data)
     }
     setCurrentProduct(currentProduct);
     setProductsLeftCount(remainder);
-    qDebug() << currentProduct
-             << remainder
-             << inWork;
+    //qDebug() << currentProduct
+    //         << remainder
+    //         << inWork;
 }
 
 void ControlPanelForm::serverWorksChanged(QString devName, bool works)
