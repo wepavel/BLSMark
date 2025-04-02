@@ -48,6 +48,10 @@ private:
     QString getGtin(){return getGtinCallback();};
 
     void getAllDaysSlot(const QByteArray &responseData, int statusCode);
+
+    // QWidget interface
+protected:
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // PRODUCTSDATETIMEEDIT_H

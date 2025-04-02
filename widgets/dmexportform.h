@@ -34,7 +34,7 @@ private:
 
     void fillProductsTable(const QByteArray &responseData, int statusCode);
     void exportDmCodes(const QJsonArray& dmCodesArray);
-    QVariant ObjectOrArrayFromString(const QString& in)
+    QVariant ObjectOrArrayFromString(const QString& in);
 };
 
 #endif // DMEXPORTFORM_H

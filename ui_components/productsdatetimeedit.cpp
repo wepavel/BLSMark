@@ -2,6 +2,8 @@
 #include "core/globalsettings.h"
 #include "core/messager.h"
 #include "qcoreevent.h"
+#include "qevent.h"
+#include "qstyleoption.h"
 #include <QEvent>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -175,5 +177,20 @@ void ProductsDateTimeEdit::getAllDaysSlot(const QByteArray &responseData, int st
         m_calendar->setDatesToPaint(dates);
         m_calendar->repaint();
         m_calendar->update();
+    }
+}
+
+void ProductsDateTimeEdit::mousePressEvent(QMouseEvent *event)
+{
+    QStyleOptionSpinBox opt;
+    initStyleOption(&opt);
+    QRect arrowRect = style()->subControlRect(QStyle::CC_SpinBox, &opt,
+                                              QStyle::SC_SpinBoxUp, this);
+    if (arrowRect.contains(event->pos())) {
+        QDateTimeEdit::mousePressEvent(event);
+    } else {
+        event->ignore();
+        setSelectedSection(QDateTimeEdit::NoSection);
+        clearFocus();
     }
 }
