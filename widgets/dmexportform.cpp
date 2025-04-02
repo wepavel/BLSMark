@@ -15,6 +15,7 @@ DMExportForm::DMExportForm(QWidget *parent)
     , ui(new Ui::DMExportForm)
 {
     ui->setupUi(this);
+    ui->dte_date->setFocusPolicy(Qt::NoFocus);
     ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_products));
     httpManager = new HttpManager(this);
     productModel = new ExportProductsModel(this);
@@ -103,7 +104,7 @@ void DMExportForm::exportDmCodes(const QJsonArray& dmCodesArray)
 
     QNetworkReply* reply = httpManager->makeRequestAsync(url,
                                                          QJsonDocument(dmCodesArray),
-                                                         HttpManager::HttpMethod::Get);
+                                                         HttpManager::HttpMethod::Post);
     if (!reply) {
         messagerInst.addMessage("Не удалось выполнить get запрос code-export/export_dmcodes", Error, true);
         return;
