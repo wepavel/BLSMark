@@ -8,7 +8,7 @@
 #include <QFutureWatcher>
 #include <QInputDialog>
 #include "widgets/dminfoform.h"
-#include "sqlmodels/dmcodemodel.h"
+// #include "sqlmodels/dmcodemodel.h"
 #include <core/messager.h>
 
 #define gtinIsNotInDb "false"
