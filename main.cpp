@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     gSettings.loadSettings("/ini/settings.ini");
     styleManager.setTheme(gSettings.getTheme());
     MainWindow w;
-    w.show();
+    w.showMaximized();
 
     return a.exec();
 }
