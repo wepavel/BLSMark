@@ -129,11 +129,15 @@ win32: RC_ICONS = ico/bls_ico.ico
 
 
 # Путь к директории с библиотекой$
-LIBS += -L$$PWD/side_packs/libs/dmtx -ldmtx
+# LIBS += -L$$PWD/side_packs/libs/dmtx -ldmtx
 # Зависимость от статической библиотеки
-PRE_TARGETDEPS += $$PWD/side_packs/libs/dmtx/libdmtx.a
+# PRE_TARGETDEPS += $$PWD/side_packs/libs/dmtx/libdmtx.a
 INCLUDEPATH += $$PWD/side_packs/libs/dmtx
 
+
+LIBS += -L$$PWD
+LIBS += -ldmtx
+# INCLUDEPATH += $$PWD/libs/include
 
 # D:\Qt\6.8.1\mingw_64\bin\lupdate.exe BLSMark.pro
 TRANSLATIONS += bls_mark_ru.ts
