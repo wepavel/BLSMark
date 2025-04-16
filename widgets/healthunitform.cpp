@@ -42,3 +42,13 @@ void HealthUnitForm::setAvailable(const bool available)
         itIsAvailable = false;
     }
 }
+
+bool HealthUnitForm::getItWorks() const
+{
+    return itWorks;
+}
+
+bool HealthUnitForm::getItIsAvailable() const
+{
+    return itIsAvailable;
+}

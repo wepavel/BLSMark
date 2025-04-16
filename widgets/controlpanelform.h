@@ -2,6 +2,7 @@
 #define CONTROLPANELFORM_H
 
 #include "core/httpmanager.h"
+#include "healthcheckform.h"
 #include "qpushbutton.h"
 #include <QWidget>
 
@@ -14,7 +15,7 @@ class ControlPanelForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit ControlPanelForm(QWidget *parent = nullptr);
+    explicit ControlPanelForm(HealthCheckForm* hf, QWidget *parent = nullptr);
     ~ControlPanelForm();
 
     enum SystemState{
@@ -41,6 +42,7 @@ private:
     Ui::ControlPanelForm *ui;
     SystemState currentState = Stopped;
     HttpManager *httpManager;
+    HealthCheckForm* healthForm;
 };
 
 #endif // CONTROLPANELFORM_H

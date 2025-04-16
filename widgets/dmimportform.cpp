@@ -211,6 +211,16 @@ void DMImportForm::on_pb_load_in_db_clicked()
 //-----------------------PRIVATE FUNCS-----------------------
 void DMImportForm::startReadDm(const QString &program, const QStringList &arguments)
 {
+    // Проверяем существование программы
+    QFileInfo programFile(program);
+
+    if (!programFile.exists()) {
+        QMessageBox::critical(this,
+                              tr("Ошибка"),
+                              tr("Программа %1 не найдена!").arg(program));
+        return;
+    }
+
     importModel->clear();
 
     QFuture<void> future = QtConcurrent::run([=]() {

@@ -58,3 +58,27 @@ void HealthCheckForm::setWorks(const QString& unitName, const bool works)
         qDebug() << "Единица не найдена:" << unitName;
     }
 }
+
+QSet<QString> HealthCheckForm::getNotWorkingUnits() const
+{
+    QSet<QString> result = {};
+    foreach (const QString &key, unitsMap.keys()) {
+        HealthUnitForm* unit = unitsMap.value(key);
+        if(!unit->getItWorks()){
+            result.insert(key);
+        }
+    }
+    return result;
+}
+
+QSet<QString> HealthCheckForm::getNotAvailUnits() const
+{
+    QSet<QString> result = {};
+    foreach (const QString &key, unitsMap.keys()) {
+        HealthUnitForm* unit = unitsMap.value(key);
+        if(!unit->getItIsAvailable()){
+            result.insert(key);
+        }
+    }
+    return result;
+}

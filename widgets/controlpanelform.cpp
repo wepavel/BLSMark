@@ -6,11 +6,12 @@
 #include "qmessagebox.h"
 #include "ui_controlpanelform.h"
 
-ControlPanelForm::ControlPanelForm(QWidget *parent)
+ControlPanelForm::ControlPanelForm(HealthCheckForm *hf, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ControlPanelForm)
 {
     ui->setupUi(this);
+    this->healthForm = hf;
     ui->cb_gtin_names->setFocusPolicy(Qt::NoFocus);
     ui->pb_start->setFocusPolicy(Qt::NoFocus);
     ui->pb_clean_history->setFocusPolicy(Qt::NoFocus);
@@ -127,13 +128,39 @@ void ControlPanelForm::serverAvailableChanged(QString devName, bool available)
 
 void ControlPanelForm::on_pb_start_clicked()
 {
-    if(ui->cb_gtin_names->currentText().isEmpty()){
+    bool hasUnavailable = !this->healthForm->getNotAvailUnits().isEmpty();
+    bool hasNotWorking = !this->healthForm->getNotWorkingUnits().isEmpty();
+
+    if (hasUnavailable || hasNotWorking) {
+        QString errorMessage = "Невозможно начать печать!\n";
+
+        if (hasUnavailable && hasNotWorking) {
+            errorMessage += "\nЕсть недоступные устройства:\n• " +
+                            this->healthForm->getNotAvailUnits().values().join("\n• ");
+            errorMessage += "\n\nЕсть неработающие устройства:\n• " +
+                            this->healthForm->getNotWorkingUnits().values().join("\n• ");
+        }
+        else if (hasUnavailable) {
+            errorMessage += "\nЕсть недоступные устройства:\n• " +
+                            this->healthForm->getNotAvailUnits().values().join("\n• ");
+        }
+        else {
+            errorMessage += "\nЕсть неработающие устройства:\n• " +
+                            this->healthForm->getNotWorkingUnits().values().join("\n• ");
+        }
+
+        QMessageBox::critical(this, "Ошибка", errorMessage);
+        return;
+    }
+
+    if (ui->cb_gtin_names->currentText().isEmpty()){
         QMessageBox::warning(this,
                              "Внимание",
                              "Позиция на печать не выбрана, пожалуйста, выберите позицию",
                              QMessageBox::Ok);
         return;
     }
+
     ui->pb_start->setEnabled(false);
     ui->pb_stop->setEnabled(false);
     ui->cb_gtin_names->setEnabled(false);

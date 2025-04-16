@@ -17,6 +17,10 @@ public:
     void setWorking(const bool works);
     void setAvailable(const bool available);
 
+    bool getItWorks() const;
+
+    bool getItIsAvailable() const;
+
 private:
     Ui::HealthUnitForm *ui;
     QString name;
