@@ -4,6 +4,7 @@
 #include <QJsonObject>
 
 #include "qdialog.h"
+#include "qmessagebox.h"
 #include "ui_connectionstateform.h"
 #include "connectionstateform.h"
 #include "ui_components/gtinnamescombobox.h"
@@ -24,7 +25,6 @@ ConnectionStateForm::ConnectionStateForm(QWidget *parent)
 
 ConnectionStateForm::~ConnectionStateForm()
 {
-
     delete mdl;
     delete m_hChecker;
     delete m_tvProducts;
@@ -49,7 +49,20 @@ void ConnectionStateForm::initProductsTable()
     m_tvProducts->setFocusPolicy(Qt::NoFocus);
 
     connect(mdl, &ProductsModel::dataHasBeenAdded, m_tvProducts, &AutoScrollTableView::update);
-    connect(controlPanelWidget->getClearHistoryPbPtr(), &QPushButton::clicked, mdl, &ProductsModel::clear);
+
+    connect(controlPanelWidget->getClearHistoryPbPtr(), &QPushButton::clicked, [this](){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Подтверждение");
+        msgBox.setText("Вы уверены, что хотите очистить коды из таблицы?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setButtonText(QMessageBox::Yes, "Да");
+        msgBox.setButtonText(QMessageBox::No, "Нет");
+
+        if (msgBox.exec() == QMessageBox::Yes) {
+            this->mdl->clear();
+        }
+    });
+
     connect(m_tvProducts, &QTableView::doubleClicked, [this](const QModelIndex &index) {
         if(!index.isValid()){
             return;
@@ -65,7 +78,7 @@ void ConnectionStateForm::initProductsTable()
 
 void ConnectionStateForm::initControlPanel()
 {
-    controlPanelWidget = new ControlPanelForm(this);
+    controlPanelWidget = new ControlPanelForm(this->m_healthCheckForm, this);
     layout()->addWidget(controlPanelWidget);
     // auto hrz_layout = new QHBoxLayout(this);
     // hrz_layout->addWidget(gtin_cb);

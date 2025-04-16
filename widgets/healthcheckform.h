@@ -18,6 +18,9 @@ public:
     void setAvailable(const QString& unitName, const bool available);
     void setWorks(const QString& unitName, const bool works);
 
+    QSet<QString> getNotWorkingUnits() const;
+    QSet<QString> getNotAvailUnits() const;
+
 private:
     Ui::HealthCheckForm *ui;
     QStringList unitsOrder = {"Сервер", "Сканер", "Принтер", "Аппликатор", "База данных"};
