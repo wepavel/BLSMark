@@ -284,40 +284,15 @@ void DMImportForm::setupImportTable()
 
     connect(ui->tw_dm_codes, &DragDropTableView::filesWereDropped, this, &DMImportForm::files_were_dropped);
     connect(ui->tw_dm_codes, &QTableView::doubleClicked, [this](const QModelIndex &index) {
-        // Получаем модель
-        QAbstractItemModel *model = ui->tw_dm_codes->model();
-
-        // Получаем номер строки
-        int row = index.row();
-
-        // Создаем список для хранения значений всех столбцов
-        QStringList rowData;
-
-
-        QModelIndex codeIdx = model->index(row, DMImportModel::CodeColumn);
-        QModelIndex filenameIdx = model->index(row, DMImportModel::FilenameColumn);
-
-        QDialog dialog;
-
-
-        QPixmap pixmap(gSettings.getAppPath() + "/DataMatrixImages/" + getHashForCode(model->data(codeIdx).toString()));
-        QWidget *widget;
-        if (pixmap.isNull()) {
-            // widget = new DMInfoForm(model->data(codeIdx).toString(), QString(), &dialog);
-            widget = new DMInfoForm(model->data(codeIdx).toString(), &dialog);
-        } else {
-            // Использование загруженного изображения
-            // widget = new DMInfoForm(model->data(codeIdx).toString(), pixmap, &dialog);
-            widget = new DMInfoForm(model->data(codeIdx).toString(), &dialog);
+        if(!index.isValid()){
+            return;
         }
-
-        QVBoxLayout *layout = new QVBoxLayout(&dialog);
-        layout->addWidget(widget);
-        dialog.setLayout(layout);
-
-        // Настройка вашего виджета
-
-        int result = dialog.exec();
+        int row = index.row();
+        QModelIndex codeIdx = importModel->index(row, DMImportModel::CodeColumn);
+        QString code = importModel->data(codeIdx).toString();
+        if(code.isEmpty())
+            return;
+        DMInfoForm::showInfoDialog(this, code);
     });
 }
 
@@ -343,7 +318,7 @@ bool DMImportForm::writeImageToDisk(const QString &code, const QString &base64Im
     QString saveDir = gSettings.getAppPath() + "/DataMatrixImages";
     QDir().mkpath(saveDir);
 
-    QString codeHash = getHashForCode(code);
+    QString codeHash = DMInfoForm::getHashForCode(code);
     QString fileName = saveDir + "/" + codeHash + ".png";
     QByteArray imageData = QByteArray::fromBase64(base64Image.toUtf8());
 
@@ -365,11 +340,6 @@ bool DMImportForm::writeImageToDisk(const QString &code, const QString &base64Im
 
     qDebug() << "Image saved successfully to" << fileName;
     return true;
-}
-
-QString DMImportForm::getHashForCode(const QString &code)
-{
-    return QCryptographicHash::hash(code.toUtf8(), QCryptographicHash::Sha256).toHex();
 }
 
 bool DMImportForm::insertGtinInDb(const QString& gtin) {
@@ -424,8 +394,7 @@ void DMImportForm::insertAllGtinsAndDmCodes() {
                                             +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
                 insertGtinSuccess = false;
             } else if (statusCode==-1) {
-                messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
-                                            +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+                messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode), Error, true);
                 insertGtinSuccess = false; // также
             } else {
                 if (QString::fromUtf8(responseData) == "false" && !insertGtinInDb(gtin)) {
@@ -477,8 +446,7 @@ void DMImportForm::insertAllDmCodes() {
                 messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
                                             +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
         } else if (statusCode==-1) {
-            messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode)
-                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            messagerInst.addMessage("Не удалось выполнить запрос! Код ответа: "+QString::number(statusCode), Error, true);
         } else {
             QJsonArray result = ObjectOrArrayFromString(responseData).toJsonArray();
             if (result.isEmpty()) {

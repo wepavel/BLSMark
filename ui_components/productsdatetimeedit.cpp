@@ -59,10 +59,10 @@ ProductsDateTimeEdit::ProductsDateTimeEdit(QWidget* parent):
     QDateTimeEdit(parent)
 {
     m_httpManager = new HttpManager();
-    setCalendarPopup(true);
+
     m_calendar = new ProductsCalendarWidget();
-    m_calendar->installEventFilter(this);
-    setCalendarWidget(m_calendar);
+    connect(m_calendar, &ProductsCalendarWidget::activated, this, &ProductsDateTimeEdit::setDateFromCalendar);
+
     setDateTime(QDateTime::currentDateTime());
     connect(m_calendar, &ProductsCalendarWidget::currentPageChanged, [this](const int year, const int month){
         QDate dt(year, month, 1);
@@ -84,7 +84,6 @@ void ProductsDateTimeEdit::setGetGtinCallback(const std::function<QString ()> &n
 void ProductsDateTimeEdit::setShowExportedCodes(bool newShowExportedCodes)
 {
     showExportedCodes = newShowExportedCodes;
-    //qDebug() << showExportedCodes;
 }
 
 void ProductsDateTimeEdit::getAllDays(const QDate& dt)
@@ -142,16 +141,6 @@ void ProductsDateTimeEdit::setCurrentGtin(const QString &newCurrentGtin)
     currentGtin = newCurrentGtin;
 }
 
-bool ProductsDateTimeEdit::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == m_calendar) {
-        if (event->type() == QEvent::Show) {
-            getAllDays(m_calendar->selectedDate());
-        }
-    }
-    return QDateTimeEdit::eventFilter(watched, event);
-}
-
 void ProductsDateTimeEdit::getAllDaysSlot(const QByteArray &responseData, int statusCode)
 {
     if (statusCode!=200 && statusCode!=-1) {
@@ -160,8 +149,7 @@ void ProductsDateTimeEdit::getAllDaysSlot(const QByteArray &responseData, int st
                                     +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
     } else if (statusCode==-1) {
         messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-gtin-entry-dates! Код ответа: "
-                                    +QString::number(statusCode)
-                                    +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+                                    +QString::number(statusCode), Error, true);
     } else {
         QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
         if(!jsonDoc.isArray()){
@@ -180,17 +168,26 @@ void ProductsDateTimeEdit::getAllDaysSlot(const QByteArray &responseData, int st
     }
 }
 
-void ProductsDateTimeEdit::mousePressEvent(QMouseEvent *event)
-{
-    QStyleOptionSpinBox opt;
-    initStyleOption(&opt);
-    QRect arrowRect = style()->subControlRect(QStyle::CC_SpinBox, &opt,
-                                              QStyle::SC_SpinBoxUp, this);
-    if (arrowRect.contains(event->pos())) {
-        QDateTimeEdit::mousePressEvent(event);
-    } else {
-        event->ignore();
-        setSelectedSection(QDateTimeEdit::NoSection);
-        clearFocus();
+void ProductsDateTimeEdit::showHideCalendar() {
+    if (m_calendar->isVisible()) {
+        m_calendar->hide();
+        return;
     }
+    getAllDays(m_calendar->selectedDate());
+
+    // Получаем позицию QDateTimeEdit в глобальных координатах
+    QPoint globalPos = mapToGlobal(QPoint(0, height()));
+
+    // Устанавливаем позицию и размер календаря
+    m_calendar->setGeometry(globalPos.x(), globalPos.y()+height()+5, 300, 300);
+    m_calendar->show();
+    m_calendar->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    m_calendar->raise();
+    m_calendar->activateWindow();
+}
+
+void ProductsDateTimeEdit::setDateFromCalendar(QDate date)
+{
+    setDate(date);
+    m_calendar->setVisible(false);
 }

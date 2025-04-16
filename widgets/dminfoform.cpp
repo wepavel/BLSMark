@@ -1,4 +1,6 @@
 #include "dminfoform.h"
+#include "core/globalsettings.h"
+#include "qdialog.h"
 #include "ui_dminfoform.h"
 
 #include <QRegularExpression>
@@ -310,5 +312,24 @@ QString DMInfoForm::exportDataMatrix(QString code)
     code.replace("<GS>", QChar(29));
 
     return code;
+}
+
+QString DMInfoForm::getHashForCode(const QString &code)
+{
+    return QCryptographicHash::hash(code.toUtf8(), QCryptographicHash::Sha256).toHex();
+}
+
+void DMInfoForm::showInfoDialog(QWidget *parent, const QString code)
+{
+    QDialog dialog(parent);
+
+    QPixmap pixmap(gSettings.getAppPath() + "/DataMatrixImages/" + DMInfoForm::getHashForCode(code));
+    QWidget *widget = pixmap.isNull() ? new DMInfoForm(code, &dialog) : new DMInfoForm(code, &dialog);
+
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+    layout->addWidget(widget);
+    dialog.setLayout(layout);
+
+    dialog.exec();
 }
 

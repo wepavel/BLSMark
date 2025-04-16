@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
+    <width>677</width>
     <height>327</height>
    </rect>
   </property>
@@ -90,7 +90,49 @@
         <string>dd.MM.yyyy</string>
        </property>
        <property name="calendarPopup">
-        <bool>true</bool>
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_calendar">
+       <property name="maximumSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border: none; /* Без границ по умолчанию */
+}
+
+QPushButton:hover {
+    border: 1px solid #fb9f18; /* Границы появляются при наведении */
+}
+
+QPushButton:pressed {
+    background-color: gray; /* Изменение фона при нажатии */
+} 
+
+QPushButton:focus {
+    color: white;
+    background-color: gray; /* Изменение фона при нажатии */
+}
+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/images/img/calendar.svg</normaloff>:/images/img/calendar.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
        </property>
       </widget>
      </item>

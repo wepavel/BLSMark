@@ -104,8 +104,7 @@ void GtinNamesComboBox::getAllGtinsNamesSlot(const QByteArray &responseData, int
                                     +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
     } else if (statusCode==-1) {
         messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
-                                    +QString::number(statusCode)
-                                    +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+                                    +QString::number(statusCode), Error, true);
     } else {
 
         QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);

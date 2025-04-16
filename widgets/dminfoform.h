@@ -1,6 +1,7 @@
 #ifndef DMINFOFORM_H
 #define DMINFOFORM_H
 
+#include "qcryptographichash.h"
 #include <QWidget>
 
 
@@ -72,6 +73,8 @@ public:
     static QPixmap generateDataMatrix(const QString& data, int size);
     static QString prepareDataMatrix(const QString &code);
     static QString exportDataMatrix(QString code);
+    static QString getHashForCode(const QString &code);
+    static void showInfoDialog(QWidget* parent, const QString code);
 
 private:
     Ui::DMInfoForm *ui;

@@ -18,6 +18,7 @@
         <file>img/stop.svg</file>
         <file>img/play.svg</file>
         <file>img/refresh.svg</file>
+        <file>img/calendar.svg</file>
     </qresource>
     <qresource prefix="/qss_icons">
         <file>styles/qdarkstyle/rc/branch_closed.png</file>
