@@ -3,9 +3,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+#include "qdialog.h"
 #include "ui_connectionstateform.h"
 #include "connectionstateform.h"
 #include "ui_components/gtinnamescombobox.h"
+#include "widgets/dminfoform.h"
 
 ConnectionStateForm::ConnectionStateForm(QWidget *parent)
     : QWidget(parent)
@@ -47,6 +49,18 @@ void ConnectionStateForm::initProductsTable()
     m_tvProducts->setFocusPolicy(Qt::NoFocus);
 
     connect(mdl, &ProductsModel::dataHasBeenAdded, m_tvProducts, &AutoScrollTableView::update);
+    connect(controlPanelWidget->getClearHistoryPbPtr(), &QPushButton::clicked, mdl, &ProductsModel::clear);
+    connect(m_tvProducts, &QTableView::doubleClicked, [this](const QModelIndex &index) {
+        if(!index.isValid()){
+            return;
+        }
+        int row = index.row();
+        QModelIndex codeIdx = mdl->index(row, ProductsModel::CodeColumn);
+        QString code = mdl->data(codeIdx, Qt::DisplayRole).toString();
+        if(code.isEmpty())
+            return;
+        DMInfoForm::showInfoDialog(this, code);
+    });
 }
 
 void ConnectionStateForm::initControlPanel()

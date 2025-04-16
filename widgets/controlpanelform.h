@@ -2,6 +2,7 @@
 #define CONTROLPANELFORM_H
 
 #include "core/httpmanager.h"
+#include "qpushbutton.h"
 #include <QWidget>
 
 namespace Ui {
@@ -25,6 +26,7 @@ public:
     void setSystemState(const SystemState& state);
     void setCurrentProduct(const QString& product);
     void setControlPanelActive(const bool& active);
+    QPushButton* getClearHistoryPbPtr();
 
 public slots:
     void processWsData(const QJsonObject& data);

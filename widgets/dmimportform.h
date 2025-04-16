@@ -70,7 +70,6 @@ private:
     void showBigAmountWarning();
     QString getFileNameFromPath(const QString& filePath);
     static bool writeImageToDisk(const QString &code, const QString &base64Image);
-    static QString getHashForCode(const QString &code);
     bool insertGtinInDb(const QString& gtin);
     void insertAllGtinsAndDmCodes();
     void insertAllDmCodes();

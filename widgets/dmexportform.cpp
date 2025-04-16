@@ -8,6 +8,8 @@
 #include <QMessageBox>
 #include "dmexportform.h"
 #include "core/messager.h"
+#include "dminfoform.h"
+#include "qevent.h"
 #include "ui_dmexportform.h"
 
 DMExportForm::DMExportForm(QWidget *parent)
@@ -15,12 +17,9 @@ DMExportForm::DMExportForm(QWidget *parent)
     , ui(new Ui::DMExportForm)
 {
     ui->setupUi(this);
-    ui->dte_date->setFocusPolicy(Qt::NoFocus);
     ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_products));
     httpManager = new HttpManager(this);
-    productModel = new ExportProductsModel(this);
-    ui->tv_products->setModel(productModel);
-    ui->tv_products->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    initProductTable();
 }
 
 DMExportForm::~DMExportForm()
@@ -97,6 +96,23 @@ QVariant DMExportForm::ObjectOrArrayFromString(const QString& in)
     return result;
 }
 
+void DMExportForm::initProductTable()
+{
+    productModel = new ExportProductsModel(this);
+    ui->tv_products->setModel(productModel);
+    ui->tv_products->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    connect(ui->tv_products, &QTableView::doubleClicked, [this](const QModelIndex &index) {
+        if(!index.isValid()){
+            return;
+        }
+        int row = index.row();
+        QModelIndex codeIdx = productModel->index(row, ExportProductsModel::CodeColumn);
+        QString code = productModel->data(codeIdx, Qt::DisplayRole).toString();
+        if(code.isEmpty())
+            return;
+        DMInfoForm::showInfoDialog(this, code);
+    });
+}
 
 void DMExportForm::exportDmCodes(const QJsonArray& dmCodesArray)
 {
@@ -182,5 +198,10 @@ void DMExportForm::on_pb_load_in_csv_clicked()
 void DMExportForm::on_chb_exported_stateChanged(int checked)
 {
     ui->dte_date->setShowExportedCodes(checked);
+}
+
+void DMExportForm::on_pb_calendar_clicked()
+{
+    ui->dte_date->showHideCalendar();
 }
 

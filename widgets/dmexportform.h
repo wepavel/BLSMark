@@ -24,6 +24,8 @@ private slots:
 
     void on_chb_exported_stateChanged(int checked);
 
+    void on_pb_calendar_clicked();
+
 private:
     Ui::DMExportForm *ui;
     HttpManager* httpManager;
@@ -35,6 +37,7 @@ private:
     void fillProductsTable(const QByteArray &responseData, int statusCode);
     void exportDmCodes(const QJsonArray& dmCodesArray);
     QVariant ObjectOrArrayFromString(const QString& in);
+    void initProductTable();
 };
 
 #endif // DMEXPORTFORM_H

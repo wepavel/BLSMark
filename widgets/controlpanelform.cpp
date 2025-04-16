@@ -13,6 +13,7 @@ ControlPanelForm::ControlPanelForm(QWidget *parent)
     ui->setupUi(this);
     ui->cb_gtin_names->setFocusPolicy(Qt::NoFocus);
     ui->pb_start->setFocusPolicy(Qt::NoFocus);
+    ui->pb_clean_history->setFocusPolicy(Qt::NoFocus);
     setSystemState(Stopped);
     httpManager = new HttpManager(this);
 }
@@ -75,6 +76,11 @@ void ControlPanelForm::setControlPanelActive(const bool &active)
         setCurrentProduct("");
         setProductsLeftCount(0);
     }
+}
+
+QPushButton *ControlPanelForm::getClearHistoryPbPtr()
+{
+    return ui->pb_clean_history;
 }
 
 void ControlPanelForm::processWsData(const QJsonObject &data)
@@ -140,8 +146,7 @@ void ControlPanelForm::on_pb_start_clicked()
             ui->pb_start->setEnabled(true);
             ui->pb_stop->setEnabled(true);
         } else if (statusCode==-1) {
-            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: "+QString::number(statusCode)
-                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: "+QString::number(statusCode), Error, true);
             ui->pb_start->setEnabled(true);
             ui->pb_stop->setEnabled(true);
         } else {
@@ -165,8 +170,8 @@ void ControlPanelForm::on_pb_stop_clicked()
             ui->pb_stop->setEnabled(true);
             ui->pb_start->setEnabled(true);
         } else if (statusCode==-1) {
-            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-stop/! Код ответа: "+QString::number(statusCode)
-                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-stop/! Код ответа: "
+                                        +QString::number(statusCode), Error, true);
             ui->pb_stop->setEnabled(true);
             ui->pb_start->setEnabled(true);
         } else {
