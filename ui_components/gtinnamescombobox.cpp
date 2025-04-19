@@ -31,28 +31,37 @@ void GtinNamesComboBox::updateNames()
     }
 
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-        if (reply->error() != QNetworkReply::NoError) {
-            messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins!", Error, true);
+        int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).isValid()
+        ? reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt()
+        : -1;
+
+        if (reply->error() != QNetworkReply::NoError || statusCode != 200) {
+            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1")
+                                        .arg(statusCode), Error, true);
             reply->deleteLater();
             return;
         }
 
-        QByteArray responseData = reply->readAll();
-        int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        auto message = QString("");
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(reply->readAll());
+        if (!jsonDoc.isNull() && jsonDoc.isObject()) {
+            QJsonObject jsonObj = jsonDoc.object();
+            message = jsonObj.value("msg").toString();
+        }
 
         if (statusCode != 200) {
-            messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
-                                        +QString::number(statusCode)
-                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1\nСообщение: %2")
+                                        .arg(statusCode)
+                                        .arg(message), Error, true);
             reply->deleteLater();
             return;
         }
 
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-        if(!jsonDoc.isArray()){
-            qDebug() << "JSON is not an array!";
-            return;
-        }
+        // QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+        // if(!jsonDoc.isArray()){
+        //     qDebug() << "JSON is not an array!";
+        //     return;
+        // }
 
         QJsonArray jsonArray = jsonDoc.array();
 
