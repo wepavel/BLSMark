@@ -31,46 +31,61 @@ DMExportForm::~DMExportForm()
 
 void DMExportForm::on_pb_search_clicked()
 {
-    productModel->clear();
+    if (ui->cb_products->currentText().isEmpty()) {
+        QMessageBox::warning(this,
+                             "Внимание",
+                             "Позиция на экспорт не выбрана, пожалуйста, выберите позицию",
+                             QMessageBox::Ok);
+        return;
+    }
+
     QUrl url = HttpManager::createApiUrl(QString("code-export/get-gtin-dmcodes-by-date/%1/%2/%3")
                                              .arg(ui->chb_exported->isChecked())
                                              .arg(ui->cb_products->getGtin())
                                              .arg(ui->dte_date->date().toString("yyyy_MM_dd")));
+
     ui->pb_search->setEnabled(false);
-    httpManager->makeRequest(url,
-                             QJsonDocument(),
-                             HttpManager::HttpMethod::Get,
-                             std::bind(&DMExportForm::fillProductsTable, this, std::placeholders::_1, std::placeholders::_2));
-    ui->pb_search->setEnabled(true);
+    httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Get,
+                             [&](const QByteArray& responseData, int statusCode) {
+                                 if (statusCode == 200) {
+                                     fillProductsTable(responseData);
+                                 } else {
+                                     auto message = QString("");
+                                     QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+                                     if (!jsonDoc.isNull() && jsonDoc.isObject()) {
+                                         QJsonObject jsonObj = jsonDoc.object();
+                                         message = jsonObj.value("msg").toString();
+                                     }
+                                     messagerInst.addMessage(QString("Не удалось выполнить запрос code-export/get-gtin-dmcodes-by-date/! Код ответа: %1\nСообщение: %2")
+                                                                 .arg(statusCode)
+                                                                 .arg(message), Error, true);
+                                 }
+                                 ui->pb_search->setEnabled(true);
+                             });
 }
 
-void DMExportForm::fillProductsTable(const QByteArray &responseData, int statusCode)
+void DMExportForm::fillProductsTable(const QByteArray &responseData)
 {
-    if (statusCode!=200 && statusCode!=-1) {
-        messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
-                                    +QString::number(statusCode)
-                                    +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
-    } else if (statusCode==-1) {
-        messagerInst.addMessage("Не удалось выполнить запрос api/v1/code-export/get-all-gtins! Код ответа: "
-                                    +QString::number(statusCode), Error, true);
-    } else {
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-        if(!jsonDoc.isArray()){
-            qDebug() << "JSON is not an array!";
-            return;
-        }
-        QJsonArray jsonArray = jsonDoc.array();
-        if(jsonArray.isEmpty()){
-            QMessageBox::warning(this, tr("Внимание"), tr("Товары за указанную дату не найдены!"));
-            return;
-        }
-        for (const QJsonValue &value : jsonArray) {
-            auto obj = value.toObject();
-            productModel->addRow(obj["dm_code"].toString(), obj["product_name"].toString());
-        }
-        this->choosenName=ui->cb_products->currentText();
-        this->choosenDate=ui->dte_date->date().toString("yyyy_MM_dd");
+    productModel->clear();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+    if (!jsonDoc.isArray()) {
+        qDebug() << "JSON is not an array!";
+        return;
     }
+
+    QJsonArray jsonArray = jsonDoc.array();
+    if (jsonArray.isEmpty()) {
+        QMessageBox::warning(this, tr("Внимание"), tr("Товары за указанную дату не найдены!"));
+        return;
+    }
+
+    for (const QJsonValue &value : jsonArray) {
+        auto obj = value.toObject();
+        productModel->addRow(obj["dm_code"].toString(), obj["product_name"].toString());
+    }
+
+    this->choosenName = ui->cb_products->currentText();
+    this->choosenDate = ui->dte_date->date().toString("yyyy_MM_dd");
 }
 
 QVariant DMExportForm::ObjectOrArrayFromString(const QString& in)

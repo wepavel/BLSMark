@@ -34,7 +34,7 @@ private:
     QString choosenDate="";
     QString choosenName="";
 
-    void fillProductsTable(const QByteArray &responseData, int statusCode);
+    void fillProductsTable(const QByteArray &responseData);
     void exportDmCodes(const QJsonArray& dmCodesArray);
     QVariant ObjectOrArrayFromString(const QString& in);
     void initProductTable();

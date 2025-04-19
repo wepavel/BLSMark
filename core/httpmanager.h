@@ -35,7 +35,7 @@ public:
     static QUrl createApiUrl(const QString &path);
 
 signals:
-    void requestError(const QString& err);
+    void requestError(const QString &errorMessage);
 
 private slots:
     void onReplyFinished();

@@ -4,6 +4,7 @@
 #include "qnetworkreply.h"
 
 #include <QTimer>
+#include <QJsonObject>
 
 #define HTTP_REQUEST_TIMEOUT 3000
 
@@ -23,16 +24,12 @@ void HttpManager::makeRequest(const QUrl &url,
 
     switch (method) {
     case HttpMethod::Get:
-    {
         reply = get(request);
         break;
-    }
     case HttpMethod::Post:
-    {
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
         reply = post(request, jsonDoc.toJson());
         break;
-    }
     default:
         emit requestError("Unknown HTTP method");
         callback(QByteArray(), -1);
@@ -42,38 +39,34 @@ void HttpManager::makeRequest(const QUrl &url,
     QTimer timer;
     QEventLoop loop;
 
-    // Устанавливаем таймер на 5 секунд (можно изменить по необходимости)
     timer.setSingleShot(true);
     timer.setInterval(HTTP_REQUEST_TIMEOUT);
 
-    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    QObject::connect(&timer, &QTimer::timeout, [&]() {
+        if (reply->isRunning()) {
+            reply->abort();
+            emit requestError("Connection timeout");
+            callback(QByteArray(), -1);
+        }
+        loop.quit();
+    });
+
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
 
     timer.start();
     loop.exec();
 
-    int statusCode = -1;
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).isValid()
+                         ? reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt()
+                         : -1;
 
-    if (timer.isActive()) {
-        // Ответ получен вовремя
-        timer.stop();
+    QByteArray responseData = reply->readAll();
 
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray responseData = reply->readAll();
-            statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-            callback(responseData, statusCode);
-        } else {
-            emit requestError(reply->errorString());
-            statusCode = -1;
-            callback(QByteArray(), statusCode);
-        }
+    if (reply->error() == QNetworkReply::NoError) {
+        callback(responseData, statusCode);
     } else {
-        // Таймаут - нет подключения
-        disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-        reply->abort();
-        emit requestError("Connection timeout");
-        statusCode = -1;
-        callback(QByteArray(), statusCode);
+        emit requestError(reply->errorString());
+        callback(responseData, statusCode);
     }
 
     reply->deleteLater();
@@ -100,34 +93,62 @@ QNetworkReply* HttpManager::makeRequestAsync(const QUrl &url,
     }
 
     if (reply) {
-        QTimer *timer = new QTimer(reply); // Таймер принадлежит reply
+        QTimer *timer = new QTimer(reply);
         timer->setSingleShot(true);
         timer->setInterval(HTTP_REQUEST_TIMEOUT);
         timer->start();
 
-        connect(timer, &QTimer::timeout, this, &HttpManager::onAsyncTimeout);
+        connect(timer, &QTimer::timeout, [=]() {
+            if (reply->isRunning()) {
+                reply->abort();
+                emit requestError("Async request timeout");
+            }
+            reply->deleteLater();
+            timer->deleteLater();
+        });
+
         connect(reply, &QNetworkReply::finished, [timer]() { timer->stop(); });
         connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred), [timer]() { timer->stop(); });
 
-        reply->setProperty("timer", QVariant::fromValue(timer)); // Сохраняем таймер в reply
+        reply->setProperty("timer", QVariant::fromValue(timer));
     }
 
     return reply;
 }
 
 
+// void HttpManager::onReplyFinished()
+// {
+//     timeoutTimer->stop();
+
+//     if (!currentReply) return;
+
+//     int statusCode = currentReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+//     if (currentReply->error() == QNetworkReply::NoError) {
+//         currentCallback(currentReply->readAll(), statusCode);
+//     } else {
+//         emit requestError(currentReply->errorString());
+//         currentCallback(QByteArray(), -1);
+//     }
+
+//     currentReply->deleteLater();
+//     currentReply = nullptr;
+//     currentCallback = nullptr;
+// }
+
 void HttpManager::onReplyFinished()
 {
     timeoutTimer->stop();
-
     if (!currentReply) return;
 
     int statusCode = currentReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QByteArray responseData = currentReply->readAll();  // Читаем тело ответа всегда
+
     if (currentReply->error() == QNetworkReply::NoError) {
-        currentCallback(currentReply->readAll(), statusCode);
+        currentCallback(responseData, statusCode);
     } else {
         emit requestError(currentReply->errorString());
-        currentCallback(QByteArray(), -1);
+        currentCallback(responseData, statusCode); // Передаём тело даже при ошибке
     }
 
     currentReply->deleteLater();
@@ -139,6 +160,7 @@ void HttpManager::onReplyErrorOccurred(QNetworkReply::NetworkError error)
 {
     Q_UNUSED(error);
     timeoutTimer->stop();
+    if (!currentReply) return;
     emit requestError(currentReply->errorString());
     currentCallback(QByteArray(), -1);
     currentReply->deleteLater();
@@ -158,22 +180,35 @@ void HttpManager::onReplyErrorOccurred(QNetworkReply::NetworkError error)
 //     }
 // }
 
+// void HttpManager::onAsyncTimeout()
+// {
+//     QTimer *timer = qobject_cast<QTimer*>(sender());
+//     if (timer) {
+//         QNetworkReply *reply = qobject_cast<QNetworkReply*>(timer->parent());
+//         if (reply) {
+//             if (reply->isRunning()) {
+//                 reply->abort();
+//                 emit requestError("Async request timeout");
+//             }
+//             reply->deleteLater();
+//         }
+//         timer->deleteLater();
+//     }
+// }
 void HttpManager::onAsyncTimeout()
 {
     QTimer *timer = qobject_cast<QTimer*>(sender());
-    if (timer) {
-        QNetworkReply *reply = qobject_cast<QNetworkReply*>(timer->parent());
-        if (reply) {
-            if (reply->isRunning()) {
-                reply->abort();
-                emit requestError("Async request timeout");
-            }
-            reply->deleteLater();
-        }
-        timer->deleteLater();
-    }
-}
+    if (!timer) return; // Проверяем, что таймер существует
 
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(timer->parent());
+    if (reply && reply->isRunning()) {
+        reply->abort();
+        emit requestError("Async request timeout");
+    }
+
+    if (reply) reply->deleteLater(); // Удаляем reply
+    timer->deleteLater(); // Теперь таймер тоже удалится
+}
 //-------------------------------CREATE URL-----------------------------------
 QUrl HttpManager::createApiUrl(const QString &path)
 {

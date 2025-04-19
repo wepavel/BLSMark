@@ -128,36 +128,26 @@ void ControlPanelForm::serverAvailableChanged(QString devName, bool available)
 
 void ControlPanelForm::on_pb_start_clicked()
 {
-    bool hasUnavailable = !this->healthForm->getNotAvailUnits().isEmpty();
-    bool hasNotWorking = !this->healthForm->getNotWorkingUnits().isEmpty();
-
-    if (hasUnavailable || hasNotWorking) {
-        QString errorMessage = "Невозможно начать печать!\n";
-
-        if (hasUnavailable && hasNotWorking) {
-            errorMessage += "\nЕсть недоступные устройства:\n• " +
-                            this->healthForm->getNotAvailUnits().values().join("\n• ");
-            errorMessage += "\n\nЕсть неработающие устройства:\n• " +
-                            this->healthForm->getNotWorkingUnits().values().join("\n• ");
-        }
-        else if (hasUnavailable) {
-            errorMessage += "\nЕсть недоступные устройства:\n• " +
-                            this->healthForm->getNotAvailUnits().values().join("\n• ");
-        }
-        else {
-            errorMessage += "\nЕсть неработающие устройства:\n• " +
-                            this->healthForm->getNotWorkingUnits().values().join("\n• ");
-        }
-
-        QMessageBox::critical(this, "Ошибка", errorMessage);
-        return;
-    }
-
     if (ui->cb_gtin_names->currentText().isEmpty()){
         QMessageBox::warning(this,
                              "Внимание",
                              "Позиция на печать не выбрана, пожалуйста, выберите позицию",
                              QMessageBox::Ok);
+        return;
+    }
+
+    bool hasUnavailable = !this->healthForm->getNotAvailUnits().isEmpty();
+    bool hasNotWorking = !this->healthForm->getNotWorkingUnits().isEmpty();
+
+    if (hasUnavailable || hasNotWorking) {
+        QStringList issues;
+
+        if (hasUnavailable)
+            issues << "Есть недоступные устройства:\n• " + this->healthForm->getNotAvailUnits().values().join("\n• ");
+        if (hasNotWorking)
+            issues << "Есть неработающие устройства:\n• " + this->healthForm->getNotWorkingUnits().values().join("\n• ");
+
+        QMessageBox::critical(this, "Ошибка", "Невозможно начать печать!\n\n" + issues.join("\n\n"));
         return;
     }
 
@@ -168,12 +158,21 @@ void ControlPanelForm::on_pb_start_clicked()
                                              .arg(ui->cb_gtin_names->getGtin()));
     httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
         if (statusCode!=200 && statusCode!=-1) {
-            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: "+QString::number(statusCode)
-                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            // Преобразование ответа в JSON
+            auto message = QString("");
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+            if (!jsonDoc.isNull() && jsonDoc.isObject()) {
+                QJsonObject jsonObj = jsonDoc.object();
+                message = jsonObj.value("msg").toString();
+            }
+            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1\nСообщение: %2")
+                                        .arg(statusCode)
+                                        .arg(message), Error, true);
             ui->pb_start->setEnabled(true);
             ui->pb_stop->setEnabled(true);
         } else if (statusCode==-1) {
-            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: "+QString::number(statusCode), Error, true);
+            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1")
+                                        .arg(statusCode), Error, true);
             ui->pb_start->setEnabled(true);
             ui->pb_stop->setEnabled(true);
         } else {
@@ -192,13 +191,21 @@ void ControlPanelForm::on_pb_stop_clicked()
     QUrl url = HttpManager::createApiUrl(QString("code-process/set-system-stop"));
     httpManager->makeRequest(url, QJsonDocument(), HttpManager::HttpMethod::Post, [&](const QByteArray& responseData, int statusCode){
         if (statusCode!=200 && statusCode!=-1) {
-            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-stop/! Код ответа: "+QString::number(statusCode)
-                                        +"\n Тело ответа: "+QString::fromUtf8(responseData), Error, true);
+            // Преобразование ответа в JSON
+            auto message = QString("");
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+            if (!jsonDoc.isNull() && jsonDoc.isObject()) {
+                QJsonObject jsonObj = jsonDoc.object();
+                message = jsonObj.value("msg").toString();
+            }
+            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1\nСообщение: %2")
+                                        .arg(statusCode)
+                                        .arg(message), Error, true);
             ui->pb_stop->setEnabled(true);
             ui->pb_start->setEnabled(true);
         } else if (statusCode==-1) {
-            messagerInst.addMessage("Не удалось выполнить запрос code-process/set-system-stop/! Код ответа: "
-                                        +QString::number(statusCode), Error, true);
+            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1")
+                                        .arg(statusCode), Error, true);
             ui->pb_stop->setEnabled(true);
             ui->pb_start->setEnabled(true);
         } else {
