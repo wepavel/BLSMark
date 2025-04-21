@@ -36,7 +36,7 @@ void GtinNamesComboBox::updateNames()
         : -1;
 
         if (reply->error() != QNetworkReply::NoError || statusCode != 200) {
-            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1")
+            messagerInst.addMessage(QString("Не удалось выполнить запрос api/v1/code-export/get-all-gtins!! Код ответа: %1")
                                         .arg(statusCode), Error, true);
             reply->deleteLater();
             return;
@@ -50,7 +50,7 @@ void GtinNamesComboBox::updateNames()
         }
 
         if (statusCode != 200) {
-            messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1\nСообщение: %2")
+            messagerInst.addMessage(QString("Не удалось выполнить запрос api/v1/code-export/get-all-gtins!Код ответа: %1\nСообщение: %2")
                                         .arg(statusCode)
                                         .arg(message), Error, true);
             reply->deleteLater();
