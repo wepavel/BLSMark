@@ -28,7 +28,7 @@ public:
 
     // QObject interface
 public:
-    // bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event);
 
     void getAllDays(const QDate& dt);
 
@@ -37,8 +37,6 @@ public:
     void setGetGtinCallback(const std::function<QString ()> &newCallback);
 
     void setShowExportedCodes(bool newShowExportedCodes);
-
-    void showHideCalendar();
 
 private:
     ProductsCalendarWidget* m_calendar;
@@ -50,11 +48,10 @@ private:
     QString getGtin(){return getGtinCallback();};
 
     void getAllDaysSlot(const QByteArray &responseData, int statusCode);
-    void setDateFromCalendar(QDate date);
 
-//     // QWidget interface
-// protected:
-//     void mousePressEvent(QMouseEvent *event);
+    // QWidget interface
+protected:
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // PRODUCTSDATETIMEEDIT_H

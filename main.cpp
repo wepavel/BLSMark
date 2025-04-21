@@ -19,8 +19,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-
-
     gSettings.loadSettings("/ini/settings.ini");
     styleManager.setTheme(gSettings.getTheme());
     MainWindow w;

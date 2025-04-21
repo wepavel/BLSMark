@@ -24,8 +24,6 @@ private slots:
 
     void on_chb_exported_stateChanged(int checked);
 
-    void on_pb_calendar_clicked();
-
 private:
     Ui::DMExportForm *ui;
     HttpManager* httpManager;

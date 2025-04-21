@@ -215,8 +215,3 @@ void DMExportForm::on_chb_exported_stateChanged(int checked)
     ui->dte_date->setShowExportedCodes(checked);
 }
 
-void DMExportForm::on_pb_calendar_clicked()
-{
-    ui->dte_date->showHideCalendar();
-}
-

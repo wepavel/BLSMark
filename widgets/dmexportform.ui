@@ -90,49 +90,7 @@
         <string>dd.MM.yyyy</string>
        </property>
        <property name="calendarPopup">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pb_calendar">
-       <property name="maximumSize">
-        <size>
-         <width>25</width>
-         <height>25</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-    border: none; /* Без границ по умолчанию */
-}
-
-QPushButton:hover {
-    border: 1px solid #fb9f18; /* Границы появляются при наведении */
-}
-
-QPushButton:pressed {
-    background-color: gray; /* Изменение фона при нажатии */
-} 
-
-QPushButton:focus {
-    color: white;
-    background-color: gray; /* Изменение фона при нажатии */
-}
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources.qrc">
-         <normaloff>:/images/img/calendar.svg</normaloff>:/images/img/calendar.svg</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
