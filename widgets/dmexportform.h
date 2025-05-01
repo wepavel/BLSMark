@@ -24,6 +24,8 @@ private slots:
 
     void on_chb_exported_stateChanged(int checked);
 
+    void on_pb_load_in_xlsx_clicked();
+
 private:
     Ui::DMExportForm *ui;
     HttpManager* httpManager;
@@ -36,6 +38,7 @@ private:
     void exportDmCodes(const QJsonArray& dmCodesArray);
     QVariant ObjectOrArrayFromString(const QString& in);
     void initProductTable();
+    QPair<bool, QString> saveFile(const QString &extension, const std::function<QPair<bool, QString>(const QString&)> &saveFunction);
 };
 
 #endif // DMEXPORTFORM_H

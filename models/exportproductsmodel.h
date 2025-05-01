@@ -34,6 +34,8 @@ public:
     void addRow(const QString &code,
                 const QString &productName);
     QPair<bool, QString> saveToCsv(const QString& fullPath);
+    QPair<bool, QString> saveToXlsx(const QString &fullPath);
+
     void clear();
 };
 

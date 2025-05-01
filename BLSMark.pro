@@ -133,9 +133,13 @@ win32: RC_ICONS = ico/bls_ico.ico
 # Зависимость от статической библиотеки
 # PRE_TARGETDEPS += $$PWD/side_packs/libs/dmtx/libdmtx.a
 INCLUDEPATH += $$PWD/side_packs/libs/dmtx
+INCLUDEPATH += $$PWD/include/qxlsx
 
+# Папка, где лежат скомпилированные библиотеки
+LIBS += -L$$PWD/libs
 
-LIBS += -L$$PWD
+# Подключаем библиотеки
+LIBS += -lQXlsx
 LIBS += -ldmtx
 # INCLUDEPATH += $$PWD/libs/include
 
