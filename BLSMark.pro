@@ -133,13 +133,18 @@ win32: RC_ICONS = ico/bls_ico.ico
 # Зависимость от статической библиотеки
 # PRE_TARGETDEPS += $$PWD/side_packs/libs/dmtx/libdmtx.a
 INCLUDEPATH += $$PWD/side_packs/libs/dmtx
-INCLUDEPATH += $$PWD/include/qxlsx
+# QXlsx code for Application Qt project
+QXLSX_PARENTPATH=$$PWD/QXlsx/QXlsx         # current QXlsx path is . (. means curret directory)
+QXLSX_HEADERPATH=$$PWD/QXlsx/QXlsx/header/  # current QXlsx header path is ./header/
+QXLSX_SOURCEPATH=$$PWD/QXlsx/QXlsx/source/  # current QXlsx source path is ./source/
+include($$PWD/QXlsx/QXlsx/QXlsx.pri)
+# INCLUDEPATH += $$PWD/include/qxlsx
 
 # Папка, где лежат скомпилированные библиотеки
 LIBS += -L$$PWD/libs
 
 # Подключаем библиотеки
-LIBS += -lQXlsx
+# LIBS += -lQXlsx
 LIBS += -ldmtx
 # INCLUDEPATH += $$PWD/libs/include
 
