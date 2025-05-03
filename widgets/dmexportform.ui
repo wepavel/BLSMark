@@ -124,11 +124,22 @@ QPushButton:hover {
     <widget class="QTableView" name="tv_products"/>
    </item>
    <item>
-    <widget class="QPushButton" name="pb_load_in_csv">
-     <property name="text">
-      <string>Вывести таблицу в .csv файл</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="pb_load_in_csv">
+       <property name="text">
+        <string>Вывести таблицу в .csv файл</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_load_in_xlsx">
+       <property name="text">
+        <string>Вывести таблицу в .xlsx файл</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -6,6 +6,7 @@
 #include "core/messager.h"
 #include "qbrush.h"
 #include "qdatetime.h"
+#include "xlsxdocument.h"
 
 #include <qfile.h>
 
@@ -112,6 +113,31 @@ QPair<bool, QString> ExportProductsModel::saveToCsv(const QString &fullPath)
     file.close();
 
     return QPair<bool, QString>(true,"");
+}
+
+QPair<bool, QString> ExportProductsModel::saveToXlsx(const QString &fullPath)
+{
+    QXlsx::Document xlsx;  // Создаем объект для работы с Excel
+
+    // Добавляем данные в таблицу
+    for (int rowIndex = 0; rowIndex < m_data.size(); ++rowIndex) {
+        const RowData &row = m_data[rowIndex];
+
+        // Преобразуем код в формат, подходящий для XLSX
+        QString code = DMInfoForm::exportDataMatrix(row.code);
+
+        // Записываем в ячейку (нумерация строк и столбцов с 1)
+        xlsx.write(rowIndex + 1, 1, code);  // Записываем в ячейку (rowIndex + 1, 1) (столбец A)
+    }
+
+    // Сохраняем файл
+    bool saved = xlsx.saveAs(fullPath);
+    if (!saved) {
+        messagerInst.addMessage("Не удалось сохранить файл: " + fullPath, Error);
+        return QPair<bool, QString>(false, "Не удалось сохранить файл: " + fullPath);
+    }
+
+    return QPair<bool, QString>(true, "");
 }
 
 void ExportProductsModel::clear()

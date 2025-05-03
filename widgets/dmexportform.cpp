@@ -20,6 +20,11 @@ DMExportForm::DMExportForm(QWidget *parent)
     ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_products));
     httpManager = new HttpManager(this);
     initProductTable();
+    productModel->addRow("code", "name");
+    productModel->addRow("code1", "name1");
+    productModel->addRow("code2", "name2");
+    productModel->addRow("code3", "name3");
+    productModel->addRow("code4", "name4");
 }
 
 DMExportForm::~DMExportForm()
@@ -182,28 +187,11 @@ void DMExportForm::exportDmCodes(const QJsonArray& dmCodesArray)
 
 void DMExportForm::on_pb_load_in_csv_clicked()
 {
-    if(productModel->isEmpty()){
-        QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
-        return;
-    }
-    // Открываем диалог выбора папки
-    QString fileName = choosenDate+"_"+choosenName.trimmed().replace(" ","_")+".csv";
-    QString directory = QFileDialog::getExistingDirectory(this, tr("Выберите папку для сохранения файла ")+fileName,
-                                                          QDir::homePath());
-
-    // Проверяем, выбрал ли пользователь папку
-    if (directory.isEmpty()) {
-        QMessageBox::warning(this, tr("Ошибка"), tr("Не выбрана папка для сохранения!"));
-        return;
-    }
-
-    QString filePath = directory + "/" + fileName;
-
-    auto res = productModel->saveToCsv(filePath);
-
+    auto res = saveFile("csv", [this](const QString &filePath) {
+        return productModel->saveToCsv(filePath);
+    });
 
     if (res.first) {
-        //QMessageBox::information(this, tr("Успех"), tr("Файл ") + filePath + tr(" успешно сохранен."));
         exportDmCodes(productModel->getDmCodesArray());
     } else {
         QMessageBox::critical(this, tr("Ошибка"), res.second);
@@ -214,4 +202,42 @@ void DMExportForm::on_chb_exported_stateChanged(int checked)
 {
     ui->dte_date->setShowExportedCodes(checked);
 }
+
+
+void DMExportForm::on_pb_load_in_xlsx_clicked()
+{
+    auto res = saveFile("xlsx", [this](const QString &filePath) {
+        return productModel->saveToXlsx(filePath);
+    });
+
+    if (res.first) {
+        exportDmCodes(productModel->getDmCodesArray());
+    } else {
+        QMessageBox::critical(this, tr("Ошибка"), res.second);
+    }
+}
+
+QPair<bool, QString> DMExportForm::saveFile(const QString &extension, const std::function<QPair<bool, QString>(const QString&)> &saveFunction)
+{
+    if (productModel->isEmpty()) {
+        QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
+        return QPair<bool, QString>(false, tr("Отсутсвуют данные для выгрузки"));
+    }
+
+    // Открываем диалог выбора папки
+    QString fileName = choosenDate + "_" + choosenName.trimmed().replace(" ", "_") + "." + extension;
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Выберите папку для сохранения файла ") + fileName, QDir::homePath());
+
+    // Проверяем, выбрал ли пользователь папку
+    if (directory.isEmpty()) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не выбрана папка для сохранения!"));
+        return QPair<bool, QString>(false, tr("Не выбрана папка для сохранения"));
+    }
+
+    QString filePath = directory + "/" + fileName;
+
+    // Вызываем соответствующую функцию для сохранения
+    return saveFunction(filePath);
+}
+
 

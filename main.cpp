@@ -13,6 +13,7 @@
 #include "widgets/healthcheckform.h"
 #include "core/wsmanager.h"
 #include "widgets/msglogwidget.h"
+#include "xlsxdocument.h"
 
 
 int main(int argc, char *argv[])
