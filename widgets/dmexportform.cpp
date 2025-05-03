@@ -20,11 +20,11 @@ DMExportForm::DMExportForm(QWidget *parent)
     ui->dte_date->setGetGtinCallback(std::bind(&GtinNamesComboBox::getGtin, ui->cb_products));
     httpManager = new HttpManager(this);
     initProductTable();
-    productModel->addRow("code", "name");
-    productModel->addRow("code1", "name1");
-    productModel->addRow("code2", "name2");
-    productModel->addRow("code3", "name3");
-    productModel->addRow("code4", "name4");
+    // productModel->addRow("code", "name");
+    // productModel->addRow("code1", "name1");
+    // productModel->addRow("code2", "name2");
+    // productModel->addRow("code3", "name3");
+    // productModel->addRow("code4", "name4");
 }
 
 DMExportForm::~DMExportForm()
