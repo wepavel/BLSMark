@@ -57,6 +57,7 @@ private:
     void wsRequestStatesData();
 
     QString getName(QString name);
+
     QMap<QString, QString> devNamesMap = {
         {"printer","Принтер"},
         {"plc","Аппликатор"},
@@ -81,8 +82,11 @@ private:
     QMap<QString, bool> devWorksMap;
 
     void initMaps();
+
+    /// ___________________ОБРАБОТЧИКИ СОБЫТИЙ WEBSOCKET_____________________
     void processHeartbeatEvent(const QJsonObject& data);
     void processApplicationStateEvent(const QJsonObject& data);
+    void processMessageBoxEvent(const QJsonObject& data);
 };
 
 #endif // WSMANAGER_H

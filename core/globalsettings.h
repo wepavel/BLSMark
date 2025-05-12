@@ -35,6 +35,7 @@ public:
     void setBackendServicePort(const int port);
 
     QString getAppPath() const;
+    QString getClientId();
 
 
 signals:
@@ -54,6 +55,7 @@ private:
     bool checkRightPath(const QString& path);
 
     void initializeSettings();
+    static QString generateClientId();
 
     //---Vars
     QSettings* m_settings;
@@ -65,6 +67,7 @@ private:
     QString m_gsWin64Path;
     QString m_backendServiceIP;
     int m_backendServicePort;
+    QString client_ws_id = "";
 };
 
 // Глобальный макрос для удобного доступа

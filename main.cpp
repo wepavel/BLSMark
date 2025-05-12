@@ -14,6 +14,7 @@
 #include "core/wsmanager.h"
 #include "widgets/msglogwidget.h"
 #include "xlsxdocument.h"
+using namespace QXlsx;
 
 
 int main(int argc, char *argv[])
