@@ -1,4 +1,6 @@
 #include "globalsettings.h"
+#include "qdatetime.h"
+#include "qrandom.h"
 #include <QApplication>
 #include <QFile>
 
@@ -163,9 +165,41 @@ void GlobalSettings::initializeSettings()
     m_backendServicePort = getValue("CONNECTIONS", "backend_service_port").toInt();
 }
 
+QString GlobalSettings::generateClientId()
+{
+    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+    const int length = 16;
+
+    QString randomString;
+    randomString.reserve(length);
+
+    QRandomGenerator* generator = QRandomGenerator::global();
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+
+    // Используем первые 8 символов из timestamp (в 16-ричном представлении)
+    randomString.append(QString::number(timestamp, 16).left(8));
+
+    // Дополняем оставшиеся 8 символов случайными символами
+    for (int i = 8; i < length; ++i) {
+        int index = generator->bounded(possibleCharacters.length());
+        QChar nextChar = possibleCharacters.at(index);
+        randomString.append(nextChar);
+    }
+
+    return randomString;
+}
+
 QString GlobalSettings::getAppPath() const
 {
     return app_path;
+}
+
+QString GlobalSettings::getClientId()
+{
+    if(this->client_ws_id.isEmpty()){
+        this->client_ws_id = generateClientId();
+    }
+    return this->client_ws_id;
 }
 
 

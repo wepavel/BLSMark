@@ -63,6 +63,18 @@ void MsgLogWidget::addMsg(const QString &msg, MsgType type)
         break;
     }
 
+    case MsgType::Success: {
+        QListWidgetItem* successItem = new QListWidgetItem(dateTime + " SUCCESS: " + msg);
+        successItem->setForeground(Qt::green); // Зеленый цвет для Успеха
+
+        QListWidgetItem* successItem1 = new QListWidgetItem(dateTime + " SUCCESS: " + msg);
+        successItem1->setForeground(Qt::green);  // Зеленый цвет для Успеха
+
+        ui->lw_info->addItem(successItem);
+        ui->lw_common->addItem(successItem1);
+        break;
+    }
+
     default:
         break;
     }
@@ -72,6 +84,11 @@ void MsgLogWidget::showWithOpenTab(const MsgType &type)
 {
     switch (type) {
     case MsgType::Info:
+    {
+        ui->tabWidget->setCurrentIndex(0);
+        break;
+    }
+    case MsgType::Success:
     {
         ui->tabWidget->setCurrentIndex(0);
         break;

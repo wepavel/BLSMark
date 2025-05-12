@@ -6,7 +6,8 @@
 enum MsgType{
     Error,
     Warning,
-    Info
+    Info,
+    Success
 };
 
 namespace Ui {

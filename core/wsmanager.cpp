@@ -2,7 +2,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QThread>
+#include <qapplication.h>
 #include "wsmanager.h"
+#include "qmessagebox.h"
 
 WsManager::WsManager(QObject *parent)
     : QObject{parent}
@@ -20,10 +22,12 @@ WsManager::WsManager(QObject *parent)
     connect(httpTimer, &QTimer::timeout, this, &WsManager::httpSendPingRequest);
     httpTimer->start();
 
+    //qDebug() << gSettings.getClientId() << gSettings.getClientId() << gSettings.getClientId();
     // websocket
-    m_websocketUrl = QString("ws://%1:%2/api/v1/streaming/ws-status/1")
+    m_websocketUrl = QString("ws://%1:%2/api/v1/streaming/ws-status/%3")
                          .arg(gSettings.getBackendServiceIP())
-                         .arg(gSettings.getBackendServicePort());
+                         .arg(gSettings.getBackendServicePort())
+                         .arg(gSettings.getClientId());
     m_webSocket = new QWebSocket();
     connect(m_webSocket, &QWebSocket::connected, this, &WsManager::on_ws_connected);
     connect(m_webSocket, &QWebSocket::disconnected, this, &WsManager::on_ws_disconnected);
@@ -40,6 +44,7 @@ WsManager::WsManager(QObject *parent)
 
     wsConnectToServer();
 }
+
 
 void WsManager::httpSendPingRequest()
 {
@@ -137,7 +142,8 @@ void WsManager::initMaps()
 
     eventsHandlerMap = {
         {"heartbeat", std::bind(&WsManager::processHeartbeatEvent, this, std::placeholders::_1)},
-        {"applicator_state", std::bind(&WsManager::processApplicationStateEvent, this, std::placeholders::_1)}
+        {"applicator_state", std::bind(&WsManager::processApplicationStateEvent, this, std::placeholders::_1)},
+        {"broadcast_messagebox", std::bind(&WsManager::processMessageBoxEvent, this, std::placeholders::_1)}
     };
 }
 
@@ -181,6 +187,55 @@ void WsManager::processHeartbeatEvent(const QJsonObject &data)
 void WsManager::processApplicationStateEvent(const QJsonObject &data)
 {
     emit sendApplicatorStateData(data);
+}
+
+void WsManager::processMessageBoxEvent(const QJsonObject &data)
+{
+    QString message = data["message"].toString();
+    QString notificationType = data["notification_type"].toString();
+
+    QMessageBox msgBox;
+    QString windowTitle = "";
+
+    if (notificationType == "WARNING"){
+        msgBox.setIcon(QMessageBox::Warning);
+        windowTitle = "Внимание!";
+        messagerInst.addMessage(QString("Сообщение от сервера: %1").arg(message), Warning);
+    }
+
+    if (notificationType == "CRITICAL"){
+        msgBox.setIcon(QMessageBox::Critical);
+        windowTitle = "Критическая ошибка!";
+        messagerInst.addMessage(QString("Сообщение от сервера: %1").arg(message), Error);
+    }
+
+    if (notificationType == "SUCCESS"){
+        msgBox.setIconPixmap(QIcon(":/images/img/success.svg").pixmap(32, 32));
+        windowTitle = "Успех!";
+        messagerInst.addMessage(QString("Сообщение от сервера: %1").arg(message), Success);
+    }
+
+    if (notificationType == "INFO"){
+        msgBox.setIcon(QMessageBox::Information);
+        windowTitle = "Информация";
+        messagerInst.addMessage(QString("Сообщение от сервера: %1").arg(message), Info);
+    }
+
+    msgBox.setWindowTitle(windowTitle);
+
+    // Установка родителя (если есть активное окно, QMessageBox появится в его центре)
+    QWidget* parentWidget = qobject_cast<QWidget*>(QApplication::activeWindow());
+    if (parentWidget) {
+        msgBox.setParent(parentWidget);
+        msgBox.setWindowModality(Qt::WindowModal); // Блокирует только родительское окно
+    }
+
+    msgBox.setText(QString("Сообщение от сервера: %1").arg(message));
+
+    QPushButton *okButton = msgBox.addButton("Ок", QMessageBox::AcceptRole);
+    msgBox.setDefaultButton(okButton);
+
+    msgBox.exec();
 }
 
 void WsManager::on_ws_connected()
