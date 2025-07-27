@@ -23,6 +23,7 @@ private:
     };
 
     QVector<RowData> m_data;
+    QString escapeCsvField(const QString &field);
 
 public:
     int rowCount(const QModelIndex &parent) const;

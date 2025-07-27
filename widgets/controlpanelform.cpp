@@ -136,20 +136,20 @@ void ControlPanelForm::on_pb_start_clicked()
         return;
     }
 
-    bool hasUnavailable = !this->healthForm->getNotAvailUnits().isEmpty();
-    bool hasNotWorking = !this->healthForm->getNotWorkingUnits().isEmpty();
+    // bool hasUnavailable = !this->healthForm->getNotAvailUnits().isEmpty();
+    // bool hasNotWorking = !this->healthForm->getNotWorkingUnits().isEmpty();
 
-    if (hasUnavailable || hasNotWorking) {
-        QStringList issues;
+    // if (hasUnavailable || hasNotWorking) {
+    //     QStringList issues;
 
-        if (hasUnavailable)
-            issues << "Есть недоступные устройства:\n• " + this->healthForm->getNotAvailUnits().values().join("\n• ");
-        if (hasNotWorking)
-            issues << "Есть неработающие устройства:\n• " + this->healthForm->getNotWorkingUnits().values().join("\n• ");
+    //     if (hasUnavailable)
+    //         issues << "Есть недоступные устройства:\n• " + this->healthForm->getNotAvailUnits().values().join("\n• ");
+    //     if (hasNotWorking)
+    //         issues << "Есть неработающие устройства:\n• " + this->healthForm->getNotWorkingUnits().values().join("\n• ");
 
-        QMessageBox::critical(this, "Ошибка", "Невозможно начать печать!\n\n" + issues.join("\n\n"));
-        return;
-    }
+    //     QMessageBox::critical(this, "Ошибка", "Невозможно начать печать!\n\n" + issues.join("\n\n"));
+    //     return;
+    // }
 
     ui->pb_start->setEnabled(false);
     ui->pb_stop->setEnabled(false);
@@ -167,7 +167,8 @@ void ControlPanelForm::on_pb_start_clicked()
             }
             messagerInst.addMessage(QString("Не удалось выполнить запрос code-process/set-system-working/! Код ответа: %1\nСообщение: %2")
                                         .arg(statusCode)
-                                        .arg(message), Error, true);
+                                        .arg(message), Warning, false);
+            QMessageBox::warning(this, "Ошибка", "Невозможно начать печать!\nНекоторые из устройств недоступны!");
             ui->pb_start->setEnabled(true);
             ui->pb_stop->setEnabled(true);
         } else if (statusCode==-1) {

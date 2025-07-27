@@ -25,6 +25,9 @@ DMExportForm::DMExportForm(QWidget *parent)
     // productModel->addRow("code2", "name2");
     // productModel->addRow("code3", "name3");
     // productModel->addRow("code4", "name4");
+
+    ui->pb_load_in_csv->setVisible(false);
+    ui->pb_load_in_xlsx->setVisible(false);
 }
 
 DMExportForm::~DMExportForm()
@@ -168,7 +171,7 @@ void DMExportForm::exportDmCodes(const QJsonArray& dmCodesArray)
 
         if (result.isEmpty())
         {
-            QMessageBox::information(this, tr("Успешный экспорт DM-кодов"), tr("DM-коды были успешно экспортированы!"));
+            // QMessageBox::information(this, tr("Успешный экспорт DM-кодов"), tr("DM-коды были успешно экспортированы!"));
             messagerInst.addMessage(tr("Успешный экспорт DM-кодов. DM-коды были успешно экспортированы!"), Info);
         } else {
             for (const QJsonValue &value : qAsConst(result)) {
@@ -217,7 +220,78 @@ void DMExportForm::on_pb_load_in_xlsx_clicked()
     }
 }
 
+void DMExportForm::on_pb_load_in_xlsx_csv_clicked()
+{
+    // Проверка наличия данных для выгрузки
+    if (productModel->isEmpty()) {
+        QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
+        return;
+    }
+
+    QJsonArray jsonArray = productModel->getDmCodesArray();
+
+    // Формируем базовое имя файла
+    QString baseFileName = choosenDate + "_" + choosenName.trimmed().replace(" ", "_");
+
+    // Открываем диалог выбора папки один раз
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Выберите папку для сохранения файлов ") + baseFileName, QDir::homePath());
+    if (directory.isEmpty()) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не выбрана папка для сохранения!"));
+        return;
+    }
+
+    // Формирование полных путей для обоих форматов
+    QString filePathXlsx = directory + "/" + baseFileName + ".xlsx";
+    QString filePathCsv  = directory + "/" + baseFileName + ".csv";
+
+    // Сохраняем данные в XLSX
+    auto res_xlsx = productModel->saveToXlsx(filePathXlsx);
+    if (!res_xlsx.first) {
+        QMessageBox::critical(this, tr("Ошибка сохранения XLSX"), res_xlsx.second);
+        return;
+    }
+
+    // Сохраняем данные в CSV
+    auto res_csv = productModel->saveToCsv(filePathCsv);
+    if (!res_csv.first) {
+        QMessageBox::critical(this, tr("Ошибка сохранения CSV"), res_csv.second);
+        return;
+    }
+
+    // Если оба файла сохранены успешно, вызываем общую функцию экспорта
+    exportDmCodes(jsonArray);
+
+    QString fileNameXlsx = QFileInfo(filePathXlsx).fileName();
+    QString fileNameCsv  = QFileInfo(filePathCsv).fileName();
+    QString message = tr("Файлы успешно сохранены:\n%1,\n%2").arg(fileNameXlsx).arg(fileNameCsv);
+    QMessageBox::information(this, tr("Успех"), message);
+}
+
 QPair<bool, QString> DMExportForm::saveFile(const QString &extension, const std::function<QPair<bool, QString>(const QString&)> &saveFunction)
+{
+    if (productModel->isEmpty()) {
+        QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
+        return QPair<bool, QString>(false, tr("Отсутсвуют данные для выгрузки"));
+    }
+
+    // Открываем диалог выбора папки
+    QString fileName = choosenDate + "_" + choosenName.trimmed().replace(" ", "_") + "." + extension;
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Выберите папку для сохранения файла ") + fileName, QDir::homePath());
+
+    // Проверяем, выбрал ли пользователь папку
+    if (directory.isEmpty()) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не выбрана папка для сохранения!"));
+        return QPair<bool, QString>(false, tr("Не выбрана папка для сохранения"));
+    }
+
+    QString filePath = directory + "/" + fileName;
+
+    // Вызываем соответствующую функцию для сохранения
+    return saveFunction(filePath);
+}
+
+
+QPair<bool, QString> DMExportForm::saveFiles(const QString &extension, const std::function<QPair<bool, QString>(const QString&)> &saveFunction)
 {
     if (productModel->isEmpty()) {
         QMessageBox::warning(this, tr("Внимание"), tr("Отсутсвуют данные для выгрузки в таблице!"));
