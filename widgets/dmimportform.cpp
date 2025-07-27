@@ -7,6 +7,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QInputDialog>
+#include <QTextCodec>
 #include "widgets/dminfoform.h"
 // #include "sqlmodels/dmcodemodel.h"
 #include <core/messager.h>
@@ -29,26 +30,8 @@ DMImportForm::DMImportForm(QWidget *parent)
     connect(importModel, &DMImportModel::dataHasBeenCleared,
             [this](){ui->pb_load_in_db->setEnabled(true);});
 
-    // connect(httpManager, &HttpManager::requestError, [&](const QString& err){
-    //     QMessageBox::critical(this, "Ошибка с БД", err);
-    // });
-
     setAcceptDrops(true);
     setupImportTable();
-
-    // if (db.createTable<DMCodeModel>()) {
-    //     qDebug() << "User table created successfully";
-    // } else {
-    //     qDebug() << "Failed to create DMCodeModel table";
-    // }
-
-    // m_db->setDatabaseName(gSettings.getAppPath()+"/mydb.sqlite");
-    // m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
-    // m_db->setDatabaseName(gSettings.getAppPath() + "/mydb.sqlite");
-
-    // if (!m_db->open()) {
-    //     qDebug() << "Error opening database:" << m_db->lastError().text();
-    // }
 }
 
 DMImportForm::~DMImportForm()
@@ -125,6 +108,7 @@ void DMImportForm::init_process()
 void DMImportForm::recieve_dm_data(QString row)
 {
     // qDebug() << row;
+
     row.replace("Payload: ", "");
     QStringList cols = row.split("|");
 
@@ -145,7 +129,6 @@ void DMImportForm::recieve_dm_data(QString row)
     }
 
     m_doubleProgressDialog->setFileProgress(doc_progress);
-
     m_doubleProgressDialog->setFilesProgress(docs_progress);
 }
 

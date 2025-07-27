@@ -424,7 +424,7 @@ QScrollBar::sub-line:vertical:on {
 
 QScrollBar::add-line:vertical:hover,
 QScrollBar::add-line:vertical:on {
-    border-image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    border-image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
     height: 10px;
     width: 10px;
     subcontrol-position: bottom;
@@ -638,7 +638,7 @@ QComboBox::down-arrow {
 QComboBox::down-arrow:on,
 QComboBox::down-arrow:hover,
 QComboBox::down-arrow:focus {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
 }
 
 QAbstractSpinBox {
@@ -683,7 +683,7 @@ QAbstractSpinBox::down-arrow:off {
 }
 
 QAbstractSpinBox::down-arrow:hover {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
 }
 
 QLabel {
@@ -1044,7 +1044,7 @@ QToolButton::menu-button:pressed {
 /* the subcontrol below is used only in the InstantPopup or DelayedPopup mode */
 
 QToolButton::menu-indicator {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
     top: -7px;
     left: -2px;
     /* shift it a bit */
@@ -1063,7 +1063,7 @@ QToolButton::menu-button {
 }
 
 QToolButton::menu-arrow {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
 }
 
 QToolButton::menu-arrow:open {
@@ -1140,7 +1140,7 @@ QHeaderView::section::horizontal {
 /* style the sort indicator */
 
 QHeaderView::down-arrow {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrowdown_arrow_disabled.png);
 }
 
 QHeaderView::up-arrow {
@@ -1252,7 +1252,7 @@ QDateEdit::down-arrow {
 QDateEdit::down-arrow:on,
 QDateEdit::down-arrow:hover,
 QDateEdit::down-arrow:focus {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
 }
 
 /* Стили для QDateTimeEdit */
@@ -1296,7 +1296,7 @@ QDateTimeEdit::down-arrow {
 QDateTimeEdit::down-arrow:on,
 QDateTimeEdit::down-arrow:hover,
 QDateTimeEdit::down-arrow:focus {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
 }
 
 QDateTimeEdit::up-arrow,
@@ -1336,7 +1336,7 @@ QCalendarWidget QToolButton::menu-indicator {
 
 QCalendarWidget QToolButton::menu-indicator:hover,
 QCalendarWidget QToolButton::menu-indicator:pressed {
-    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow.png);
+    image: url(:/qss_icons/styles/qdarkstyle/rc/down_arrow_disabled.png);
 }
 
 QCalendarWidget QToolButton#qt_calendar_prevmonth {

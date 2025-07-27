@@ -96,6 +96,24 @@ void ExportProductsModel::addRow(const QString &code,
     endInsertRows();
 }
 
+QString ExportProductsModel::escapeCsvField(const QString &field)
+{
+    // Определяем, содержит ли поле один из "опасных" символов
+    bool needQuotes = field.contains(",")   || field.contains(";")   ||
+                      field.contains("\t")  || field.contains("\n")  ||
+                      field.contains("\"");
+
+    // Экранируем двойные кавычки (заменяем " на "")
+    QString escaped = field;
+    escaped.replace("\"", "\"\"");
+
+    // Если встречались спецсимволы – обрамляем двойными кавычками
+    if (needQuotes) {
+        return "\"" + escaped + "\"";
+    }
+    return escaped;
+}
+
 QPair<bool, QString> ExportProductsModel::saveToCsv(const QString &fullPath)
 {
     QFile file(fullPath);
@@ -107,7 +125,15 @@ QPair<bool, QString> ExportProductsModel::saveToCsv(const QString &fullPath)
     QTextStream out(&file);
 
     for (const RowData &row : m_data) {
-        out <<  DMInfoForm::exportDataMatrix(row.code) << "\n";
+        // out <<  DMInfoForm::exportDataMatrix(row.code) << "\n";
+        // // Предполагаем, что row.code содержит список ячеек строки
+        // QStringList escapedFields;
+        // for (const QString &cell : row.code) {
+        //     escapedFields.append(escapeCsvField(cell));
+        // }
+        // Можно использовать разделитель, который соответствует вашим ожиданиям (например, ";")
+
+        out <<  DMInfoForm::exportDataMatrix(escapeCsvField(row.code)) << "\n";
     }
 
     file.close();
@@ -127,7 +153,7 @@ QPair<bool, QString> ExportProductsModel::saveToXlsx(const QString &fullPath)
         QString code = DMInfoForm::exportDataMatrix(row.code);
 
         // Записываем в ячейку (нумерация строк и столбцов с 1)
-        xlsx.write(rowIndex + 1, 1, code);  // Записываем в ячейку (rowIndex + 1, 1) (столбец A)
+        xlsx.write(rowIndex + 1, 1, code.split(QChar(29))[0]);  // Записываем в ячейку (rowIndex + 1, 1) (столбец A)
     }
 
     // Сохраняем файл

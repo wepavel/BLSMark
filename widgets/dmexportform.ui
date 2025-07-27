@@ -139,6 +139,13 @@ QPushButton:hover {
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pb_load_in_xlsx_csv">
+       <property name="text">
+        <string>Вывести таблицу в файлы</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
